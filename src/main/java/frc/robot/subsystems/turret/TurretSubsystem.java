@@ -26,13 +26,16 @@ import com.fasterxml.jackson.core.format.MatchStrength;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.SlewRateLimiter;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.AngleUnit;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
@@ -79,6 +82,8 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
 
   private Mechanism2d turretMech;
   private MechanismLigament2d turretLigament;
+  private Field2d fieldViz;
+  private Translation2d currentTarget = null;
 
   private State setpoint = new State();
 
@@ -93,12 +98,26 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
 	public TurretSubsystem() {
 		super(TurretConstants.getMotorIO(), "Turret Motor");
     initMechanism();
+    // Set default command to point at field center (or use hubCenter for the actual goal)
+    // Example: Point at center of field
+    Translation2d fieldCenter = new Translation2d(
+      frc.robot.FieldConstants.fieldLength / 2.0,
+      frc.robot.FieldConstants.fieldWidth / 2.0
+    );
+   //setDefaultCommand(pointAtFieldPosition(fieldCenter));
+
+    // Alternative: Point at the hub/speaker
+    setDefaultCommand(pointAtFieldPosition(frc.robot.FieldConstants.hubCenter));
 	}
 
   private void initMechanism(){
     turretMech = new Mechanism2d(3, 2);
     MechanismRoot2d turretRoot = turretMech.getRoot("root", 1.5, 0.1);
     turretLigament = turretRoot.append(new MechanismLigament2d("Turret", 1, 0));
+
+    // Initialize field visualization for AdvantageScope
+    fieldViz = new Field2d();
+    SmartDashboard.putData("Turret Field Viz", fieldViz);
   }
 
    public void periodic() {
@@ -168,24 +187,34 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
 
       this.applySetpoint(Setpoint.withMotionMagicSetpoint(Radians.of(setpoint.position)));
       
-      /* Logger.recordOutput("Turret/GoalPositionRad", bestAngle);
-      Logger.recordOutput("Turret/GoalVelocityRadPerSec", robotRelativeGoalVelocity);
-      Logger.recordOutput("Turret/SetpointPositionRad", setpoint);
-      Logger.recordOutput("Turret/SetpointVelocityRadPerSec", robotRelativeGoalVelocity);*/
+      
       SmartDashboard.putNumber("Turret/GoalPositionRad", bestAngle);
       SmartDashboard.putNumber("Turret/SetpointPositionRad", setpoint.position);
-     /* outputs.mode = TurretIOOutputMode.CLOSED_LOOP;
-      outputs.position = setpoint - turretOffset;
-      outputs.velocity = robotRelativeGoalVelocity;
-      outputs.kP = kP.get();
-      outputs.kD = kD.get();*/
-
-     // turretLigament.setAngle(robotRelativeGoalAngle);
+     
     }
 
     // Always update the turret mechanism visual (even when disabled)
-    turretLigament.setAngle(Units.radiansToDegrees(getTurretAngle()));
+    double robotRelativeAngleDeg = Units.radiansToDegrees(getTurretAngle());
+    turretLigament.setAngle(robotRelativeAngleDeg);
     SmartDashboard.putData("Turret Mech", turretMech);
+
+    // Calculate and display field-relative angle
+    Pose2d robotPose = DriveSubsystem.mInstance.getState().Pose;
+    Rotation2d robotAngle = robotPose.getRotation();
+    double fieldRelativeAngleDeg = robotAngle.getDegrees() + robotRelativeAngleDeg;
+    SmartDashboard.putNumber("Turret/RobotRelativeAngleDeg", robotRelativeAngleDeg);
+    SmartDashboard.putNumber("Turret/FieldRelativeAngleDeg", fieldRelativeAngleDeg);
+
+    // Update field visualization for AdvantageScope
+    // Create a pose at the robot's position with the turret's field-relative angle
+    Rotation2d turretFieldAngle = Rotation2d.fromDegrees(fieldRelativeAngleDeg);
+    Pose2d turretAimPose = new Pose2d(robotPose.getTranslation(), turretFieldAngle);
+    fieldViz.setRobotPose(turretAimPose);
+
+    // Show the target position if using pointAtFieldPosition
+    if (currentTarget != null) {
+      fieldViz.getObject("Target").setPose(new Pose2d(currentTarget, new Rotation2d()));
+    }
 
     SmartDashboard.putString("State", shootState.toString());
 
@@ -238,6 +267,42 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
           setFieldRelativeTarget(angle.get(), velocity.getAsDouble());
           setShootState(ShootState.TRACKING);
         });
+  }
+
+  /**
+   * Command to point the turret at a specific field position.
+   *
+   * @param targetPosition Field position to aim at (in meters)
+   * @return Command that continuously tracks the target position
+   */
+  public Command pointAtFieldPosition(Translation2d targetPosition) {
+    return run(() -> {
+      // Store target for visualization
+      currentTarget = targetPosition;
+
+      // Get robot's current position on the field
+      Pose2d robotPose = DriveSubsystem.mInstance.getState().Pose;
+      Translation2d robotPosition = robotPose.getTranslation();
+
+      // Calculate vector from robot to target
+      Translation2d toTarget = targetPosition.minus(robotPosition);
+
+      // Calculate angle to target (in field coordinates)
+      Rotation2d angleToTarget = new Rotation2d(toTarget.getX(), toTarget.getY());
+
+      // Calculate angular velocity if target or robot is moving (0 for stationary target)
+      double angularVelocity = 0.0;
+
+      // Set the turret goal
+      setFieldRelativeTarget(angleToTarget, angularVelocity);
+      setShootState(ShootState.ACTIVE_SHOOTING);
+
+      // Debug telemetry
+      SmartDashboard.putNumber("Turret/TargetX", targetPosition.getX());
+      SmartDashboard.putNumber("Turret/TargetY", targetPosition.getY());
+      SmartDashboard.putNumber("Turret/AngleToTargetDeg", angleToTarget.getDegrees());
+      SmartDashboard.putNumber("Turret/DistanceToTarget", toTarget.getNorm());
+    });
   }
 
   public Command zeroCommand() {
