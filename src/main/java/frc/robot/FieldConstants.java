@@ -12,6 +12,7 @@ package frc.robot;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Filesystem;
@@ -34,6 +35,10 @@ public class FieldConstants {
   public static final Translation2d hubCenter = new Translation2d(4.6256194, 4.0346376);
 
  
+   public static final AprilTagFieldLayout fieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded);
+       
+    public static final double startingLineX = 4.040481;
+
   
   public enum AprilTagLayoutType {
 

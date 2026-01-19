@@ -91,6 +91,10 @@ public class MotorSubsystem<IO extends MotorIO> extends SubsystemBase {
 		return io.getSupplyCurrent();
 	}
 
+	public void setCurrentPosition(Angle position) {
+    	io.setCurrentPosition(position);
+	}
+
 	/**
 	 * Gets the last read output voltage of the subsystem's main motor.
 	 *

@@ -4,15 +4,28 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.MotorArrangementValue;
 
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Voltage;
+import frc.robot.lib.io.MotorIO;
 import frc.robot.lib.io.MotorIOTalonFX;
+import frc.robot.lib.io.MotorIOSim;
 import frc.robot.Ports;
 import frc.robot.Robot;
 
 
 public class TurretConstants {
 	
+	public static final int id = 0;
+	public static final double anglePerCount = 360; //TODO find this
+	public static final Translation2d turretOffset = new Translation2d(0, 0);
+
+	public static final double toleranceDeg = 1;
+	public static final double debounceTime = 0.15;
+
+	public static final double maxLimit = 90;
+	public static final double minLimit = -90;
+
 
 	public static TalonFXConfiguration getFXConfig() {
 		TalonFXConfiguration config = new TalonFXConfiguration();
@@ -25,9 +38,16 @@ public class TurretConstants {
 		config.CurrentLimits.SupplyCurrentLowerLimit = 60.0;
 		config.CurrentLimits.SupplyCurrentLowerTime = 0.1;
 
+
+		config.MotionMagic.MotionMagicCruiseVelocity = 80; // rotations/sec at mechanism
+   		config.MotionMagic.MotionMagicAcceleration = 160; // rotations/sec² at mechanism
+    	config.MotionMagic.MotionMagicJerk = 1600; // rotations/sec³ at mechanism
+
+
 		config.Voltage.PeakForwardVoltage = 12.0;
 		config.Voltage.PeakReverseVoltage = -12.0;
 		
+		config.Feedback.SensorToMechanismRatio = 41.6667;
 		config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
 		return config;
@@ -43,10 +63,40 @@ public class TurretConstants {
 		return config;
 	}
 
-	public static MotorIOTalonFX getMotorIO() {
-		
-		return new MotorIOTalonFX(getIOConfig());
-		
+	public static MotorIO getMotorIO() {
+		if (Robot.isReal()) {
+			return new MotorIOTalonFX(getIOConfig());
+		} else {
+			return new MotorIOSim(getSimConfig());
+		}
+	}
+
+	public static MotorIOSim.MotorIOSimConfig getSimConfig() {
+		MotorIOSim.MotorIOSimConfig config = new MotorIOSim.MotorIOSimConfig();
+		config.unit = Units.Rotations;
+		config.time = Units.Minute;
+		config.gearing = 41.6667; // Must match SensorToMechanismRatio
+		config.jKgMetersSquared = 0.01; // Moment of inertia for turret (increased for stability)
+
+		// PID gains tuned for simulation (lower than real hardware but still responsive)
+		config.positionKp = 15.0;
+		config.positionKi = 0.0;
+		config.positionKd = 0.5;
+		config.positionTolerance = 0.02;
+
+		config.velocityKp = 0.5;
+		config.velocityKi = 0.0;
+		config.velocityKd = 0.0;
+
+		// Motion profile constraints (converted from rotations/sec to rad/s)
+		config.maxVelocity = 80 * 2 * Math.PI; // 80 rot/s = ~502 rad/s
+		config.maxAcceleration = 160 * 2 * Math.PI; // 160 rot/s² = ~1005 rad/s²
+
+		// Soft limits (in radians)
+		config.forwardSoftLimit = java.lang.Math.toRadians(90);
+		config.reverseSoftLimit = java.lang.Math.toRadians(-90);
+
+		return config;
 	}
 
 }

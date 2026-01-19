@@ -94,6 +94,8 @@ public class RobotContainer {
 		CommandScheduler.getInstance().setPeriod(0.02);
 
 		DriveSubsystem.mInstance.getDrivetrain().seedFieldCentric();
+
+		
 		
 		//autoChooser = AutoBuilder.buildAutoChooser();
 		/*if(SmartDashboard.containsKey("Auto Mode")) {
@@ -121,6 +123,7 @@ public class RobotContainer {
 	 * joysticks}.
 	 */
 	private void configureBindings() {
+
 
 		ControlSubsystem.mInstance.configureBindings();		
 	}

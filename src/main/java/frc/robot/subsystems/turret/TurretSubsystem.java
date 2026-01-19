@@ -4,9 +4,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.lib.LoggedTunableNumber;
-import frc.robot.lib.io.MotorIOTalonFX;
-import frc.robot.lib.io.MotorSubsystem;
+import frc.robot.lib.io.MotorIO;
 import frc.robot.lib.io.MotorIO.Setpoint;
+import frc.robot.lib.io.MotorSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.intake.IntakeConstants;
 import frc.robot.subsystems.intake.IntakeSubsystem;
@@ -14,6 +14,7 @@ import frc.robot.subsystems.turret.TurretSubsystem.ShootState;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 
 import java.util.function.DoubleSupplier;
@@ -37,7 +38,7 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-public class TurretSubsystem extends MotorSubsystem<MotorIOTalonFX> {
+public class TurretSubsystem extends MotorSubsystem<MotorIO> {
     
   private static final double minAngle = Units.degreesToRadians(-210.0);
   private static final double maxAngle = Units.degreesToRadians(210.0);
@@ -58,6 +59,7 @@ public class TurretSubsystem extends MotorSubsystem<MotorIOTalonFX> {
 
   static {
         maxVelocity.initDefault(12.0);
+        maxAcceleration.initDefault(24.0);
         kP.initDefault(2000.0);
         kD.initDefault(50.0);
         kA.initDefault(0.0);
@@ -71,7 +73,7 @@ public class TurretSubsystem extends MotorSubsystem<MotorIOTalonFX> {
 
   TrapezoidProfile profile = new TrapezoidProfile(new TrapezoidProfile.Constraints(maxVelocity.get(), maxAcceleration.get()));
   private double turretOffset;
-  private boolean turretZeroed = false;
+  private boolean turretZeroed = true;
 
   private ShootState shootState = ShootState.ACTIVE_SHOOTING;
 
@@ -100,26 +102,18 @@ public class TurretSubsystem extends MotorSubsystem<MotorIOTalonFX> {
   }
 
    public void periodic() {
+        super.periodic(); // Critical: Updates motor inputs from simulation or hardware
 
-        // Stop when disabled
-        if (DriverStation.isDisabled()) {
-        //outputs.mode = TurretIOOutputMode.BRAKE;
-
-           // if (coastOverride.getAsBoolean()) {
-                //outputs.mode = TurretIOOutputMode.COAST;
-           // }
-        }
+        SmartDashboard.putBoolean("Turret/ControlLoopActive", DriverStation.isEnabled() && turretZeroed);
+        SmartDashboard.putNumber("Turret/CurrentPositionDeg", Units.radiansToDegrees(getTurretAngle()));
+        SmartDashboard.putNumber("Turret/MaxVelocity", maxVelocity.get());
+        SmartDashboard.putNumber("Turret/MaxAcceleration", maxAcceleration.get());
 
         // Update profile constraints
-        if (maxVelocity.hasChanged(hashCode())) {
+        if (maxVelocity.hasChanged(hashCode()) || maxAcceleration.hasChanged(hashCode())) {
             profile = new TrapezoidProfile(new TrapezoidProfile.Constraints(maxVelocity.get(), maxAcceleration.get()));
         }
 
-        // Reset profile when disabled
-        if (DriverStation.isDisabled()) {
-       // profile.reset(getPosition());
-        //lastGoalAngle = getPosition();
-        }
 
 
         if(DriverStation.isEnabled() && turretZeroed){
@@ -129,6 +123,11 @@ public class TurretSubsystem extends MotorSubsystem<MotorIOTalonFX> {
 
           Rotation2d robotRelativeGoalAngle = goalAngle.minus(robotAngle);
           double robotRelativeGoalVelocity = goalVelocity - robotAngularVelocity;
+
+          // Debug telemetry
+          SmartDashboard.putNumber("Turret/RobotAngleDeg", robotAngle.getDegrees());
+          SmartDashboard.putNumber("Turret/GoalAngleDeg", goalAngle.getDegrees());
+          SmartDashboard.putNumber("Turret/RobotAngularVelRadPerSec", robotAngularVelocity);
 
           boolean hasBestAngle = false;
           double bestAngle = 0;
@@ -163,6 +162,10 @@ public class TurretSubsystem extends MotorSubsystem<MotorIOTalonFX> {
 
       setpoint = profile.calculate(Constants.loopPeriodSecs, setpoint, goalState);
 
+      SmartDashboard.putNumber("Turret/BestAngleRad", bestAngle);
+      SmartDashboard.putNumber("Turret/SetpointPositionRad", setpoint.position);
+      SmartDashboard.putNumber("Turret/SetpointVelocityRadPerSec", setpoint.velocity);
+
       this.applySetpoint(Setpoint.withMotionMagicSetpoint(Radians.of(setpoint.position)));
       
       /* Logger.recordOutput("Turret/GoalPositionRad", bestAngle);
@@ -178,9 +181,10 @@ public class TurretSubsystem extends MotorSubsystem<MotorIOTalonFX> {
       outputs.kD = kD.get();*/
 
      // turretLigament.setAngle(robotRelativeGoalAngle);
-     turretLigament.setAngle(new Rotation2d(getTurretAngle()));
     }
-    
+
+    // Always update the turret mechanism visual (even when disabled)
+    turretLigament.setAngle(Units.radiansToDegrees(getTurretAngle()));
     SmartDashboard.putData("Turret Mech", turretMech);
 
     SmartDashboard.putString("State", shootState.toString());
@@ -194,16 +198,16 @@ public class TurretSubsystem extends MotorSubsystem<MotorIOTalonFX> {
 
   private void zero() {
     turretZeroed = true;
-    turretOffset = -getPosition().in(Radians); //-inputs.positionRads;
+    turretOffset = 0.0; 
+    setCurrentPosition(Radians.of(0.0));
   }
 
   public double getTurretAngle() {
-    return  turretOffset + getPosition().in(Radians); //return inputs.positionRads + turretOffset;
+    return  turretOffset + getPosition().in(Radians); 
   }
 
-  @AutoLogOutput(key = "Turret/MeasuredVelocityRadPerSec")
   public double getTurretVelocity() {
-    return getVelocity().in(RadiansPerSecond); //return inputs.velocityRadsPerSec;
+    return getVelocity().in(RadiansPerSecond); 
   }
 
   public void setShootState(ShootState state){
@@ -239,6 +243,7 @@ public class TurretSubsystem extends MotorSubsystem<MotorIOTalonFX> {
   public Command zeroCommand() {
     return runOnce(this::zero).ignoringDisable(true);
   }
+
 
 
 }
