@@ -33,6 +33,7 @@ public class MotorIOSim extends MotorIO {
 	private double appliedVoltage = 0.0;
 	private boolean isInBrakeMode = true;
 	private boolean softLimitsEnabled = false;
+	private boolean inverted = false;
 	private double forwardSoftLimit = Double.POSITIVE_INFINITY;
 	private double reverseSoftLimit = Double.NEGATIVE_INFINITY;
 
@@ -65,6 +66,7 @@ public class MotorIOSim extends MotorIO {
 
 		this.forwardSoftLimit = config.forwardSoftLimit;
 		this.reverseSoftLimit = config.reverseSoftLimit;
+		this.inverted = config.inverted;
 
 		positionController.setTolerance(config.positionTolerance);
 	}
@@ -81,7 +83,7 @@ public class MotorIOSim extends MotorIO {
 			if (Math.abs(currentVelocity) < 0.1) {
 				brakeVoltage = 0;
 			}
-			motorSim.setInputVoltage(brakeVoltage);
+			applyVoltageToSim(brakeVoltage);
 		}
 
 		// Update inputs from simulation
@@ -138,23 +140,23 @@ public class MotorIOSim extends MotorIO {
 			if (Math.abs(currentVelocity) < 0.1) {
 				brakeVoltage = 0;
 			}
-			motorSim.setInputVoltage(brakeVoltage);
+			applyVoltageToSim(brakeVoltage);
 		} else {
-			motorSim.setInputVoltage(0.0);
+			applyVoltageToSim(0.0);
 		}
 	}
 
 	@Override
 	protected void setCoastSetpoint() {
 		appliedVoltage = 0.0;
-		motorSim.setInputVoltage(0.0);
+		applyVoltageToSim(0.0);
 	}
 
 	@Override
 	protected void setVoltageSetpoint(Voltage voltage) {
 		appliedVoltage = voltage.in(Units.Volts);
 		appliedVoltage = clampVoltageToLimits(appliedVoltage);
-		motorSim.setInputVoltage(appliedVoltage);
+		applyVoltageToSim(appliedVoltage);
 	}
 
 	@Override
@@ -196,7 +198,7 @@ public class MotorIOSim extends MotorIO {
 		SmartDashboard.putNumber("Sim/Goal", goalPositionRadians);
 		SmartDashboard.putNumber("Sim/PositionError", positionError);
 
-		motorSim.setInputVoltage(appliedVoltage);
+		applyVoltageToSim(appliedVoltage);
 	}
 
 	@Override
@@ -206,7 +208,7 @@ public class MotorIOSim extends MotorIO {
 
 		appliedVoltage = velocityController.calculate(currentVelocity, goalVelocityRadPerSec);
 		appliedVoltage = Math.max(-12.0, Math.min(12.0, appliedVoltage));
-		motorSim.setInputVoltage(appliedVoltage);
+		applyVoltageToSim(appliedVoltage);
 	}
 
 	@Override
@@ -214,7 +216,7 @@ public class MotorIOSim extends MotorIO {
 		double percentValue = percent.in(Units.Percent) / 100.0;
 		appliedVoltage = percentValue * 12.0;
 		appliedVoltage = clampVoltageToLimits(appliedVoltage);
-		motorSim.setInputVoltage(appliedVoltage);
+		applyVoltageToSim(appliedVoltage);
 	}
 
 	@Override
@@ -225,7 +227,17 @@ public class MotorIOSim extends MotorIO {
 		double currentPosition = motorSim.getAngularPositionRad();
 		appliedVoltage = positionController.calculate(currentPosition, goalPositionRadians);
 		appliedVoltage = Math.max(-12.0, Math.min(12.0, appliedVoltage));
-		motorSim.setInputVoltage(appliedVoltage);
+		applyVoltageToSim(appliedVoltage);
+	}
+
+	/**
+	 * Applies voltage to the motor sim with inversion if needed.
+	 *
+	 * @param voltage Voltage to apply
+	 */
+	private void applyVoltageToSim(double voltage) {
+		double finalVoltage = inverted ? -voltage : voltage;
+		motorSim.setInputVoltage(finalVoltage);
 	}
 
 	/**
@@ -274,6 +286,7 @@ public class MotorIOSim extends MotorIO {
 		public DCMotor motor = DCMotor.getFalcon500(1);
 		public double gearing = 1.0;
 		public double jKgMetersSquared = 0.001;
+		public boolean inverted = false;
 
 		// PID gains for position control
 		public double positionKp = 10.0;

@@ -77,6 +77,7 @@ public class TurretConstants {
 		config.time = Units.Minute;
 		config.gearing = 41.6667; // Must match SensorToMechanismRatio
 		config.jKgMetersSquared = 0.01; // Moment of inertia for turret (increased for stability)
+		config.inverted = true; // Invert motor direction to match desired behavior
 
 		// PID gains tuned for simulation (lower than real hardware but still responsive)
 		config.positionKp = 15.0;
