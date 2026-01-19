@@ -201,6 +201,7 @@ public class MotorIOTalonFX extends MotorIO {
 	 *
 	 * @param config Configuration to create MotorIOTalonFX from.
 	 */
+	@SuppressWarnings("removal") // TalonFX constructor deprecated in Phoenix 6 but is still the correct API
 	public MotorIOTalonFX(MotorIOTalonFXConfig config) {
 		super(config.unit, config.time, config.followerIDs.length);
 		requestGetter = config.requestGetter;
@@ -208,10 +209,12 @@ public class MotorIOTalonFX extends MotorIO {
 		setMainConfig(config.mainConfig);
 
 		followers = new TalonFX[config.followerIDs.length];
-		/*for (int i = 0; i < config.followerIDs.length; i++) {
-			followers[i] = new TalonFX(config.followerIDs[i], config.followerBuses[i]);
-			//followers[i].setControl(new Follower(config.mainID, config.followerOpposeMain[i]));
-		}*/
+		// TODO: Follower setup disabled due to Phoenix 6 API changes
+		// Uncomment and update when follower motors are needed
+		// for (int i = 0; i < config.followerIDs.length; i++) {
+		// 	followers[i] = new TalonFX(config.followerIDs[i], config.followerBuses[i]);
+		// 	// Phoenix 6 Follower API: followers[i].setControl(new Follower(config.mainID, opposeDirection));
+		// }
 
 		setFollowerConfig(followerConfig);
 	}
