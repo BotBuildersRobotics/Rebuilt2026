@@ -47,6 +47,7 @@ import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
 import frc.robot.subsystems.drive.ControlSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
+import frc.robot.subsystems.turret.TurretSubsystem;
 import frc.robot.subsystems.vision.Limelight;
 import frc.robot.subsystems.vision.LimelightSubsystem;
 import frc.robot.subsystems.vision.VisionIO;
@@ -81,6 +82,7 @@ public class RobotContainer {
 			DriveSubsystem.mInstance,
 			Limelight.mInstance,
 			IntakeSubsystem.mInstance,
+			TurretSubsystem.mInstance,
 			SuperSystem.mInstance,
 			
 		}) {

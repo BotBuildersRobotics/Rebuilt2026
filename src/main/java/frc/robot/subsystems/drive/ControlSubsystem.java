@@ -1,20 +1,12 @@
 package frc.robot.subsystems.drive;
 
-import static edu.wpi.first.units.Units.MetersPerSecond;
-
-import java.util.function.BooleanSupplier;
-import java.util.function.Supplier;
 
 import com.ctre.phoenix6.swerve.SwerveRequest;
-import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
-
-import edu.wpi.first.wpilibj.GenericHID.RumbleType;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.generated.TunerConstants;
+
 import frc.robot.subsystems.SuperSystem;
+import frc.robot.subsystems.turret.TurretSubsystem;
 
 
 
@@ -53,6 +45,8 @@ public class ControlSubsystem {
 			s.idleIntakes()
 		);
 
+		driver.x().onTrue(TurretSubsystem.mInstance.zeroCommand());
+		driver.y().onTrue(TurretSubsystem.mInstance.runTrackTargetCommand());
 
     }
 
