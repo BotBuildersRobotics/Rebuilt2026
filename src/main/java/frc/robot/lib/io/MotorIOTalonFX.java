@@ -1,5 +1,6 @@
 package frc.robot.lib.io;
 
+import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.TalonFXSConfiguration;
@@ -10,6 +11,7 @@ import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicExpoVoltage;
 import com.ctre.phoenix6.controls.NeutralOut;
 import com.ctre.phoenix6.controls.PositionTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -104,6 +106,11 @@ public class MotorIOTalonFX extends MotorIO {
 	@Override
 	protected void setMotionMagicSetpoint(Angle mechanismPosition) {
 		setControl(requestGetter.getMotionMagicRequest(mechanismPosition));
+	}
+
+	@Override
+	protected void setPositionVelocitySetpoint(Angle mechanismPosition, AngularVelocity velocity){
+		setControl(requestGetter.getPositionVelocityRequest(mechanismPosition, velocity));
 	}
 
 	@Override
@@ -204,7 +211,9 @@ public class MotorIOTalonFX extends MotorIO {
 	public MotorIOTalonFX(MotorIOTalonFXConfig config) {
 		super(config.unit, config.time, config.followerIDs.length);
 		requestGetter = config.requestGetter;
-		main = new TalonFX(config.mainID, config.mainBus);
+		var cb = new CANBus(config.mainBus);
+		main = new TalonFX(config.mainID, cb);
+		
 		setMainConfig(config.mainConfig);
 
 		followers = new TalonFX[config.followerIDs.length];
@@ -244,6 +253,10 @@ public class MotorIOTalonFX extends MotorIO {
 
 		public ControlRequest getMotionMagicRequest(Angle mechanismPosition) {
 			return new MotionMagicExpoVoltage(mechanismPosition).withSlot(0).withEnableFOC(true);
+		}
+
+		public ControlRequest getPositionVelocityRequest(Angle mechanismPosition, AngularVelocity velocity){
+			return new PositionVoltage(mechanismPosition).withSlot(0).withEnableFOC(true).withVelocity(velocity);
 		}
 
 		public ControlRequest getVelocityRequest(AngularVelocity mechanismVelocity) {

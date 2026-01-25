@@ -46,7 +46,9 @@ import frc.robot.subsystems.SuperSystem;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
 import frc.robot.subsystems.drive.ControlSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem;
+import frc.robot.subsystems.hood.HoodSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
+import frc.robot.subsystems.shooter.ShooterSubsystem;
 import frc.robot.subsystems.turret.TurretSubsystem;
 import frc.robot.subsystems.vision.Limelight;
 import frc.robot.subsystems.vision.LimelightSubsystem;
@@ -73,7 +75,7 @@ public class RobotContainer {
 
 
 	/* Path follower */
-	//private final SendableChooser<Command> autoChooser;
+	private final SendableChooser<Command> autoChooser;
 
 	public RobotContainer() {
 		
@@ -83,6 +85,8 @@ public class RobotContainer {
 			Limelight.mInstance,
 			IntakeSubsystem.mInstance,
 			TurretSubsystem.mInstance,
+			HoodSubsystem.mInstance,
+			ShooterSubsystem.mInstance,
 			SuperSystem.mInstance,
 			
 		}) {
@@ -97,11 +101,11 @@ public class RobotContainer {
 
 		
 		
-		//autoChooser = AutoBuilder.buildAutoChooser();
+		autoChooser = AutoBuilder.buildAutoChooser();
 		/*if(SmartDashboard.containsKey("Auto Mode")) {
 			SmartDashboard.getEntry("Auto Mode").close();
 		}*/
-		//SmartDashboard.putData("Auto Mode", autoChooser);
+		SmartDashboard.putData("Auto Mode", autoChooser);
 
 		configureBindings();
 		

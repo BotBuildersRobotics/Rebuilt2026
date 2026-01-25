@@ -1,5 +1,6 @@
 package frc.robot.lib.io;
 
+import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.TalonFXSConfiguration;
@@ -10,6 +11,7 @@ import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicExpoVoltage;
 import com.ctre.phoenix6.controls.NeutralOut;
 import com.ctre.phoenix6.controls.PositionTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -108,6 +110,12 @@ public class MotorIOTalonFXS extends MotorIO {
 		setControl(requestGetter.getVelocityRequest(mechanismVelocity));
 	}
 
+	
+	@Override
+	protected void setPositionVelocitySetpoint(Angle mechanismPosition, AngularVelocity velocity){
+		setControl(requestGetter.getPositionVelocityRequest(mechanismPosition, velocity));
+	}
+
 	@Override
 	protected void setPositionSetpoint(Angle mechanismPosition) {
 		setControl(requestGetter.getPositionRequest(mechanismPosition));
@@ -201,7 +209,8 @@ public class MotorIOTalonFXS extends MotorIO {
 	public MotorIOTalonFXS(MotorIOTalonFXSConfig config) {
 		super(config.unit, config.time, config.followerIDs.length);
 		requestGetter = config.requestGetter;
-		main = new TalonFXS(config.mainID, config.mainBus);
+		var cb = new CANBus(config.mainBus);
+		main = new TalonFXS(config.mainID, cb);
 		setMainConfig(config.mainConfig);
 
 		followers = new TalonFXS[config.followerIDs.length];
@@ -242,6 +251,11 @@ public class MotorIOTalonFXS extends MotorIO {
 		public ControlRequest getVelocityRequest(AngularVelocity mechanismVelocity) {
 			return new VelocityTorqueCurrentFOC(mechanismVelocity).withSlot(1);
 		}
+
+		public ControlRequest getPositionVelocityRequest(Angle mechanismPosition, AngularVelocity velocity){
+			return new PositionVoltage(mechanismPosition).withSlot(0).withEnableFOC(true).withVelocity(velocity);
+		}
+
 
 		public ControlRequest getPositionRequest(Angle mechanismPosition) {
 			return new PositionTorqueCurrentFOC(mechanismPosition).withSlot(2);

@@ -4,7 +4,9 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.lib.AllianceFlipUtil;
 import frc.robot.subsystems.intake.IntakeSubsystem;
+import frc.robot.subsystems.turret.TurretSubsystem;
 
 
 
@@ -51,6 +53,14 @@ public class SuperSystem extends SubsystemBase {
 		
 		return IntakeSubsystem.mInstance.setpointCommand(IntakeSubsystem.INTAKE);
 					
+	}
+
+	public Command AimAtCenterHub(){
+		return TurretSubsystem.mInstance.pointAtFieldPosition(frc.robot.FieldConstants.hubCenter);
+	}
+
+	public Command AimAtPassingZone(){
+		return TurretSubsystem.mInstance.pointAtFieldPosition((frc.robot.FieldConstants.fieldLayout.getTagPose(29).get().getTranslation().toTranslation2d()));
 	}
 
 }

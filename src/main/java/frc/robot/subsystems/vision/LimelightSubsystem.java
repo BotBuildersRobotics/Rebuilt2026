@@ -52,7 +52,7 @@ public class LimelightSubsystem<IO extends VisionIOLimelight> extends SubsystemB
 	}
 
 	public static class LimelightConfig {
-		public String name = "no-name-assigned";
+		public String name = "limelight";
 		public Pose3d robotToCameraOffset = new Pose3d();
 		public Vector<N3> aprilTagVisionStdDevs = VecBuilder.fill(0.3, 0.3, 99999.0);
 	}

@@ -78,6 +78,9 @@ public abstract class MotorIO implements Sendable {
 	 */
 	protected abstract void setMotionMagicSetpoint(Angle mechanismPosition);
 
+
+	protected abstract void setPositionVelocitySetpoint(Angle mechanismPosition, AngularVelocity velocity);
+
 	/**
 	 * Sets the motor to go to a given velocity. Should not be called directly, only applied through Setpoints.
 	 *
@@ -401,6 +404,7 @@ public abstract class MotorIO implements Sendable {
 		}
 	}
 
+
 	/**
 	 * Setpoint for a MotorIO.
 	 */
@@ -445,6 +449,16 @@ public abstract class MotorIO implements Sendable {
 				return io;
 			};
 			return new Setpoint(applier, Mode.MOTIONMAGIC, motionMagicSetpoint.baseUnitMagnitude());
+		}
+
+		public static Setpoint withPositionVelocitySetpoint(Angle mechAngle, AngularVelocity velocity){
+
+			UnaryOperator<MotorIO> applier = (MotorIO io) -> {
+				io.setPositionVelocitySetpoint(mechAngle, velocity);
+				return io;
+			};
+
+			return new Setpoint(applier, Mode.POSITIONPID, mechAngle.baseUnitMagnitude());
 		}
 
 		/**

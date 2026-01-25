@@ -39,17 +39,23 @@ public class TurretConstants {
 		config.CurrentLimits.SupplyCurrentLowerTime = 0.1;
 
 
-		config.MotionMagic.MotionMagicCruiseVelocity = 80; // rotations/sec at mechanism
-   		config.MotionMagic.MotionMagicAcceleration = 160; // rotations/sec² at mechanism
-    	config.MotionMagic.MotionMagicJerk = 1600; // rotations/sec³ at mechanism
+		config.MotionMagic.MotionMagicCruiseVelocity =  80 * 2 * Math.PI; // rotations/sec at mechanism
+   		config.MotionMagic.MotionMagicAcceleration = 160 * 2 * Math.PI; // rotations/sec² at mechanism
+    	//config.MotionMagic.MotionMagicJerk = 1600; // rotations/sec³ at mechanism
 
 
 		config.Voltage.PeakForwardVoltage = 12.0;
 		config.Voltage.PeakReverseVoltage = -12.0;
 		
 		config.Feedback.SensorToMechanismRatio = 41.6667;
-		config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+		config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
+		config.Slot0.kP = 15.0;
+		config.Slot0.kI = 0.0;
+		config.Slot0.kD = 0.5;
+		
+
+		
 		return config;
 	}
 
@@ -58,8 +64,8 @@ public class TurretConstants {
 		config.mainConfig = getFXConfig();
 		config.time = Units.Minute;
 		config.unit = Units.Rotations;
-		config.mainID = Ports.INTAKE.getDeviceNumber();
-		config.mainBus = Ports.INTAKE.getBus();
+		config.mainID = Ports.TURRET.getDeviceNumber();
+		config.mainBus = Ports.TURRET.getBus();
 		return config;
 	}
 

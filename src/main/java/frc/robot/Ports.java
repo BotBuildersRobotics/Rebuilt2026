@@ -5,12 +5,13 @@ import frc.robot.lib.io.CanDeviceId;
 public class Ports {
 
     //each CAN device will have a name and a unique ID.
-    //Right now each one has a random ID
-
-    
-    //Intake Subsystem Motors
-    public static final CanDeviceId INTAKE = new CanDeviceId(53, "canivore");
-    
+   
+    public static final CanDeviceId INTAKE = new CanDeviceId(19, "canivore");
+    public static final CanDeviceId TURRET = new CanDeviceId(31, "canivore");
+   
+    public static final CanDeviceId SHOOTER = new CanDeviceId(21, "canivore");
+    public static final CanDeviceId HOOD = new CanDeviceId(33, "canivore");
+   
 
     public static final int PIGEON = 13;
 

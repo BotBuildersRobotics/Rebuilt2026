@@ -1,5 +1,8 @@
 package frc.robot.lib.io;
 
+import com.ctre.phoenix6.controls.ControlRequest;
+import com.ctre.phoenix6.controls.PositionVoltage;
+
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
@@ -105,6 +108,11 @@ public class MotorIOSim extends MotorIO {
 		SmartDashboard.putNumber("Sim/MotorVelocityRadPerSec", motorSim.getAngularVelocityRadPerSec());
 		SmartDashboard.putNumber("Sim/AppliedVoltage", appliedVoltage);
 		SmartDashboard.putNumber("Sim/CurrentDraw", currentDraw);
+	}
+
+	@Override
+	public void setPositionVelocitySetpoint(Angle mechAngle, AngularVelocity velocity){
+		
 	}
 
 	@Override

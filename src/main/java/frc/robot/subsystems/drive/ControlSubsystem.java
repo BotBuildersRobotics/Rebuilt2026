@@ -3,9 +3,11 @@ package frc.robot.subsystems.drive;
 
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 import frc.robot.subsystems.SuperSystem;
+import frc.robot.subsystems.shooter.ShooterSubsystem;
 import frc.robot.subsystems.turret.TurretSubsystem;
 
 
@@ -40,7 +42,7 @@ public class ControlSubsystem {
 
 		SuperSystem s = SuperSystem.mInstance;
 
-		driver.leftTrigger().onTrue(
+		driver.rightTrigger().onTrue(
 			s.Intake()
 		).onFalse(
 			s.idleIntakes()
@@ -49,6 +51,13 @@ public class ControlSubsystem {
 		driver.x().onTrue(TurretSubsystem.mInstance.zeroCommand());
 		driver.y().onTrue(TurretSubsystem.mInstance.runTrackTargetCommand());
 
+		driver.b().onTrue(SuperSystem.mInstance.AimAtCenterHub());
+		driver.rightBumper().onTrue(SuperSystem.mInstance.AimAtPassingZone());
+
+	
+		driver.leftBumper().onTrue(ShooterSubsystem.mInstance.runTrackTargetActiveShootingCommand());
+		driver.a().onTrue(ShooterSubsystem.mInstance.stopCommnad());
+		
     }
 
     public void setRumble(boolean on) {

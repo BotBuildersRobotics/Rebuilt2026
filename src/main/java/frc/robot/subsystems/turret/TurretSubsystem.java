@@ -33,6 +33,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.AngleUnit;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -98,16 +99,10 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
 	public TurretSubsystem() {
 		super(TurretConstants.getMotorIO(), "Turret Motor");
     initMechanism();
-    // Set default command to point at field center (or use hubCenter for the actual goal)
-    // Example: Point at center of field
-    Translation2d fieldCenter = new Translation2d(
-      frc.robot.FieldConstants.fieldLength / 2.0,
-      frc.robot.FieldConstants.fieldWidth / 2.0
-    );
-   //setDefaultCommand(pointAtFieldPosition(fieldCenter));
+
 
     // Alternative: Point at the hub/speaker
-    setDefaultCommand(pointAtFieldPosition(frc.robot.FieldConstants.hubCenter));
+    //setDefaultCommand(pointAtFieldPosition(frc.robot.FieldConstants.hubCenter));
 	}
 
   private void initMechanism(){
@@ -186,6 +181,7 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
       SmartDashboard.putNumber("Turret/SetpointVelocityRadPerSec", setpoint.velocity);
 
       this.applySetpoint(Setpoint.withMotionMagicSetpoint(Radians.of(setpoint.position)));
+      //this.applySetpoint(Setpoint.withPositionVelocitySetpoint(Radians.of(setpoint.position), RadiansPerSecond.of(setpoint.velocity)));
       
       
       SmartDashboard.putNumber("Turret/GoalPositionRad", bestAngle);
