@@ -156,6 +156,10 @@ public class MotorSubsystem<IO extends MotorIO> extends SubsystemBase {
 		io.enable();
 	}
 
+	public MotorIO getMotorIO(){
+		return io;
+	}
+
 	/**
 	 * Creates a command to disable this Subsystem's MotorIO.
 	 *

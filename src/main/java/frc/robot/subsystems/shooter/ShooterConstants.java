@@ -4,11 +4,14 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.InvertedValue;
 
 import edu.wpi.first.units.Units;
+import edu.wpi.first.units.measure.Voltage;
 import frc.robot.Ports;
 import frc.robot.Robot;
 import frc.robot.lib.io.MotorIOTalonFX;
 
 public class ShooterConstants {
+
+	public static final Voltage kShootVoltage = Units.Volts.of( 4.5);
     
     public static TalonFXConfiguration getFXConfig() {
 		TalonFXConfiguration config = new TalonFXConfiguration();
@@ -23,9 +26,23 @@ public class ShooterConstants {
 
 		config.Voltage.PeakForwardVoltage = 12.0;
 		config.Voltage.PeakReverseVoltage = -12.0;
+
+		
+		config.Slot0.kP = 15.0;
+		config.Slot0.kI = 0.0;
+		config.Slot0.kD = 0.5;
+
+		
+		config.MotionMagic.MotionMagicAcceleration = 100;
+		config.MotionMagic.MotionMagicCruiseVelocity = 1100;
+		config.MotionMagic.MotionMagicExpo_kA = 0.0074516;
+		config.MotionMagic.MotionMagicExpo_kV = 0.12034;
+		config.Slot1.kS = 0.30532;
+		config.Slot0.kP = 0.053558;
+		
 		
 
-		config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+		config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
 		return config;
 	}

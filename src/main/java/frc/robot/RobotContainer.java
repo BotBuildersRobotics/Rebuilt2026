@@ -85,7 +85,7 @@ public class RobotContainer {
 			Limelight.mInstance,
 			IntakeSubsystem.mInstance,
 			TurretSubsystem.mInstance,
-			HoodSubsystem.mInstance,
+			//HoodSubsystem.mInstance,
 			ShooterSubsystem.mInstance,
 			SuperSystem.mInstance,
 			
@@ -98,6 +98,8 @@ public class RobotContainer {
 		CommandScheduler.getInstance().setPeriod(0.02);
 
 		DriveSubsystem.mInstance.getDrivetrain().seedFieldCentric();
+
+		ShooterSubsystem.mInstance.setDefaultCommand(ShooterSubsystem.mInstance.runTrackTargetActiveShootingCommand());
 
 		
 		

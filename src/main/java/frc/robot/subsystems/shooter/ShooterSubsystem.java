@@ -3,11 +3,16 @@ package frc.robot.subsystems.shooter;
 import frc.robot.lib.io.MotorIO.Setpoint;
 
 import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.Volts;
 
 import java.util.function.DoubleSupplier;
 
+import com.ctre.phoenix6.SignalLogger;
+import com.ctre.phoenix6.controls.VoltageOut;
+
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.lib.io.MotorIOTalonFX;
 import frc.robot.lib.io.MotorSubsystem;
 import frc.robot.subsystems.turret.ShotCalculator;
@@ -22,17 +27,28 @@ public class ShooterSubsystem  extends MotorSubsystem<MotorIOTalonFX> {
 
 	public static final ShooterSubsystem mInstance = new ShooterSubsystem();
 
+	public static final Setpoint SHOOT = Setpoint.withVoltageSetpoint(ShooterConstants.kShootVoltage);
+	
+
+    private double desiredVelocity = 0.0;
+
 	public ShooterSubsystem() {
 		super(ShooterConstants.getMotorIO(), "Shooter Rollers");
 	}
 
+    public void periodic() {
+        super.periodic(); 
+        this.applySetpoint(Setpoint.withVelocitySetpoint(AngularVelocity.ofBaseUnits(desiredVelocity, RadiansPerSecond)));
+    }
+
     private void runVelocity(double velocityRadsPerSec){
 
-        this.applySetpoint(Setpoint.withVelocitySetpoint(AngularVelocity.ofBaseUnits(velocityRadsPerSec, RadiansPerSecond)));
+        desiredVelocity = velocityRadsPerSec;
+       
     }
 
     private void stop(){
-        this.applySetpoint(IDLE);
+        runVelocity(0);
     }
 
     public Command runTrackTargetActiveShootingCommand() {
@@ -56,6 +72,31 @@ public class ShooterSubsystem  extends MotorSubsystem<MotorIOTalonFX> {
     public Command stopCommnad()
     {
         return runOnce(this::stop);
+    }
+
+    private final VoltageOut m_voltReq = new VoltageOut(0.0);
+    private final SysIdRoutine m_sysIdRoutine =
+   new SysIdRoutine(
+      new SysIdRoutine.Config(
+         null,        // Use default ramp rate (1 V/s)
+         Volts.of(8), // Reduce dynamic step voltage to 4 to prevent brownout
+         null,        // Use default timeout (10 s)
+                      // Log state with Phoenix SignalLogger class
+         (state) -> SignalLogger.writeString("state", state.toString())
+      ),
+      new SysIdRoutine.Mechanism(
+         (volts) -> ((MotorIOTalonFX)this.getMotorIO()).setMotorControl(m_voltReq.withOutput(volts.in(Volts))),
+         null,
+         this
+      )
+   );
+
+    public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
+        return m_sysIdRoutine.quasistatic(direction);
+    }
+
+    public Command sysIdDynamic(SysIdRoutine.Direction direction) {
+        return m_sysIdRoutine.dynamic(direction);
     }
 
 }

@@ -9,10 +9,12 @@ import com.ctre.phoenix6.controls.ControlRequest;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicExpoVoltage;
+import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 import com.ctre.phoenix6.controls.NeutralOut;
 import com.ctre.phoenix6.controls.PositionTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.hardware.TalonFXS;
@@ -121,6 +123,11 @@ public class MotorIOTalonFX extends MotorIO {
 	@Override
 	protected void setPositionSetpoint(Angle mechanismPosition) {
 		setControl(requestGetter.getPositionRequest(mechanismPosition));
+	}
+
+
+	public void setMotorControl(ControlRequest request){
+		setControl(request);
 	}
 
 	@Override
@@ -263,7 +270,9 @@ public class MotorIOTalonFX extends MotorIO {
 		}
 
 		public ControlRequest getVelocityRequest(AngularVelocity mechanismVelocity) {
-			return new VelocityTorqueCurrentFOC(mechanismVelocity).withSlot(1);
+			return new MotionMagicVelocityVoltage(mechanismVelocity).withSlot(1);
+			//return new VelocityVoltage(mechanismVelocity).withSlot(1);
+			//return new VelocityTorqueCurrentFOC(mechanismVelocity).withSlot(1);
 		}
 
 		public ControlRequest getPositionRequest(Angle mechanismPosition) {

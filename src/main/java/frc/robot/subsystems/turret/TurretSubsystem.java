@@ -118,10 +118,10 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
    public void periodic() {
         super.periodic(); // Critical: Updates motor inputs from simulation or hardware
 
-        SmartDashboard.putBoolean("Turret/ControlLoopActive", DriverStation.isEnabled() && turretZeroed);
+        /*SmartDashboard.putBoolean("Turret/ControlLoopActive", DriverStation.isEnabled() && turretZeroed);
         SmartDashboard.putNumber("Turret/CurrentPositionDeg", Units.radiansToDegrees(getTurretAngle()));
         SmartDashboard.putNumber("Turret/MaxVelocity", maxVelocity.get());
-        SmartDashboard.putNumber("Turret/MaxAcceleration", maxAcceleration.get());
+        SmartDashboard.putNumber("Turret/MaxAcceleration", maxAcceleration.get());*/
 
         // Update profile constraints
         if (maxVelocity.hasChanged(hashCode()) || maxAcceleration.hasChanged(hashCode())) {

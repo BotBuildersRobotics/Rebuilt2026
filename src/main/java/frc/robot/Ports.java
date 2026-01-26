@@ -9,7 +9,7 @@ public class Ports {
     public static final CanDeviceId INTAKE = new CanDeviceId(19, "canivore");
     public static final CanDeviceId TURRET = new CanDeviceId(31, "canivore");
    
-    public static final CanDeviceId SHOOTER = new CanDeviceId(21, "canivore");
+    public static final CanDeviceId SHOOTER = new CanDeviceId(18, "canivore");
     public static final CanDeviceId HOOD = new CanDeviceId(33, "canivore");
    
 
