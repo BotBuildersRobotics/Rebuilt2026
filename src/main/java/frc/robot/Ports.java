@@ -11,6 +11,9 @@ public class Ports {
    
     public static final CanDeviceId SHOOTER = new CanDeviceId(18, "canivore");
     public static final CanDeviceId HOOD = new CanDeviceId(33, "canivore");
+
+    public static final CanDeviceId SHUFFLA = new CanDeviceId(36, "canivore");
+    public static final CanDeviceId CHUTE = new CanDeviceId(37, "canivore");
    
 
     public static final int PIGEON = 13;
