@@ -56,11 +56,11 @@ public class SuperSystem extends SubsystemBase {
 	}
 
 	public Command AimAtCenterHub(){
-		return TurretSubsystem.mInstance.pointAtFieldPosition(frc.robot.FieldConstants.hubCenter);
+		return TurretSubsystem.mInstance.pointAtFieldPosition(frc.robot.FieldConstants.Hub.innerCenterPoint.toTranslation2d());
 	}
 
 	public Command AimAtPassingZone(){
-		return TurretSubsystem.mInstance.pointAtFieldPosition((frc.robot.FieldConstants.fieldLayout.getTagPose(29).get().getTranslation().toTranslation2d()));
+		return TurretSubsystem.mInstance.pointAtFieldPosition((frc.robot.FieldConstants.Outpost.centerPoint));
 	}
 
 }

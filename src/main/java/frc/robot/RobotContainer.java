@@ -97,7 +97,9 @@ public class RobotContainer {
 
 		CommandScheduler.getInstance().setPeriod(0.02);
 
-		DriveSubsystem.mInstance.getDrivetrain().seedFieldCentric();
+		//DriveSubsystem.mInstance.getDrivetrain().seedFieldCentric();
+
+		DriveSubsystem.mInstance.getDrivetrain().resetPose(new Pose2d(3.6256, 4.0346, Rotation2d.fromDegrees(0)));
 
 		ShooterSubsystem.mInstance.setDefaultCommand(ShooterSubsystem.mInstance.runTrackTargetActiveShootingCommand());
 

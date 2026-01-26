@@ -85,7 +85,7 @@ public class ShotCalculator {
     }
 
     // Calculate distance from turret to target
-    Translation2d target = AllianceFlipUtil.apply(FieldConstants.hubCenter);
+    Translation2d target = AllianceFlipUtil.apply(FieldConstants.Hub.innerCenterPoint.toTranslation2d());
     Pose2d turretPosition = DriveSubsystem.mInstance.getDrivetrain().getState().Pose.transformBy(robotToTurret);
     double turretToTargetDistance = target.getDistance(turretPosition.getTranslation());
 
