@@ -8,6 +8,7 @@
 
 package frc.robot.subsystems.turret;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -57,6 +58,11 @@ public class ShotCalculator {
   private static final InterpolatingDoubleTreeMap timeOfFlightMap =
       new InterpolatingDoubleTreeMap();
 
+  // Min/max distances for interpolation maps to prevent extrapolation.
+  // Update these if you add data points outside this range.
+  private static final double MIN_SHOOTING_DISTANCE_METERS = 1.8;
+  private static final double MAX_SHOOTING_DISTANCE_METERS = 5.0;
+
   static {
     shotHoodAngleMap.put(1.8122, Rotation2d.fromDegrees(20.0));
     shotHoodAngleMap.put(2.612079, Rotation2d.fromDegrees(25.0));
@@ -98,7 +104,11 @@ public class ShotCalculator {
                     - robotToTurret.getY() * Math.sin(robotAngle));
 
     // Account for imparted velocity by robot (turret) to offset
-    double timeOfFlight = timeOfFlightMap.get(turretToTargetDistance);
+    double clampedDistanceForTOF = MathUtil.clamp(
+        turretToTargetDistance,
+        MIN_SHOOTING_DISTANCE_METERS,
+        MAX_SHOOTING_DISTANCE_METERS);
+    double timeOfFlight = timeOfFlightMap.get(clampedDistanceForTOF);
     double offsetX = turretVelocityX * timeOfFlight;
     double offsetY = turretVelocityY * timeOfFlight;
     Pose2d lookaheadPose =
@@ -107,9 +117,15 @@ public class ShotCalculator {
             turretPosition.getRotation());
     double lookaheadTurretToTargetDistance = target.getDistance(lookaheadPose.getTranslation());
 
+    // Clamp distance to valid interpolation range to prevent extrapolation
+    double clampedDistance = MathUtil.clamp(
+        lookaheadTurretToTargetDistance,
+        MIN_SHOOTING_DISTANCE_METERS,
+        MAX_SHOOTING_DISTANCE_METERS);
+
     // Calculate parameters accounted for imparted velocity
     turretAngle = target.minus(lookaheadPose.getTranslation()).getAngle();
-    hoodAngle = shotHoodAngleMap.get(lookaheadTurretToTargetDistance).getRadians();
+    hoodAngle = shotHoodAngleMap.get(clampedDistance).getRadians();
     if (lastTurretAngle == null) lastTurretAngle = turretAngle;
     if (Double.isNaN(lastHoodAngle)) lastHoodAngle = hoodAngle;
     turretVelocity =
@@ -123,7 +139,7 @@ public class ShotCalculator {
             turretVelocity,
             hoodAngle,
             hoodVelocity,
-            shotFlywheelSpeedMap.get(lookaheadTurretToTargetDistance));
+            shotFlywheelSpeedMap.get(clampedDistance));
 
     // Log calculated values
     Logger.recordOutput("ShotCalculator/LookaheadPose", lookaheadPose);

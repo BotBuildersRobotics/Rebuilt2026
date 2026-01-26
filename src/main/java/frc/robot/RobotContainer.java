@@ -101,6 +101,8 @@ public class RobotContainer {
 
 		ShooterSubsystem.mInstance.setDefaultCommand(ShooterSubsystem.mInstance.runTrackTargetActiveShootingCommand());
 
+		TurretSubsystem.mInstance.setDefaultCommand(TurretSubsystem.mInstance.runTrackTargetActiveShootingCommand());
+
 		
 		
 		autoChooser = AutoBuilder.buildAutoChooser();

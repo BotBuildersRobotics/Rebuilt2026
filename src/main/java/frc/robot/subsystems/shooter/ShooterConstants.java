@@ -16,10 +16,10 @@ public class ShooterConstants {
     public static TalonFXConfiguration getFXConfig() {
 		TalonFXConfiguration config = new TalonFXConfiguration();
 
-		config.CurrentLimits.StatorCurrentLimitEnable = Robot.isReal();
+		config.CurrentLimits.StatorCurrentLimitEnable = true;
 		config.CurrentLimits.StatorCurrentLimit = 120.0;
 
-		config.CurrentLimits.SupplyCurrentLimitEnable = Robot.isReal();
+		config.CurrentLimits.SupplyCurrentLimitEnable = true;
 		config.CurrentLimits.SupplyCurrentLimit = 60.0;
 		config.CurrentLimits.SupplyCurrentLowerLimit = 60.0;
 		//config.CurrentLimits.SupplyCurrentLowerTime = 0.1;
@@ -28,17 +28,13 @@ public class ShooterConstants {
 		config.Voltage.PeakReverseVoltage = -12.0;
 
 		
-		config.Slot0.kP = 15.0;
-		config.Slot0.kI = 0.0;
-		config.Slot0.kD = 0.5;
-
-		
 		config.MotionMagic.MotionMagicAcceleration = 100;
 		config.MotionMagic.MotionMagicCruiseVelocity = 1100;
 		config.MotionMagic.MotionMagicExpo_kA = 0.0074516;
 		config.MotionMagic.MotionMagicExpo_kV = 0.12034;
 		config.Slot1.kS = 0.30532;
-		config.Slot0.kP = 0.053558;
+		config.Slot1.kP = 0.053558;
+		config.Slot1.kV = 0.12034;
 		
 		
 

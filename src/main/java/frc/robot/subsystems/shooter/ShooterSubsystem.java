@@ -30,25 +30,17 @@ public class ShooterSubsystem  extends MotorSubsystem<MotorIOTalonFX> {
 	public static final Setpoint SHOOT = Setpoint.withVoltageSetpoint(ShooterConstants.kShootVoltage);
 	
 
-    private double desiredVelocity = 0.0;
-
 	public ShooterSubsystem() {
 		super(ShooterConstants.getMotorIO(), "Shooter Rollers");
 	}
 
-    public void periodic() {
-        super.periodic(); 
-        this.applySetpoint(Setpoint.withVelocitySetpoint(AngularVelocity.ofBaseUnits(desiredVelocity, RadiansPerSecond)));
+    private void runVelocity(double velocityRadsPerSec) {
+        this.applySetpoint(Setpoint.withVelocitySetpoint(
+            AngularVelocity.ofBaseUnits(velocityRadsPerSec, RadiansPerSecond)));
     }
 
-    private void runVelocity(double velocityRadsPerSec){
-
-        desiredVelocity = velocityRadsPerSec;
-       
-    }
-
-    private void stop(){
-        runVelocity(0);
+    private void stop() {
+        this.applySetpoint(IDLE);
     }
 
     public Command runTrackTargetActiveShootingCommand() {
@@ -69,7 +61,7 @@ public class ShooterSubsystem  extends MotorSubsystem<MotorIOTalonFX> {
             });
     }
 
-    public Command stopCommnad()
+    public Command stopCommand()
     {
         return runOnce(this::stop);
     }
