@@ -30,7 +30,8 @@ public class ShooterConstants {
 		
 		config.MotionMagic.MotionMagicAcceleration = 100;
 		config.MotionMagic.MotionMagicCruiseVelocity = 1100;
-		config.MotionMagic.MotionMagicExpo_kA = 0.0074516;
+		//config.MotionMagic.MotionMagicExpo_kA = 0.0074516;
+		config.MotionMagic.MotionMagicExpo_kA = 0.074516;
 		config.MotionMagic.MotionMagicExpo_kV = 0.12034;
 		config.Slot1.kS = 0.30532;
 		config.Slot1.kP = 0.053558;

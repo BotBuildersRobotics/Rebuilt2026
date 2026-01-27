@@ -99,9 +99,11 @@ public class RobotContainer {
 
 		DriveSubsystem.mInstance.getDrivetrain().seedFieldCentric();
 
-		ShooterSubsystem.mInstance.setDefaultCommand(ShooterSubsystem.mInstance.runTrackTargetActiveShootingCommand());
+		DriveSubsystem.mInstance.getDrivetrain().resetPose(new Pose2d(3.6256, 4.0346, Rotation2d.fromDegrees(0)));
 
-		TurretSubsystem.mInstance.setDefaultCommand(TurretSubsystem.mInstance.runTrackTargetActiveShootingCommand());
+		//ShooterSubsystem.mInstance.setDefaultCommand(ShooterSubsystem.mInstance.runTrackTargetActiveShootingCommand());
+
+		//TurretSubsystem.mInstance.setDefaultCommand(TurretSubsystem.mInstance.runTrackTargetActiveShootingCommand());
 
 		
 		

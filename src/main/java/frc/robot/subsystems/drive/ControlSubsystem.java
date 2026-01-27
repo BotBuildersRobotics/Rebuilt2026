@@ -68,8 +68,8 @@ public class ControlSubsystem {
 			Setpoint.withVelocitySetpoint(AngularVelocity.ofBaseUnits(10, RadiansPerSecond))
 		));*/
 		
-		driver.leftBumper().onTrue(ShooterSubsystem.mInstance.setpointCommand(ShooterSubsystem.SHOOT));
-		//driver.leftBumper().onTrue(ShooterSubsystem.mInstance.runTrackTargetActiveShootingCommand());
+		//driver.leftBumper().onTrue(ShooterSubsystem.mInstance.setpointCommand(ShooterSubsystem.SHOOT));
+		driver.leftBumper().onTrue(ShooterSubsystem.mInstance.runTrackTargetActiveShootingCommand());
 		//driver.a().onTrue(ShooterSubsystem.mInstance.stopCommnad());
 		driver.a().onTrue(ShooterSubsystem.mInstance.setpointCommand(ShooterSubsystem.IDLE));
 
