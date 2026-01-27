@@ -56,6 +56,12 @@ public class ControlSubsystem {
 			s.idleIntakes()
 		);
 
+		driver.leftTrigger().onTrue(
+			s.Shoot()
+		).onFalse(
+			s.idleShooter()
+		);
+
 		//driver.x().onTrue(TurretSubsystem.mInstance.zeroCommand());
 		//driver.y().onTrue(TurretSubsystem.mInstance.runTrackTargetCommand());
 

@@ -43,12 +43,14 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.SuperSystem;
+import frc.robot.subsystems.chute.ChuteSubsystem;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
 import frc.robot.subsystems.drive.ControlSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.hood.HoodSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
+import frc.robot.subsystems.shuffla.ShufflaSubsystem;
 import frc.robot.subsystems.turret.TurretSubsystem;
 import frc.robot.subsystems.vision.Limelight;
 import frc.robot.subsystems.vision.LimelightSubsystem;
@@ -87,6 +89,8 @@ public class RobotContainer {
 			TurretSubsystem.mInstance,
 			//HoodSubsystem.mInstance,
 			ShooterSubsystem.mInstance,
+			ChuteSubsystem.mInstance,
+			ShufflaSubsystem.mInstance,
 			SuperSystem.mInstance,
 			
 		}) {
@@ -97,7 +101,9 @@ public class RobotContainer {
 
 		CommandScheduler.getInstance().setPeriod(0.02);
 
-		DriveSubsystem.mInstance.getDrivetrain().seedFieldCentric();
+		//DriveSubsystem.mInstance.getDrivetrain().seedFieldCentric();
+
+		DriveSubsystem.mInstance.getDrivetrain().resetPose(new Pose2d(3.6256, 4.0346, Rotation2d.fromDegrees(0)));
 
 		DriveSubsystem.mInstance.getDrivetrain().resetPose(new Pose2d(3.6256, 4.0346, Rotation2d.fromDegrees(0)));
 

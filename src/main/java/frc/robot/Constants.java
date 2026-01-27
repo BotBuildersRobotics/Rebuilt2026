@@ -17,6 +17,7 @@ public final class Constants {
   public static final double loopPeriodSecs = 0.02;
   public static final double loopPeriodWatchdogSecs = 0.2;
 
+  public static final boolean disableHAL = false;
 
   public static class OperatorConstants {
   public static final int kDriverControllerPort = 0;
