@@ -13,7 +13,7 @@ import frc.robot.Robot;
 
 public class ChuteConstants {
 	
-	public static final Voltage kShootVoltage = Units.Volts.of( 12);
+	public static final Voltage kShootVoltage = Units.Volts.of( 2);
 	public static final Voltage kReverseVoltage = Units.Volts.of(-1);
 
 	public static TalonFXConfiguration getFXConfig() {
@@ -31,7 +31,7 @@ public class ChuteConstants {
 		config.Voltage.PeakReverseVoltage = -12.0;
 		
 
-		config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+		config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
 		return config;
 	}

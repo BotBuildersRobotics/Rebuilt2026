@@ -56,11 +56,11 @@ public class ControlSubsystem {
 			s.idleIntakes()
 		);
 
-		driver.leftTrigger().onTrue(
+		/*driver.leftTrigger().onTrue(
 			s.Shoot()
 		).onFalse(
 			s.idleShooter()
-		);
+		);*/
 
 		//driver.x().onTrue(TurretSubsystem.mInstance.zeroCommand());
 		//driver.y().onTrue(TurretSubsystem.mInstance.runTrackTargetCommand());
@@ -75,9 +75,9 @@ public class ControlSubsystem {
 		));*/
 		
 		//driver.leftBumper().onTrue(ShooterSubsystem.mInstance.setpointCommand(ShooterSubsystem.SHOOT));
-		driver.leftBumper().onTrue(ShooterSubsystem.mInstance.runTrackTargetActiveShootingCommand());
-		//driver.a().onTrue(ShooterSubsystem.mInstance.stopCommnad());
-		driver.a().onTrue(ShooterSubsystem.mInstance.setpointCommand(ShooterSubsystem.IDLE));
+		//driver.leftBumper().onTrue(ShooterSubsystem.mInstance.runTrackTargetActiveShootingCommand());
+		//driver.a().onTrue(ShooterSubsystem.mInstance.stopCommand());
+		//driver.a().onTrue(ShooterSubsystem.mInstance.setpointCommand(ShooterSubsystem.IDLE));
 
 
 		//driver.leftBumper().onTrue(Commands.runOnce(SignalLogger::start));

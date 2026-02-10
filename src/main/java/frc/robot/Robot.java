@@ -45,7 +45,7 @@ public class Robot extends TimedRobot {
     CommandScheduler.getInstance().run();
 
     // Clear shooting parameters
-    ShotCalculator.getInstance().clearShootingParameters();
+   // ShotCalculator.getInstance().clearShootingParameters();
   }
 
   /** This function is called once each time the robot enters Disabled mode. */
