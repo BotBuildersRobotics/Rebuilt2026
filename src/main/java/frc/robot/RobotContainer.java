@@ -86,11 +86,11 @@ public class RobotContainer {
 			DriveSubsystem.mInstance,
 			Limelight.mInstance,
 			IntakeSubsystem.mInstance,
-			//TurretSubsystem.mInstance,
+			TurretSubsystem.mInstance,
 			//HoodSubsystem.mInstance,
 			//ShooterSubsystem.mInstance,
-			//ChuteSubsystem.mInstance,
-			//ShufflaSubsystem.mInstance,
+			ChuteSubsystem.mInstance,
+			ShufflaSubsystem.mInstance,
 			SuperSystem.mInstance,
 			
 		}) {
@@ -109,7 +109,7 @@ public class RobotContainer {
 
 		ShooterSubsystem.mInstance.setDefaultCommand(ShooterSubsystem.mInstance.runTrackTargetActiveShootingCommand());
 
-		//TurretSubsystem.mInstance.setDefaultCommand(TurretSubsystem.mInstance.runTrackTargetActiveShootingCommand());
+		TurretSubsystem.mInstance.setDefaultCommand(TurretSubsystem.mInstance.runTrackTargetActiveShootingCommand());
 
 		
 		

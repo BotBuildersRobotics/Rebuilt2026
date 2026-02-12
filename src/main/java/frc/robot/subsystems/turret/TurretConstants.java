@@ -50,7 +50,7 @@ public class TurretConstants {
 		config.Feedback.SensorToMechanismRatio = 41.6667;
 		config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
-		config.Slot0.kP = 15.0;
+		config.Slot0.kP = 35.0; //TODO - Tune for turret
 		config.Slot0.kI = 0.0;
 		config.Slot0.kD = 0.5;
 		

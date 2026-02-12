@@ -33,7 +33,7 @@ public class IntakeConstants {
 		config.Voltage.PeakReverseVoltage = -12.0;
 		
 
-		config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+		config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
 		return config;
 	}
