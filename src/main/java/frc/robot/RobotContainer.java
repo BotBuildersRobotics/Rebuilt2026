@@ -49,6 +49,7 @@ import frc.robot.subsystems.drive.ControlSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.hood.HoodSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
+import frc.robot.subsystems.pivot.PivotSubsystem;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
 import frc.robot.subsystems.shuffla.ShufflaSubsystem;
 import frc.robot.subsystems.turret.TurretSubsystem;
@@ -86,9 +87,10 @@ public class RobotContainer {
 			DriveSubsystem.mInstance,
 			Limelight.mInstance,
 			IntakeSubsystem.mInstance,
-			TurretSubsystem.mInstance,
+			PivotSubsystem.mInstance,
+			//TurretSubsystem.mInstance,
 			//HoodSubsystem.mInstance,
-			//ShooterSubsystem.mInstance,
+			ShooterSubsystem.mInstance,
 			ChuteSubsystem.mInstance,
 			ShufflaSubsystem.mInstance,
 			SuperSystem.mInstance,
@@ -109,7 +111,7 @@ public class RobotContainer {
 
 		ShooterSubsystem.mInstance.setDefaultCommand(ShooterSubsystem.mInstance.runTrackTargetActiveShootingCommand());
 
-		TurretSubsystem.mInstance.setDefaultCommand(TurretSubsystem.mInstance.runTrackTargetActiveShootingCommand());
+		//TurretSubsystem.mInstance.setDefaultCommand(TurretSubsystem.mInstance.runTrackTargetActiveShootingCommand());
 
 		
 		

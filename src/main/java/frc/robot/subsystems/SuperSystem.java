@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.lib.AllianceFlipUtil;
 import frc.robot.subsystems.chute.ChuteSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
+import frc.robot.subsystems.pivot.PivotSubsystem;
 import frc.robot.subsystems.shuffla.ShufflaSubsystem;
 import frc.robot.subsystems.turret.TurretSubsystem;
 
@@ -82,6 +83,29 @@ public class SuperSystem extends SubsystemBase {
 
 	public Command AimAtPassingZone(){
 		return TurretSubsystem.mInstance.pointAtFieldPosition((frc.robot.FieldConstants.Outpost.centerPoint));
+	}
+
+	public Command agitateCommand(){
+		return //runOnce( () ->
+					
+					
+						Commands.sequence( 
+							Shoot(),
+							Intake(),
+							Commands.sequence(
+								PivotSubsystem.mInstance.setpointCommand(PivotSubsystem.AGITATE)),
+							//Commands.waitUntil(PivotSubsystem.mInstance.isPositionWithinTolerance()),
+								Commands.waitSeconds(0.2),
+								PivotSubsystem.mInstance.setpointCommand(PivotSubsystem.DEPLOY))
+					.repeatedly()
+				.handleInterrupt( () ->
+					Commands.sequence(
+									PivotSubsystem.mInstance.setpointCommand(PivotSubsystem.DEPLOY),
+									idleIntakes(),
+									idleShooter()
+					)
+
+				);
 	}
 
 }

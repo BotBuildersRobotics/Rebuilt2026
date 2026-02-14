@@ -15,6 +15,7 @@ public class Ports {
     public static final CanDeviceId SHUFFLA = new CanDeviceId(16, "canivore");
     public static final CanDeviceId CHUTE = new CanDeviceId(37, "canivore");
    
+    public static final CanDeviceId PIVOT = new CanDeviceId(15, "canivore");
 
     public static final int PIGEON = 13;
 

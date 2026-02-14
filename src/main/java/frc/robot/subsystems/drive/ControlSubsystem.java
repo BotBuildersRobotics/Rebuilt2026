@@ -13,6 +13,7 @@ import frc.robot.lib.io.MotorIO.Setpoint;
 import frc.robot.subsystems.SuperSystem;
 import frc.robot.subsystems.intake.IntakeConstants;
 import frc.robot.subsystems.intake.IntakeSubsystem;
+import frc.robot.subsystems.pivot.PivotSubsystem;
 import frc.robot.subsystems.shooter.ShooterConstants;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
 import frc.robot.subsystems.turret.TurretSubsystem;
@@ -65,6 +66,9 @@ public class ControlSubsystem {
 		//driver.x().onTrue(TurretSubsystem.mInstance.zeroCommand());
 		//driver.y().onTrue(TurretSubsystem.mInstance.runTrackTargetCommand());
 
+		driver.x().onTrue(PivotSubsystem.mInstance.setpointCommand(PivotSubsystem.mInstance.DEPLOY));
+		driver.y().onTrue(PivotSubsystem.mInstance.setpointCommand(PivotSubsystem.mInstance.AGITATE));
+
 		//driver.b().onTrue(SuperSystem.mInstance.AimAtCenterHub());
 		//driver.rightBumper().onTrue(SuperSystem.mInstance.AimAtPassingZone());
 
@@ -76,9 +80,15 @@ public class ControlSubsystem {
 		
 		//driver.leftBumper().onTrue(ShooterSubsystem.mInstance.setpointCommand(ShooterSubsystem.SHOOT));
 		//driver.leftBumper().onTrue(ShooterSubsystem.mInstance.runTrackTargetActiveShootingCommand());
-		//driver.a().onTrue(ShooterSubsystem.mInstance.stopCommand());
+		driver.a().onTrue(ShooterSubsystem.mInstance.stopCommand());
 		//driver.a().onTrue(ShooterSubsystem.mInstance.setpointCommand(ShooterSubsystem.IDLE));
 
+		driver.leftBumper().onTrue(
+			//Commands.parallel(
+				SuperSystem.mInstance.agitateCommand()//,
+			//	s.Shoot()
+			//)
+		);
 
 		//driver.leftBumper().onTrue(Commands.runOnce(SignalLogger::start));
 		//driver.rightBumper().onTrue(Commands.runOnce(SignalLogger::stop));
