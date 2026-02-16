@@ -9,43 +9,62 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import frc.robot.subsystems.drive.DriveSubsystem;
 
-public class Limelight extends LimelightSubsystem<VisionIOLimelight> {
+public class Limelight extends LimelightSubsystem {
 	public static final Limelight mInstance = new Limelight();
 
 	private Pose2d lastPose = new Pose2d();
 	private long numPoseStableUpdates = 0;
 
 	private Limelight() {
-		super(LimelightConstants.getVisionIOConfigBackLeft(), LimelightConstants.getVisionIO());
+		super(
+			LimelightConstants.getVisionIOConfigBackLeft(),
+			LimelightConstants.getVisionIOConfigBackRight(),
+			LimelightConstants.getVisionIOConfigSide()
+		);
 	}
 
 	@Override
 	public void periodic() {
 		try {
 			super.periodic();
-			Pose2d ioPose = io.getLatestEstimate();
-			if (ioPose != lastPose) {
-				if (DriveSubsystem.mInstance.getPose().getTranslation().getDistance(ioPose.getTranslation())
+
+			// Find the most recent estimate across all cameras
+			Pose2d mostRecentPose = null;
+			Time mostRecentTime = Units.Seconds.of(0.0);
+			for (VisionIOLimelight io : ios) {
+				Time ioTime = io.getLatestEstimateTime();
+				if (ioTime.gt(mostRecentTime)) {
+					mostRecentTime = ioTime;
+					mostRecentPose = io.getLatestEstimate();
+				}
+			}
+
+			if (mostRecentPose != null && mostRecentPose != lastPose) {
+				if (DriveSubsystem.mInstance.getPose().getTranslation().getDistance(mostRecentPose.getTranslation())
 						< LimelightConstants.agreedTranslationUpdateEpsilon.in(Units.Meters)) {
 					numPoseStableUpdates++;
 				} else {
 					numPoseStableUpdates = 0;
 				}
+				lastPose = mostRecentPose;
 			}
-
-			lastPose = ioPose;
 
 			SmartDashboard.putNumber("Vision/Num Agreed Stable Updates", numPoseStableUpdates);
 		} catch (Exception e) {
 			SmartDashboard.putNumber("Limelight/Crash", Timer.getFPGATimestamp());
 			SmartDashboard.putString("Limelight/Crash Exception", e.getMessage());
-			//SmartDashboard.putString(
-			//		"Limelight/Crash Stacktrace", e.getStackTrace().toString());
 		}
 	}
 
 	public Time getLastUpdateTime() {
-		return io.getLatestEstimateTime();
+		Time latest = Units.Seconds.of(0.0);
+		for (VisionIOLimelight io : ios) {
+			Time ioTime = io.getLatestEstimateTime();
+			if (ioTime.gt(latest)) {
+				latest = ioTime;
+			}
+		}
+		return latest;
 	}
 
 	public Pose2d getLatestUpdate() {

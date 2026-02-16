@@ -10,44 +10,52 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.lib.LoggedTracer;
 import frc.robot.Robot;
 
-public class LimelightSubsystem<IO extends VisionIOLimelight> extends SubsystemBase {
-	protected final IO io;
+import java.util.ArrayList;
+import java.util.List;
 
-	public LimelightSubsystem(VisionIOConfig config, IO io) {
-		super("limelight-left");
-		config = new LimelightConfigBackLeft();
-		config.robotToCameraOffset = new Pose3d();
-		
-		this.io = io;
+public class LimelightSubsystem extends SubsystemBase {
+	protected final List<VisionIOLimelight> ios = new ArrayList<>();
 
-		if (Robot.isReal()) {
-			LimelightHelpers.setCameraPose_RobotSpace(
-					"limelight-left",
-					config.robotToCameraOffset.getX(),
-					config.robotToCameraOffset.getY(),
-					config.robotToCameraOffset.getZ(),
-					Units.radiansToDegrees(
-							config.robotToCameraOffset.getRotation().getX()),
-					Units.radiansToDegrees(
-							config.robotToCameraOffset.getRotation().getY()),
-					Units.radiansToDegrees(
-							config.robotToCameraOffset.getRotation().getZ()));
+	public LimelightSubsystem(VisionIOConfig... configs) {
+		super("Limelight");
+
+		for (VisionIOConfig config : configs) {
+			VisionIOLimelight io = new VisionIOLimelight(config);
+
+			if (Robot.isReal()) {
+				LimelightHelpers.setCameraPose_RobotSpace(
+						config.name,
+						config.robotToCameraOffset.getX(),
+						config.robotToCameraOffset.getY(),
+						config.robotToCameraOffset.getZ(),
+						Units.radiansToDegrees(
+								config.robotToCameraOffset.getRotation().getX()),
+						Units.radiansToDegrees(
+								config.robotToCameraOffset.getRotation().getY()),
+						Units.radiansToDegrees(
+								config.robotToCameraOffset.getRotation().getZ()));
+			}
+
+			ios.add(io);
 		}
-		this.io.updateConfig(config);
 	}
 
 	@Override
 	public void periodic() {
-		io.update();
+		for (VisionIOLimelight io : ios) {
+			io.update();
+		}
 		outputTelemetry();
 	}
 
 	public void disable(boolean disable) {
-		io.disable(disable);
+		for (VisionIOLimelight io : ios) {
+			io.disable(disable);
+		}
 	}
 
 	public boolean getDisabled() {
-		return io.getDisabled();
+		return !ios.isEmpty() && ios.get(0).getDisabled();
 	}
 
 	public void outputTelemetry() {

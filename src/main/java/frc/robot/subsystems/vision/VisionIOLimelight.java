@@ -12,34 +12,35 @@ import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.drive.DriveSubsystem;
-import frc.robot.subsystems.vision.LimelightConstants;
 import frc.robot.subsystems.vision.LimelightHelpers.PoseEstimate;
 
 public class VisionIOLimelight extends VisionIO {
 	private Pose2d latestEstimate = new Pose2d();
 	private Time latestEstimateTime = Units.Seconds.of(0.0);
-	private VisionIOConfig configLeft = LimelightConstants.getVisionIOConfigBackLeft();
-	private VisionIOConfig configRight = LimelightConstants.getVisionIOConfigBackRight();
-	private VisionIOConfig configSide = LimelightConstants.getVisionIOConfigBackRight();
+	private final VisionIOConfig config;
 
 	protected StructPublisher<Pose2d> visPose = NetworkTableInstance.getDefault()
 			.getTable("SmartDashboard/Vision")
 			.getStructTopic("", Pose2d.struct)
 			.publish();
 
+	public VisionIOLimelight(VisionIOConfig config) {
+		this.config = config;
+	}
+
 	@Override
 	public void setLatestEstimate(PoseEstimate poseEstimate, int minTagNum) {
 
-		SmartDashboard.putNumber("limelight-left" + "/FGPA Timestamp", Timer.getFPGATimestamp());
-		
+		SmartDashboard.putNumber(config.name + "/FGPA Timestamp", Timer.getFPGATimestamp());
+
 		if(poseEstimate == null){
 			return;
 		}
-		SmartDashboard.putNumber("limelight-left" + "/Tag Count", poseEstimate.tagCount);
-		
-		
+		SmartDashboard.putNumber(config.name + "/Tag Count", poseEstimate.tagCount);
+
+
 		SmartDashboard.putNumber(
-				"limelight-left" + "/Estimate to FGPA Timestamp", Utils.fpgaToCurrentTime(poseEstimate.timestampSeconds));
+				config.name + "/Estimate to FGPA Timestamp", Utils.fpgaToCurrentTime(poseEstimate.timestampSeconds));
 		if (poseEstimate.tagCount >= minTagNum) {
 			latestEstimate = poseEstimate.pose;
 			latestEstimateTime = Units.Seconds.of(poseEstimate.timestampSeconds);
@@ -63,9 +64,9 @@ public class VisionIOLimelight extends VisionIO {
 	@Override
 	public void update() {
 		updateGyro();
-		setLatestEstimate(LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-left"), 1);
+		setLatestEstimate(LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(config.name), 1);
 
-		SmartDashboard.putBoolean("limelight-left" + "/Disabled", disabled);
+		SmartDashboard.putBoolean(config.name + "/Disabled", disabled);
 	}
 
 	@Override
@@ -73,19 +74,19 @@ public class VisionIOLimelight extends VisionIO {
 		super.disable(disable);
 
 		if (disabled) {
-			LimelightHelpers.setPipelineIndex("limelight-left", LimelightConstants.kDisabledPipeline);
+			LimelightHelpers.setPipelineIndex(config.name, LimelightConstants.kDisabledPipeline);
 		} else {
-			LimelightHelpers.setPipelineIndex("limelight-left", LimelightConstants.kEnabledPipeline);
+			LimelightHelpers.setPipelineIndex(config.name, LimelightConstants.kEnabledPipeline);
 		}
 	}
 
 	private void updateGyro() {
 
 		Rotation2d theta = DriveSubsystem.mInstance.getPose().getRotation();
-		LimelightHelpers.SetRobotOrientation("limelight-left", theta.getDegrees(), 0, 0, 0, 0, 0);
+		LimelightHelpers.SetRobotOrientation(config.name, theta.getDegrees(), 0, 0, 0, 0, 0);
 	}
 
-	public void updateConfig(VisionIOConfig config) {
-		this.configLeft = config;
+	public String getName() {
+		return config.name;
 	}
 }
