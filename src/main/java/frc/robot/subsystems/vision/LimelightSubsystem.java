@@ -4,6 +4,8 @@ package frc.robot.subsystems.vision;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -63,18 +65,24 @@ public class LimelightSubsystem extends SubsystemBase {
 	}
 
 	public static class LimelightConfigBackRight extends VisionIOConfig {
-		public String name = "limelight-right";
-		public Pose3d robotToCameraOffset = new Pose3d();
-		public Vector<N3> aprilTagVisionStdDevs = VecBuilder.fill(0.3, 0.3, 99999.0);
+		public LimelightConfigBackRight() {
+			name = "limelight-right";
+			robotToCameraOffset = new Pose3d();
+			aprilTagVisionStdDevs = VecBuilder.fill(0.3, 0.3, 99999.0);
+		}
 	}
 	public static class LimelightConfigBackLeft extends VisionIOConfig {
-		public String name = "limelight-left";
-		public Pose3d robotToCameraOffset = new Pose3d();
-		public Vector<N3> aprilTagVisionStdDevs = VecBuilder.fill(0.3, 0.3, 99999.0);
+		public LimelightConfigBackLeft() {
+			name = "limelight-left";
+			robotToCameraOffset = new Pose3d();
+			aprilTagVisionStdDevs = VecBuilder.fill(0.3, 0.3, 99999.0);
+		}
 	}
 	public static class LimelightConfigBackSide extends VisionIOConfig {
-		public String name = "limelight-side";
-		public Pose3d robotToCameraOffset = new Pose3d();
-		public Vector<N3> aprilTagVisionStdDevs = VecBuilder.fill(0.3, 0.3, 99999.0);
+		public LimelightConfigBackSide() {
+		 	name = "limelight-side";
+			robotToCameraOffset = new Pose3d();
+			aprilTagVisionStdDevs = VecBuilder.fill(0.3, 0.3, 99999.0);
+		}
 	}
 }

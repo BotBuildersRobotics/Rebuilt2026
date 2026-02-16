@@ -24,11 +24,13 @@ public class LimelightConstants {
 	public static final int kDisabledPipeline = 1;
 	public static final Vector<N3> enabledVisionStdDevs = VecBuilder.fill(0.3, 0.3, 99999.0);
 
-	public static Pose3d kRobotToCameraOffset;
+	public static Pose3d kRobotToCameraOffsetLeft;
+	public static Pose3d kRobotToCameraOffsetRight;
+	public static Pose3d kRobotToCameraOffsetSide;
 
 	static {
 
-			kRobotToCameraOffset = new Pose3d(
+			kRobotToCameraOffsetLeft = new Pose3d(
 					new Translation3d(
 							Units.Centimeters.of(50),
 							Units.Centimeters.of(15),
@@ -37,7 +39,33 @@ public class LimelightConstants {
 					new Rotation3d(
 							Units.Degree.of(0),
 							Units.Degree.of(0),
-							Units.Degree.of(0)
+							Units.Degree.of(180)
+						)
+						);
+
+			kRobotToCameraOffsetRight = new Pose3d(
+					new Translation3d(
+							Units.Centimeters.of(50),
+							Units.Centimeters.of(15),
+							Units.Centimeters.of(0)
+						),
+					new Rotation3d(
+							Units.Degree.of(0),
+							Units.Degree.of(0),
+							Units.Degree.of(180)
+						)
+						);
+			
+			kRobotToCameraOffsetSide = new Pose3d(
+					new Translation3d(
+							Units.Centimeters.of(50),
+							Units.Centimeters.of(15),
+							Units.Centimeters.of(0)
+						),
+					new Rotation3d(
+							Units.Degree.of(0),
+							Units.Degree.of(0),
+							Units.Degree.of(90)
 						)
 						);
 
@@ -46,21 +74,21 @@ public class LimelightConstants {
 	public static final LimelightConfigBackRight getVisionIOConfigBackRight() {
 		LimelightConfigBackRight config = new LimelightConfigBackRight();
 		config.name = "limelight-right";
-		config.robotToCameraOffset = kRobotToCameraOffset;
+		config.robotToCameraOffset = kRobotToCameraOffsetRight;
 		return config;
 	}
 
 	public static final LimelightConfigBackLeft getVisionIOConfigBackLeft() {
 		LimelightConfigBackLeft config = new LimelightConfigBackLeft();
 		config.name = "limelight-left";
-		config.robotToCameraOffset = kRobotToCameraOffset;
+		config.robotToCameraOffset = kRobotToCameraOffsetLeft;
 		return config;
 	}
 
 	public static final LimelightConfigBackSide getVisionIOConfigSide() {
 		LimelightConfigBackSide config = new LimelightConfigBackSide();
 		config.name = "limelight-side";
-		config.robotToCameraOffset = kRobotToCameraOffset;
+		config.robotToCameraOffset = kRobotToCameraOffsetSide;
 		return config;
 	}
 
