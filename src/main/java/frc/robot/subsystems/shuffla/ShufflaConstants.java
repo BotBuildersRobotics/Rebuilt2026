@@ -30,7 +30,7 @@ public class ShufflaConstants {
 		config.Voltage.PeakReverseVoltage = -12.0;
 		
 
-		config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+		config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
 		return config;
 	}

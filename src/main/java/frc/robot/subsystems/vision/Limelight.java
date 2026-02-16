@@ -16,7 +16,7 @@ public class Limelight extends LimelightSubsystem<VisionIOLimelight> {
 	private long numPoseStableUpdates = 0;
 
 	private Limelight() {
-		super(LimelightConstants.getVisionIOConfig(), LimelightConstants.getVisionIO());
+		super(LimelightConstants.getVisionIOConfigBackLeft(), LimelightConstants.getVisionIO());
 	}
 
 	@Override
@@ -38,7 +38,7 @@ public class Limelight extends LimelightSubsystem<VisionIOLimelight> {
 			SmartDashboard.putNumber("Vision/Num Agreed Stable Updates", numPoseStableUpdates);
 		} catch (Exception e) {
 			SmartDashboard.putNumber("Limelight/Crash", Timer.getFPGATimestamp());
-			//SmartDashboard.putString("Limelight/Crash Exception", e.getMessage());
+			SmartDashboard.putString("Limelight/Crash Exception", e.getMessage());
 			//SmartDashboard.putString(
 			//		"Limelight/Crash Stacktrace", e.getStackTrace().toString());
 		}

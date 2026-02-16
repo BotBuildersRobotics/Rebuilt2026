@@ -9,7 +9,9 @@ import frc.robot.lib.AllianceFlipUtil;
 import frc.robot.subsystems.chute.ChuteSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.pivot.PivotSubsystem;
+import frc.robot.subsystems.shooter.ShooterSubsystem;
 import frc.robot.subsystems.shuffla.ShufflaSubsystem;
+import frc.robot.subsystems.turret.ShotCalculator;
 import frc.robot.subsystems.turret.TurretSubsystem;
 
 
@@ -32,6 +34,9 @@ public class SuperSystem extends SubsystemBase {
 
 	public SuperSystem(){
 		
+		ShooterSubsystem.mInstance.setDefaultCommand(ShooterSubsystem.mInstance.runTrackTargetActiveShootingCommand());
+		TurretSubsystem.mInstance.setDefaultCommand(TurretSubsystem.mInstance.runTrackTargetActiveShootingCommand());
+
 	}
 
     @Override
@@ -45,6 +50,8 @@ public class SuperSystem extends SubsystemBase {
     @Override
 	public void periodic() {
 		
+		 // Clear shooting parameters
+    	ShotCalculator.getInstance().clearShootingParameters();
 	}
 
 	 public Command idleIntakes() {
@@ -91,7 +98,7 @@ public class SuperSystem extends SubsystemBase {
 					
 						Commands.sequence( 
 							Shoot(),
-							Intake(),
+						//	Intake(),
 							Commands.sequence(
 								PivotSubsystem.mInstance.setpointCommand(PivotSubsystem.AGITATE)),
 							//Commands.waitUntil(PivotSubsystem.mInstance.isPositionWithinTolerance()),

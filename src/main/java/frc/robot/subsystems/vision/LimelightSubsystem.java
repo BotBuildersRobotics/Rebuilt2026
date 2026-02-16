@@ -13,13 +13,16 @@ import frc.robot.Robot;
 public class LimelightSubsystem<IO extends VisionIOLimelight> extends SubsystemBase {
 	protected final IO io;
 
-	public LimelightSubsystem(LimelightConfig config, IO io) {
-		super(config.name);
+	public LimelightSubsystem(VisionIOConfig config, IO io) {
+		super("limelight-left");
+		config = new LimelightConfigBackLeft();
+		config.robotToCameraOffset = new Pose3d();
+		
 		this.io = io;
 
 		if (Robot.isReal()) {
 			LimelightHelpers.setCameraPose_RobotSpace(
-					config.name,
+					"limelight-left",
 					config.robotToCameraOffset.getX(),
 					config.robotToCameraOffset.getY(),
 					config.robotToCameraOffset.getZ(),
@@ -51,8 +54,18 @@ public class LimelightSubsystem<IO extends VisionIOLimelight> extends SubsystemB
 		LoggedTracer.record("Vision");
 	}
 
-	public static class LimelightConfig {
-		public String name = "limelight";
+	public static class LimelightConfigBackRight extends VisionIOConfig {
+		public String name = "limelight-right";
+		public Pose3d robotToCameraOffset = new Pose3d();
+		public Vector<N3> aprilTagVisionStdDevs = VecBuilder.fill(0.3, 0.3, 99999.0);
+	}
+	public static class LimelightConfigBackLeft extends VisionIOConfig {
+		public String name = "limelight-left";
+		public Pose3d robotToCameraOffset = new Pose3d();
+		public Vector<N3> aprilTagVisionStdDevs = VecBuilder.fill(0.3, 0.3, 99999.0);
+	}
+	public static class LimelightConfigBackSide extends VisionIOConfig {
+		public String name = "limelight-side";
 		public Pose3d robotToCameraOffset = new Pose3d();
 		public Vector<N3> aprilTagVisionStdDevs = VecBuilder.fill(0.3, 0.3, 99999.0);
 	}

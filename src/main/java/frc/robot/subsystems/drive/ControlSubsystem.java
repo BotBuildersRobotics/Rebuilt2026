@@ -66,8 +66,8 @@ public class ControlSubsystem {
 		//driver.x().onTrue(TurretSubsystem.mInstance.zeroCommand());
 		//driver.y().onTrue(TurretSubsystem.mInstance.runTrackTargetCommand());
 
-		driver.x().onTrue(PivotSubsystem.mInstance.setpointCommand(PivotSubsystem.mInstance.DEPLOY));
-		driver.y().onTrue(PivotSubsystem.mInstance.setpointCommand(PivotSubsystem.mInstance.AGITATE));
+		//driver.x().onTrue(PivotSubsystem.mInstance.setpointCommand(PivotSubsystem.mInstance.DEPLOY));
+		//driver.y().onTrue(PivotSubsystem.mInstance.setpointCommand(PivotSubsystem.mInstance.AGITATE));
 
 		//driver.b().onTrue(SuperSystem.mInstance.AimAtCenterHub());
 		//driver.rightBumper().onTrue(SuperSystem.mInstance.AimAtPassingZone());
@@ -83,12 +83,18 @@ public class ControlSubsystem {
 		driver.a().onTrue(ShooterSubsystem.mInstance.stopCommand());
 		//driver.a().onTrue(ShooterSubsystem.mInstance.setpointCommand(ShooterSubsystem.IDLE));
 
-		driver.leftBumper().onTrue(
+		/*driver.leftBumper().onTrue(
 			//Commands.parallel(
 				SuperSystem.mInstance.agitateCommand()//,
 			//	s.Shoot()
 			//)
+		);*/
+
+		driver.rightBumper().onTrue(
+			PivotSubsystem.mInstance.resetDeployPosition()
 		);
+
+		driver.start().onTrue(DriveSubsystem.mInstance.runOnce( () ->DriveSubsystem.mInstance.getDrivetrain().seedFieldCentric()));
 
 		//driver.leftBumper().onTrue(Commands.runOnce(SignalLogger::start));
 		//driver.rightBumper().onTrue(Commands.runOnce(SignalLogger::stop));

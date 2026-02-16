@@ -10,7 +10,9 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
-import frc.robot.subsystems.vision.LimelightSubsystem.LimelightConfig;
+
+import frc.robot.subsystems.vision.LimelightSubsystem.LimelightConfigBackLeft;
+import frc.robot.subsystems.vision.LimelightSubsystem.LimelightConfigBackRight;
 
 
 
@@ -40,9 +42,16 @@ public class LimelightConstants {
 		
 	}
 
-	public static final LimelightConfig getVisionIOConfig() {
-		LimelightConfig config = new LimelightConfig();
+	public static final LimelightConfigBackRight getVisionIOConfigBackRight() {
+		LimelightConfigBackRight config = new LimelightConfigBackRight();
 		config.name = kLimelightName;
+		config.robotToCameraOffset = kRobotToCameraOffset;
+		return config;
+	}
+
+	public static final LimelightConfigBackLeft getVisionIOConfigBackLeft() {
+		LimelightConfigBackLeft config = new LimelightConfigBackLeft();
+		config.name = "limelight-left";
 		config.robotToCameraOffset = kRobotToCameraOffset;
 		return config;
 	}

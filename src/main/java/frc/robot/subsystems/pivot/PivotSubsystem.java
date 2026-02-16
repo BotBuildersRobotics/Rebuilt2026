@@ -3,6 +3,8 @@ package frc.robot.subsystems.pivot;
 
 import frc.robot.lib.io.ServoMotorSubsystem;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.lib.io.MotorIO.Setpoint;
 import frc.robot.subsystems.pivot.PivotConstants;
 import frc.robot.lib.io.MotorIOTalonFX;
@@ -36,6 +38,11 @@ public class PivotSubsystem extends ServoMotorSubsystem<MotorIOTalonFX> {
 		
 
 		return () -> currentPosition.isNear(targetPosition, Degrees.of(5));
+	}
+
+	public Command resetDeployPosition(){
+
+		return Commands.runOnce(() -> this.setCurrentPosition(Degrees.of(45)));
 	}
 
 

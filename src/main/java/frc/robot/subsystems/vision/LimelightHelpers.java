@@ -717,7 +717,7 @@ public class LimelightHelpers {
 
 		if (poseArray.length == 0) {
 			// Handle the case where no data is available
-			SmartDashboard.putNumber("Limelight/Thing Returns Null?", Timer.getFPGATimestamp());
+			SmartDashboard.putNumber("Limelight/Thing Returns Null?" + limelightName, Timer.getFPGATimestamp());
 			return null; // or some default PoseEstimate
 		}
 

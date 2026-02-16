@@ -88,7 +88,7 @@ public class RobotContainer {
 			Limelight.mInstance,
 			IntakeSubsystem.mInstance,
 			PivotSubsystem.mInstance,
-			//TurretSubsystem.mInstance,
+			TurretSubsystem.mInstance,
 			//HoodSubsystem.mInstance,
 			ShooterSubsystem.mInstance,
 			ChuteSubsystem.mInstance,
@@ -105,14 +105,8 @@ public class RobotContainer {
 
 		//DriveSubsystem.mInstance.getDrivetrain().seedFieldCentric();
 
-		DriveSubsystem.mInstance.getDrivetrain().resetPose(new Pose2d(3.6256, 4.0346, Rotation2d.fromDegrees(0)));
-
-		DriveSubsystem.mInstance.getDrivetrain().resetPose(new Pose2d(3.6256, 4.0346, Rotation2d.fromDegrees(0)));
-
-		ShooterSubsystem.mInstance.setDefaultCommand(ShooterSubsystem.mInstance.runTrackTargetActiveShootingCommand());
-
-		//TurretSubsystem.mInstance.setDefaultCommand(TurretSubsystem.mInstance.runTrackTargetActiveShootingCommand());
-
+		
+		
 		
 		
 		autoChooser = AutoBuilder.buildAutoChooser();
