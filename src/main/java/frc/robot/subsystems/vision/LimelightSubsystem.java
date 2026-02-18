@@ -67,14 +67,16 @@ public class LimelightSubsystem extends SubsystemBase {
 	public static class LimelightConfigBackRight extends VisionIOConfig {
 		public LimelightConfigBackRight() {
 			name = "limelight-right";
-			robotToCameraOffset = new Pose3d();
+			var rotation3d = new Rotation3d(0, 10 * Math.PI /180, 5 * Math.PI/180.0);
+			robotToCameraOffset = new Pose3d(.25324371789,.26608534095,.30238062549, rotation3d);
 			aprilTagVisionStdDevs = VecBuilder.fill(0.3, 0.3, 99999.0);
 		}
 	}
 	public static class LimelightConfigBackLeft extends VisionIOConfig {
-		public LimelightConfigBackLeft() {
+		public LimelightConfigBackLeft() { 
 			name = "limelight-left";
-			robotToCameraOffset = new Pose3d();
+			var rotation3d = new Rotation3d(0, 10 * Math.PI /180, -5 * Math.PI/180.0);
+			robotToCameraOffset = new Pose3d(.25324371985, .26608534095,.302380625494, rotation3d);
 			aprilTagVisionStdDevs = VecBuilder.fill(0.3, 0.3, 99999.0);
 		}
 	}

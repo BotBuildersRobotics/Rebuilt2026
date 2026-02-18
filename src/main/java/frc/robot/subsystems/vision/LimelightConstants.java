@@ -29,12 +29,30 @@ public class LimelightConstants {
 	public static Pose3d kRobotToCameraOffsetSide;
 
 	static {
+		/*5 up 10 side
+
+
+L:
+X = 253.24371985mm 
+Y = 266.08534095mm 
+Z = 302.38062549mm 
+
+R:
+X = 253.24371789mm 
+Y = -266.08534095mm 
+Z = 302.38062549mm 
+
+Side:
+X = 341.20250702
+Y = -211.61549741
+Z = 481.82229676
+ */
 
 			kRobotToCameraOffsetLeft = new Pose3d(
 					new Translation3d(
-							Units.Centimeters.of(50),
-							Units.Centimeters.of(15),
-							Units.Centimeters.of(0)
+							Units.Centimeters.of(525.32),
+							Units.Centimeters.of(26.1),
+							Units.Centimeters.of(30.24)
 						),
 					new Rotation3d(
 							Units.Degree.of(0),
@@ -45,9 +63,9 @@ public class LimelightConstants {
 
 			kRobotToCameraOffsetRight = new Pose3d(
 					new Translation3d(
-							Units.Centimeters.of(50),
-							Units.Centimeters.of(15),
-							Units.Centimeters.of(0)
+							Units.Centimeters.of(25.32),
+							Units.Centimeters.of(26.61),
+							Units.Centimeters.of(30.24)
 						),
 					new Rotation3d(
 							Units.Degree.of(0),
@@ -62,6 +80,7 @@ public class LimelightConstants {
 							Units.Centimeters.of(15),
 							Units.Centimeters.of(0)
 						),
+						
 					new Rotation3d(
 							Units.Degree.of(0),
 							Units.Degree.of(0),
