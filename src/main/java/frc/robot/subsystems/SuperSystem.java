@@ -20,6 +20,12 @@ public class SuperSystem extends SubsystemBase {
     
     public static SuperSystem mInstance;
 
+	private TurretSubsystem turret;
+
+	private ShooterSubsystem shooter;
+
+	private ShotCalculator shotCalc;
+
 	//private AprilTagFieldLayout kAprilTagMap = AprilTagFieldLayout.loadField(AprilTagFields);
 
 
@@ -33,10 +39,20 @@ public class SuperSystem extends SubsystemBase {
 	}
 
 	public SuperSystem(){
-		
-		ShooterSubsystem.mInstance.setDefaultCommand(ShooterSubsystem.mInstance.runTrackTargetActiveShootingCommand());
-		TurretSubsystem.mInstance.setDefaultCommand(TurretSubsystem.mInstance.runTrackTargetActiveShootingCommand());
 
+		shooter = new ShooterSubsystem();
+		turret = new TurretSubsystem();
+		shotCalc = new ShotCalculator();
+		shotCalc.getParameters(); // THIS IS IMPORTANT -  it will cause the field json to load, before teleop init
+
+		turret.setShotCalculator(shotCalc);
+		shooter.setShotCalculator(shotCalc);
+		
+		shooter.setDefaultCommand(shooter.runTrackTargetActiveShootingCommand());
+		turret.setDefaultCommand(turret.runTrackTargetActiveShootingCommand());
+
+		
+		
 	}
 
     @Override
@@ -51,7 +67,7 @@ public class SuperSystem extends SubsystemBase {
 	public void periodic() {
 		
 		 // Clear shooting parameters
-    	ShotCalculator.getInstance().clearShootingParameters();
+    	shotCalc.clearShootingParameters();
 	}
 
 	 public Command idleIntakes() {
@@ -85,12 +101,13 @@ public class SuperSystem extends SubsystemBase {
 	}
 
 	public Command AimAtCenterHub(){
-		return TurretSubsystem.mInstance.pointAtFieldPosition(frc.robot.FieldConstants.Hub.innerCenterPoint.toTranslation2d());
+		return turret.pointAtFieldPosition(frc.robot.FieldConstants.Hub.innerCenterPoint.toTranslation2d());
 	}
 
 	public Command AimAtPassingZone(){
-		return TurretSubsystem.mInstance.pointAtFieldPosition((frc.robot.FieldConstants.Outpost.centerPoint));
+		return turret.pointAtFieldPosition((frc.robot.FieldConstants.Outpost.centerPoint));
 	}
+
 
 	public Command agitateCommand(){
 		return //runOnce( () ->

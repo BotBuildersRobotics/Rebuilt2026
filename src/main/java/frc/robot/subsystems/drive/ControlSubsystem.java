@@ -80,7 +80,7 @@ public class ControlSubsystem {
 		
 		//driver.leftBumper().onTrue(ShooterSubsystem.mInstance.setpointCommand(ShooterSubsystem.SHOOT));
 		//driver.leftBumper().onTrue(ShooterSubsystem.mInstance.runTrackTargetActiveShootingCommand());
-		driver.a().onTrue(ShooterSubsystem.mInstance.stopCommand());
+		//driver.a().onTrue(ShooterSubsystem.mInstance.stopCommand());
 		//driver.a().onTrue(ShooterSubsystem.mInstance.setpointCommand(ShooterSubsystem.IDLE));
 
 		/*driver.leftBumper().onTrue(

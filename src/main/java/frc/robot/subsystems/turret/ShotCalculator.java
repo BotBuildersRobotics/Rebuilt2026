@@ -27,7 +27,7 @@ import org.littletonrobotics.junction.Logger;
 
 public class ShotCalculator {
   private static ShotCalculator instance;
-  private static Transform2d robotToTurret = new Transform2d();
+  private static Transform2d robotToTurret = new Transform2d(-0.25,0.25,Rotation2d.kZero);
 
   private Rotation2d lastTurretAngle;
   private double lastHoodAngle;

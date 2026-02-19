@@ -1,5 +1,6 @@
 package frc.robot.subsystems.intake;
 
+import com.ctre.phoenix6.configs.SoftwareLimitSwitchConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.TalonFXSConfiguration;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -45,6 +46,11 @@ public class IntakeConstants {
 		config.unit = Units.Rotations;
 		config.mainID = Ports.INTAKE.getDeviceNumber();
 		config.mainBus = Ports.INTAKE.getBus();
+
+		config.followerConfig = getFXConfig();
+		config.followerOpposeMain = new boolean[] {true};
+		config.followerBuses = new String[] {Ports.INTAKE_2.getBus()};
+		config.followerIDs = new int[] {Ports.INTAKE_2.getDeviceNumber()};
 		return config;
 	}
 

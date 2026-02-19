@@ -93,8 +93,9 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
     TRACKING
   }
 
-  public static final TurretSubsystem mInstance = new TurretSubsystem();
+  //public static final TurretSubsystem mInstance = new TurretSubsystem();
 
+  private ShotCalculator shotCalc;
   
 	public TurretSubsystem() {
 		super(TurretConstants.getMotorIO(), "Turret Motor");
@@ -113,6 +114,10 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
     // Initialize field visualization for AdvantageScope
     fieldViz = new Field2d();
     SmartDashboard.putData("Turret Field Viz", fieldViz);
+  }
+
+  public void setShotCalculator(ShotCalculator shotCalc){
+    this.shotCalc = shotCalc;
   }
 
    public void periodic() {
@@ -242,7 +247,7 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
   public Command runTrackTargetCommand() {
     return run(
         () -> {
-          var params = ShotCalculator.getInstance().getParameters();
+          var params = shotCalc.getParameters();
           setFieldRelativeTarget(params.turretAngle(), params.turretVelocity());
           setShootState(ShootState.TRACKING);
         });
@@ -251,7 +256,7 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
   public Command runTrackTargetActiveShootingCommand() {
     return run(
         () -> {
-          var params = ShotCalculator.getInstance().getParameters();
+          var params = shotCalc.getParameters();
           setFieldRelativeTarget(params.turretAngle(), params.turretVelocity());
           setShootState(ShootState.ACTIVE_SHOOTING);
         });

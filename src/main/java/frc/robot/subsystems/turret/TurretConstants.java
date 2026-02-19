@@ -17,8 +17,8 @@ import frc.robot.Robot;
 public class TurretConstants {
 	
 	public static final int id = 0;
-	public static final double anglePerCount = 360; //TODO find this
-	public static final Translation2d turretOffset = new Translation2d(0, 0);
+	//public static final double anglePerCount = 360; //TODO find this
+	//public static final Translation2d turretOffset = new Translation2d(0, 0);
 
 	public static final double toleranceDeg = 1;
 	public static final double debounceTime = 0.15;
@@ -41,7 +41,7 @@ public class TurretConstants {
 
 		config.MotionMagic.MotionMagicCruiseVelocity =  80 * 2 * Math.PI; // rotations/sec at mechanism
    		config.MotionMagic.MotionMagicAcceleration = 160 * 2 * Math.PI; // rotations/sec² at mechanism
-    	//config.MotionMagic.MotionMagicJerk = 1600; // rotations/sec³ at mechanism
+    	
 
 
 		config.Voltage.PeakForwardVoltage = 12.0;

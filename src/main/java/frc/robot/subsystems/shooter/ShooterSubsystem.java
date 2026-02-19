@@ -25,14 +25,19 @@ public class ShooterSubsystem  extends MotorSubsystem<MotorIOTalonFX> {
     // 10 rads / sec = 95.493 RPM
    // public static final Setpoint COAST = Setpoint.withVelocitySetpoint(AngularVelocity.ofBaseUnits(10, RadiansPerSecond));
 
-	public static final ShooterSubsystem mInstance = new ShooterSubsystem();
+	//public static final ShooterSubsystem mInstance = new ShooterSubsystem();
 
 	public static final Setpoint SHOOT = Setpoint.withVoltageSetpoint(ShooterConstants.kShootVoltage);
 	
+    private ShotCalculator shotCalc;
 
 	public ShooterSubsystem() {
 		super(ShooterConstants.getMotorIO(), "Shooter Rollers");
 	}
+
+    public void setShotCalculator(ShotCalculator shotCalc){
+        this.shotCalc = shotCalc;
+    }
 
     private void runVelocity(double velocityRadsPerSec) {
         this.applySetpoint(Setpoint.withVelocitySetpoint(
@@ -46,7 +51,7 @@ public class ShooterSubsystem  extends MotorSubsystem<MotorIOTalonFX> {
     public Command runTrackTargetActiveShootingCommand() {
         return run(
             () -> {
-            var params = ShotCalculator.getInstance().getParameters();
+            var params = shotCalc.getParameters();
                 runVelocity( params.flywheelSpeed());
             
             });

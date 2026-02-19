@@ -61,9 +61,9 @@ public class MotorIOTalonFX extends MotorIO {
 	public void updateInputs() {
 		updateMotorInputs(inputs, main);
 
-		for (int i = 0; i < followers.length; i++) {
+		/*for (int i = 0; i < followers.length; i++) {
 			updateMotorInputs(followerInputs[i], followers[i]);
-		}
+		}*/
 	}
 
 	/**
