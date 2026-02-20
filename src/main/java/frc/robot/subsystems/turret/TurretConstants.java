@@ -47,7 +47,7 @@ public class TurretConstants {
 		config.Voltage.PeakForwardVoltage = 12.0;
 		config.Voltage.PeakReverseVoltage = -12.0;
 		
-		config.Feedback.SensorToMechanismRatio = 41.6667;
+		config.Feedback.SensorToMechanismRatio = 40;
 		config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
 		config.Slot0.kP = 35.0; //TODO - Tune for turret
@@ -81,7 +81,7 @@ public class TurretConstants {
 		MotorIOSim.MotorIOSimConfig config = new MotorIOSim.MotorIOSimConfig();
 		config.unit = Units.Rotations;
 		config.time = Units.Minute;
-		config.gearing = 41.6667; // Must match SensorToMechanismRatio
+		config.gearing = 40; // Must match SensorToMechanismRatio
 		config.jKgMetersSquared = 0.01; // Moment of inertia for turret (increased for stability)
 		config.inverted = false; // Normal direction for field-relative tracking (turret counter-rotates)
 

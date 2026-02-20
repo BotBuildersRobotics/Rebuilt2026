@@ -60,7 +60,7 @@ public class ShotCalculator {
 
   // Min/max distances for interpolation maps to prevent extrapolation.
   // Update these if you add data points outside this range.
-  private static final double MIN_SHOOTING_DISTANCE_METERS = 1.8;
+  private static final double MIN_SHOOTING_DISTANCE_METERS = 0.3;
   private static final double MAX_SHOOTING_DISTANCE_METERS = 5.0;
 
   static {
@@ -69,10 +69,10 @@ public class ShotCalculator {
     shotHoodAngleMap.put(3.75661, Rotation2d.fromDegrees(30.0));
     shotHoodAngleMap.put(4.96786, Rotation2d.fromDegrees(35.0));
 
-    shotFlywheelSpeedMap.put(1.8122, 200.0);
-    shotFlywheelSpeedMap.put(2.612079, 210.0);
-    shotFlywheelSpeedMap.put(3.75661, 230.0);
-    shotFlywheelSpeedMap.put(4.96786, 260.0);
+    shotFlywheelSpeedMap.put(1.8122, 130.0);
+    shotFlywheelSpeedMap.put(2.612079, 150.0);
+    shotFlywheelSpeedMap.put(3.75661, 170.0);
+    shotFlywheelSpeedMap.put(4.96786, 200.0);
 
     timeOfFlightMap.put(1.64227, 0.93);
     timeOfFlightMap.put(2.859544, 1.0);

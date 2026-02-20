@@ -11,10 +11,6 @@ import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 
-import frc.robot.subsystems.vision.LimelightSubsystem.LimelightConfigBackLeft;
-import frc.robot.subsystems.vision.LimelightSubsystem.LimelightConfigBackRight;
-import frc.robot.subsystems.vision.LimelightSubsystem.LimelightConfigBackSide;
-
 
 
 public class LimelightConstants {
@@ -90,22 +86,22 @@ Z = 481.82229676
 
 	}
 
-	public static final LimelightConfigBackRight getVisionIOConfigBackRight() {
-		LimelightConfigBackRight config = new LimelightConfigBackRight();
+	public static final VisionIOConfig getVisionIOConfigBackRight() {
+		VisionIOConfig config = new VisionConfig();
 		config.name = "limelight-right";
 		config.robotToCameraOffset = kRobotToCameraOffsetRight;
 		return config;
 	}
 
-	public static final LimelightConfigBackLeft getVisionIOConfigBackLeft() {
-		LimelightConfigBackLeft config = new LimelightConfigBackLeft();
+	public static final VisionIOConfig getVisionIOConfigBackLeft() {
+		VisionIOConfig config = new VisionConfig();
 		config.name = "limelight-left";
 		config.robotToCameraOffset = kRobotToCameraOffsetLeft;
 		return config;
 	}
 
-	public static final LimelightConfigBackSide getVisionIOConfigSide() {
-		LimelightConfigBackSide config = new LimelightConfigBackSide();
+	public static final VisionIOConfig getVisionIOConfigSide() {
+		VisionIOConfig config = new VisionConfig();
 		config.name = "limelight-side";
 		config.robotToCameraOffset = kRobotToCameraOffsetSide;
 		return config;

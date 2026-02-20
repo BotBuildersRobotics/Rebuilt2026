@@ -18,6 +18,8 @@ public class Ports {
    
     public static final CanDeviceId PIVOT = new CanDeviceId(15, "canivore");
 
+    public static final CanDeviceId CLIMB = new CanDeviceId(27, "canivore");
+
     public static final int PIGEON = 13;
 
 

@@ -44,6 +44,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.SuperSystem;
 import frc.robot.subsystems.chute.ChuteSubsystem;
+import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
 import frc.robot.subsystems.drive.ControlSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem;
@@ -88,6 +89,7 @@ public class RobotContainer {
 			Limelight.mInstance,
 			IntakeSubsystem.mInstance,
 			PivotSubsystem.mInstance,
+			ClimbSubsystem.mInstance,
 			//TurretSubsystem.mInstance,
 			//HoodSubsystem.mInstance,
 			//ShooterSubsystem.mInstance,
