@@ -184,6 +184,8 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
       SmartDashboard.putNumber("Turret/BestAngleRad", bestAngle);
       SmartDashboard.putNumber("Turret/SetpointPositionRad", setpoint.position);
       SmartDashboard.putNumber("Turret/SetpointVelocityRadPerSec", setpoint.velocity);
+     
+      SmartDashboard.putNumber("Turret/Offset",turretOffset);
 
       this.applySetpoint(Setpoint.withMotionMagicSetpoint(Radians.of(setpoint.position)));
       //this.applySetpoint(Setpoint.withPositionVelocitySetpoint(Radians.of(setpoint.position), RadiansPerSecond.of(setpoint.velocity)));
@@ -232,6 +234,14 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
     setCurrentPosition(Radians.of(0.0));
   }
 
+  public void offsetLeft(){
+    turretOffset += 5.0;
+  }
+
+  public void offsetRight(){
+    turretOffset -= 5.0;
+  }
+
   public double getTurretAngle() {
     return  turretOffset + getPosition().in(Radians); 
   }
@@ -248,7 +258,7 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
     return run(
         () -> {
           var params = shotCalc.getParameters();
-          setFieldRelativeTarget(params.turretAngle(), params.turretVelocity());
+          setFieldRelativeTarget(params.turretAngle().plus(Rotation2d.fromDegrees(turretOffset)), params.turretVelocity());
           setShootState(ShootState.TRACKING);
         });
   }
@@ -257,7 +267,7 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
     return run(
         () -> {
           var params = shotCalc.getParameters();
-          setFieldRelativeTarget(params.turretAngle(), params.turretVelocity());
+          setFieldRelativeTarget(params.turretAngle().plus(Rotation2d.fromDegrees(turretOffset)), params.turretVelocity());
           setShootState(ShootState.ACTIVE_SHOOTING);
         });
   }
@@ -265,7 +275,7 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
   public Command runFixedCommand(Supplier<Rotation2d> angle, DoubleSupplier velocity) {
     return run(
         () -> {
-          setFieldRelativeTarget(angle.get(), velocity.getAsDouble());
+          setFieldRelativeTarget(angle.get().plus(Rotation2d.fromDegrees(turretOffset)), velocity.getAsDouble());
           setShootState(ShootState.TRACKING);
         });
   }
@@ -303,6 +313,7 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
       SmartDashboard.putNumber("Turret/TargetY", targetPosition.getY());
       SmartDashboard.putNumber("Turret/AngleToTargetDeg", angleToTarget.getDegrees());
       SmartDashboard.putNumber("Turret/DistanceToTarget", toTarget.getNorm());
+      SmartDashboard.putNumber("Turret/Offset",turretOffset);
     });
   }
 

@@ -50,6 +50,7 @@ import frc.robot.subsystems.drive.ControlSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.hood.HoodSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
+import frc.robot.subsystems.led.LedSubsystem;
 import frc.robot.subsystems.pivot.PivotSubsystem;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
 import frc.robot.subsystems.shuffla.ShufflaSubsystem;
@@ -96,6 +97,7 @@ public class RobotContainer {
 			ChuteSubsystem.mInstance,
 			ShufflaSubsystem.mInstance,
 			SuperSystem.mInstance,
+			LedSubsystem.mInstance
 			
 		}) {
 			SmartDashboard.putData(s);

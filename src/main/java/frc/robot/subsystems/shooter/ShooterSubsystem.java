@@ -1,5 +1,6 @@
 package frc.robot.subsystems.shooter;
 
+import frc.robot.lib.LoggedTunableNumber;
 import frc.robot.lib.io.MotorIO.Setpoint;
 
 import static edu.wpi.first.units.Units.RadiansPerSecond;
@@ -11,7 +12,9 @@ import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.controls.VoltageOut;
 
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.lib.io.MotorIOTalonFX;
 import frc.robot.lib.io.MotorSubsystem;
@@ -20,6 +23,10 @@ import frc.robot.subsystems.turret.ShotCalculator;
 public class ShooterSubsystem  extends MotorSubsystem<MotorIOTalonFX> {
 	
     public static final Setpoint IDLE = Setpoint.withNeutralSetpoint();
+
+    private static final LoggedTunableNumber manualShooter = new LoggedTunableNumber("Shooter/Manual");
+
+    private boolean manualTune = false;
     
     //RPM = radians / second * 9.5493
     // 10 rads / sec = 95.493 RPM
@@ -33,6 +40,7 @@ public class ShooterSubsystem  extends MotorSubsystem<MotorIOTalonFX> {
 
 	public ShooterSubsystem() {
 		super(ShooterConstants.getMotorIO(), "Shooter Rollers");
+        manualShooter.initDefault(200);
 	}
 
     public void setShotCalculator(ShotCalculator shotCalc){
@@ -44,6 +52,26 @@ public class ShooterSubsystem  extends MotorSubsystem<MotorIOTalonFX> {
             AngularVelocity.ofBaseUnits(velocityRadsPerSec, RadiansPerSecond)));
     }
 
+    public Command setManualShooterVelocity(){
+
+        return Commands.runOnce(() -> {
+            this.manualTune = true; 
+            this.applySetpoint(Setpoint.withVelocitySetpoint(
+            AngularVelocity.ofBaseUnits(manualShooter.get(), RadiansPerSecond)));
+        
+        });
+
+    }
+
+     public void periodic() {
+        super.periodic();
+         SmartDashboard.putNumber("Shooter/Speed",this.getVelocity().baseUnitMagnitude());
+     }
+
+    public Command resetAutoMap(){
+        return Commands.runOnce(() -> this.manualTune = false);
+    }
+
     private void stop() {
         this.applySetpoint(IDLE);
     }
@@ -51,8 +79,10 @@ public class ShooterSubsystem  extends MotorSubsystem<MotorIOTalonFX> {
     public Command runTrackTargetActiveShootingCommand() {
         return run(
             () -> {
-            var params = shotCalc.getParameters();
-                runVelocity( params.flywheelSpeed());
+                if(!this.manualTune){
+                    var params = shotCalc.getParameters();
+                    runVelocity( params.flywheelSpeed());
+                }
             
             });
     }

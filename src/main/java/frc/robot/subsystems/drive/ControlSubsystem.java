@@ -14,6 +14,7 @@ import frc.robot.subsystems.SuperSystem;
 import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.intake.IntakeConstants;
 import frc.robot.subsystems.intake.IntakeSubsystem;
+import frc.robot.subsystems.led.LedSubsystem;
 import frc.robot.subsystems.pivot.PivotSubsystem;
 import frc.robot.subsystems.shooter.ShooterConstants;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
@@ -115,6 +116,23 @@ public class ControlSubsystem {
     }
 
 	public void operatorControls(){
+
+		operator.a().onTrue(
+			SuperSystem.mInstance.setManualShooterVelocity()
+		);	
+		operator.b().onTrue(
+			SuperSystem.mInstance.resetAutoMap()
+		);	
+
+		operator.leftTrigger().onTrue(
+			SuperSystem.mInstance.offsetTurretLeft()
+		);
+
+		operator.rightTrigger().onTrue(
+			SuperSystem.mInstance.offsetTurretRight()
+		);
+
+		operator.x().onTrue(LedSubsystem.mInstance.setBlue());
 
 		operator.leftBumper().onTrue(ClimbSubsystem.mInstance.setpointCommand(ClimbSubsystem.CLIMB) ).onFalse(ClimbSubsystem.mInstance.setpointCommand(ClimbSubsystem.STOP));
 		operator.rightBumper().onTrue(ClimbSubsystem.mInstance.setpointCommand(ClimbSubsystem.REVERSE) ).onFalse(ClimbSubsystem.mInstance.setpointCommand(ClimbSubsystem.STOP));

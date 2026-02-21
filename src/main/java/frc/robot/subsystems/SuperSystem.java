@@ -109,19 +109,35 @@ public class SuperSystem extends SubsystemBase {
 	}
 
 
+	public Command setManualShooterVelocity(){
+		//use the tunable value;
+		return shooter.setManualShooterVelocity();
+	}
 
+	public Command resetAutoMap(){
+		return shooter.resetAutoMap();
+	}
 
+	public Command offsetTurretLeft(){
+		return Commands.runOnce(() ->
+			turret.offsetLeft()
+		);
+	}
+
+	public Command offsetTurretRight(){
+		return Commands.runOnce(() ->
+			turret.offsetRight()
+		);
+	}
 
 	public Command agitateCommand(){
-		return //runOnce( () ->
-					
+		return
 					
 						Commands.sequence( 
 							Shoot(),
 						//	Intake(),
 							Commands.sequence(
 								PivotSubsystem.mInstance.setpointCommand(PivotSubsystem.AGITATE)),
-							//Commands.waitUntil(PivotSubsystem.mInstance.isPositionWithinTolerance()),
 								Commands.waitSeconds(0.2),
 								PivotSubsystem.mInstance.setpointCommand(PivotSubsystem.DEPLOY))
 					.repeatedly()
