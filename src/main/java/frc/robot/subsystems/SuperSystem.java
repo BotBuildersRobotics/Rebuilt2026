@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.lib.AllianceFlipUtil;
 import frc.robot.subsystems.chute.ChuteSubsystem;
+import frc.robot.subsystems.hood.HoodSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.pivot.PivotSubsystem;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
@@ -26,6 +27,8 @@ public class SuperSystem extends SubsystemBase {
 
 	private ShotCalculator shotCalc;
 
+	private HoodSubsystem hood;
+
 	//private AprilTagFieldLayout kAprilTagMap = AprilTagFieldLayout.loadField(AprilTagFields);
 
 
@@ -42,17 +45,17 @@ public class SuperSystem extends SubsystemBase {
 
 		shooter = new ShooterSubsystem();
 		turret = new TurretSubsystem();
+		hood = new HoodSubsystem();
 		shotCalc = new ShotCalculator();
 		shotCalc.getParameters(); // THIS IS IMPORTANT -  it will cause the field json to load, before teleop init
 
+		hood.setShotCalculator(shotCalc);
 		turret.setShotCalculator(shotCalc);
 		shooter.setShotCalculator(shotCalc);
 		
 		shooter.setDefaultCommand(shooter.runTrackTargetActiveShootingCommand());
 		turret.setDefaultCommand(turret.runTrackTargetActiveShootingCommand());
 
-		
-		
 	}
 
     @Override
@@ -68,6 +71,8 @@ public class SuperSystem extends SubsystemBase {
 		
 		 // Clear shooting parameters
     	shotCalc.clearShootingParameters();
+		shooter.periodic();
+		hood.periodic();
 	}
 
 	 public Command idleIntakes() {
@@ -111,11 +116,20 @@ public class SuperSystem extends SubsystemBase {
 
 	public Command setManualShooterVelocity(){
 		//use the tunable value;
-		return shooter.setManualShooterVelocity();
+
+		return
+		Commands.sequence(
+			shooter.setManualShooterVelocity(),
+			hood.setManualHoodAngle()
+		);
 	}
 
 	public Command resetAutoMap(){
-		return shooter.resetAutoMap();
+		return 
+		Commands.sequence(		
+			shooter.resetAutoMap(),
+		 	hood.resetAutoMap()
+		);
 	}
 
 	public Command offsetTurretLeft(){

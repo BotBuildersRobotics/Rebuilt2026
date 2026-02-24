@@ -23,6 +23,7 @@ import edu.wpi.first.math.interpolation.InterpolatingTreeMap;
 import edu.wpi.first.math.interpolation.InverseInterpolator;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.RobotState;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 import frc.robot.FieldConstants;
 import frc.robot.lib.AllianceFlipUtil;
@@ -85,16 +86,16 @@ public class ShotCalculator {
     maxDistance = 5.60;
     phaseDelay = 0.03;
 
-   launchHoodAngleMap.put(1.34, Rotation2d.fromDegrees(19.0));
-    launchHoodAngleMap.put(1.78, Rotation2d.fromDegrees(19.0));
-    launchHoodAngleMap.put(2.17, Rotation2d.fromDegrees(24.0));
-    launchHoodAngleMap.put(2.81, Rotation2d.fromDegrees(27.0));
-    launchHoodAngleMap.put(3.82, Rotation2d.fromDegrees(29.0));
-    launchHoodAngleMap.put(4.09, Rotation2d.fromDegrees(30.0));
-    launchHoodAngleMap.put(4.40, Rotation2d.fromDegrees(31.0));
-    launchHoodAngleMap.put(4.77, Rotation2d.fromDegrees(32.0));
-    launchHoodAngleMap.put(5.57, Rotation2d.fromDegrees(32.0));
-    launchHoodAngleMap.put(5.60, Rotation2d.fromDegrees(35.0));
+   launchHoodAngleMap.put(1.34, Rotation2d.fromDegrees(0.0));
+    launchHoodAngleMap.put(1.78, Rotation2d.fromDegrees(0.0));
+    launchHoodAngleMap.put(2.17, Rotation2d.fromDegrees(0.0));
+    launchHoodAngleMap.put(2.81, Rotation2d.fromDegrees(2.0));
+    launchHoodAngleMap.put(3.82, Rotation2d.fromDegrees(2.0));
+    launchHoodAngleMap.put(4.09, Rotation2d.fromDegrees(3.0));
+    launchHoodAngleMap.put(4.40, Rotation2d.fromDegrees(3.0));
+    launchHoodAngleMap.put(4.77, Rotation2d.fromDegrees(3.0));
+    launchHoodAngleMap.put(5.57, Rotation2d.fromDegrees(3.5));
+    launchHoodAngleMap.put(5.60, Rotation2d.fromDegrees(3.5));
 
     launchFlywheelSpeedMap.put(1.34, 210.0);
     launchFlywheelSpeedMap.put(1.78, 220.0);
@@ -103,9 +104,9 @@ public class ShotCalculator {
     launchFlywheelSpeedMap.put(3.82, 250.0);
     launchFlywheelSpeedMap.put(4.09, 255.0);
     launchFlywheelSpeedMap.put(4.40, 260.0);
-    launchFlywheelSpeedMap.put(4.77, 265.0);
-    launchFlywheelSpeedMap.put(5.57, 275.0);
-    launchFlywheelSpeedMap.put(5.60, 290.0);
+    launchFlywheelSpeedMap.put(4.77, 155.0);
+    launchFlywheelSpeedMap.put(5.57, 155.0);
+    launchFlywheelSpeedMap.put(5.60, 150.0);
 
     timeOfFlightMap.put(5.68, 1.16);
     timeOfFlightMap.put(4.55, 1.12);
@@ -199,6 +200,9 @@ public class ShotCalculator {
     // Log calculated values
     Logger.recordOutput("LaunchCalculator/LookaheadPose", lookaheadPose);
     Logger.recordOutput("LaunchCalculator/TurretToTargetDistance", lookaheadTurretToTargetDistance);
+
+    SmartDashboard.putNumber("LaunchCalculator/TurretToTargetDistance", lookaheadTurretToTargetDistance);
+
 
     return latestParameters;
   }

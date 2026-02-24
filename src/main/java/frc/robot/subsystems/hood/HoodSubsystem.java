@@ -4,9 +4,16 @@ import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.AngleUnit;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.lib.LoggedTunableNumber;
 import frc.robot.lib.io.MotorIO.Setpoint;
 import frc.robot.lib.io.MotorIOTalonFX;
 import frc.robot.lib.io.ServoMotorSubsystem;
@@ -18,20 +25,29 @@ public class HoodSubsystem extends ServoMotorSubsystem<MotorIOTalonFX> {
     private static final double minAngle = Units.degreesToRadians(0);
     private static final double maxAngle = Units.degreesToRadians(50);
 
-    public static final HoodSubsystem mInstance = new HoodSubsystem();
-
     private double goalAngle = 0.0;
     private double goalVelocity = 0.0;
 
-	private HoodSubsystem() {
+    private boolean manualTune = false;
+    private static final LoggedTunableNumber manualHood = new LoggedTunableNumber("Hood/Manual");
+
+    private ShotCalculator shotCalc;
+
+	public HoodSubsystem() {
 		super(
 				HoodConstants.getMotorIO(),
 				"Hood",
 				HoodConstants.converter.toAngle(HoodConstants.kEpsilonThreshold));
                 
 		setCurrentPosition(HoodConstants.converter.toAngle(HoodConstants.kStowPosition));
+
+        manualHood.initDefault(0);
 		
 	}
+
+    public void setShotCalculator(ShotCalculator shotCalc){
+        this.shotCalc = shotCalc;
+    }
 
     public void periodic() {
         super.periodic();
@@ -39,9 +55,11 @@ public class HoodSubsystem extends ServoMotorSubsystem<MotorIOTalonFX> {
         //work out the distance the hood should be
         double positionInRadians = MathUtil.clamp(goalAngle, minAngle, maxAngle);
      
-        //this.applySetpoint(Setpoint.withMotionMagicSetpoint(Radians.of(positionInRadians)));
-        this.applySetpoint(Setpoint.withPositionVelocitySetpoint(Radians.of(positionInRadians), RadiansPerSecond.of(goalVelocity)));
-      
+        if(!this.manualTune){
+            //this.applySetpoint(Setpoint.withMotionMagicSetpoint(Radians.of(positionInRadians)));
+            this.applySetpoint(Setpoint.withPositionVelocitySetpoint(Radians.of(positionInRadians), RadiansPerSecond.of(goalVelocity)));
+        }
+       SmartDashboard.putNumber("Hood/Position",this.getPosition().baseUnitMagnitude());
     }
 
     private void setGoalParams(double angle, double velocity){
@@ -51,10 +69,24 @@ public class HoodSubsystem extends ServoMotorSubsystem<MotorIOTalonFX> {
 
     }
 
+    public Command setManualHoodAngle(){
+
+        return Commands.runOnce(() -> {
+            this.manualTune = true; 
+           double positionInRadians = MathUtil.clamp(manualHood.get(), minAngle, maxAngle);
+            this.applySetpoint(Setpoint.withPositionVelocitySetpoint(Radians.of(positionInRadians), RadiansPerSecond.of(1)));
+        
+        });
+
+    }
+    public Command resetAutoMap(){
+        return Commands.runOnce(() -> this.manualTune = false);
+    }
+
     public Command runTrackTargetActiveShootingCommand() {
         return run(
             () -> {
-            var params = ShotCalculator.getInstance().getParameters();
+            var params = this.shotCalc.getParameters();
                 setGoalParams(params.hoodAngle(), params.hoodVelocity());
             
             });

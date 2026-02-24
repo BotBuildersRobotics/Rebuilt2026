@@ -4,6 +4,7 @@ import frc.robot.lib.LoggedTunableNumber;
 import frc.robot.lib.io.MotorIO.Setpoint;
 
 import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
 import java.util.function.DoubleSupplier;
@@ -49,7 +50,7 @@ public class ShooterSubsystem  extends MotorSubsystem<MotorIOTalonFX> {
 
     private void runVelocity(double velocityRadsPerSec) {
         this.applySetpoint(Setpoint.withVelocitySetpoint(
-            AngularVelocity.ofBaseUnits(velocityRadsPerSec, RadiansPerSecond)));
+            AngularVelocity.ofBaseUnits(velocityRadsPerSec, RotationsPerSecond)));
     }
 
     public Command setManualShooterVelocity(){
@@ -57,7 +58,7 @@ public class ShooterSubsystem  extends MotorSubsystem<MotorIOTalonFX> {
         return Commands.runOnce(() -> {
             this.manualTune = true; 
             this.applySetpoint(Setpoint.withVelocitySetpoint(
-            AngularVelocity.ofBaseUnits(manualShooter.get(), RadiansPerSecond)));
+            AngularVelocity.ofBaseUnits(manualShooter.get(), RotationsPerSecond)));
         
         });
 
@@ -66,6 +67,8 @@ public class ShooterSubsystem  extends MotorSubsystem<MotorIOTalonFX> {
      public void periodic() {
         super.periodic();
          SmartDashboard.putNumber("Shooter/Speed",this.getVelocity().baseUnitMagnitude());
+         SmartDashboard.putBoolean("Shooter/Manual", manualTune);
+        
      }
 
     public Command resetAutoMap(){
