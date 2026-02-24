@@ -118,7 +118,7 @@ public class SuperSystem extends SubsystemBase {
 		//use the tunable value;
 
 		return
-		Commands.sequence(
+		Commands.parallel(
 			shooter.setManualShooterVelocity(),
 			hood.setManualHoodAngle()
 		);

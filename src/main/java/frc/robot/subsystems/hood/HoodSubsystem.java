@@ -71,11 +71,11 @@ public class HoodSubsystem extends ServoMotorSubsystem<MotorIOTalonFX> {
 
     public Command setManualHoodAngle(){
 
-        return Commands.runOnce(() -> {
-            this.manualTune = true; 
+        return run(() -> {
+            this.manualTune = true;
            double positionInRadians = MathUtil.clamp(manualHood.get(), minAngle, maxAngle);
             this.applySetpoint(Setpoint.withPositionVelocitySetpoint(Radians.of(positionInRadians), RadiansPerSecond.of(1)));
-        
+
         });
 
     }

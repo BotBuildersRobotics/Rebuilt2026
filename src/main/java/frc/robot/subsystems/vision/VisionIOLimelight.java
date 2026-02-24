@@ -17,6 +17,7 @@ import frc.robot.subsystems.vision.LimelightHelpers.PoseEstimate;
 public class VisionIOLimelight extends VisionIO {
 	private Pose2d latestEstimate = new Pose2d();
 	private Time latestEstimateTime = Units.Seconds.of(0.0);
+	private PoseEstimate latestPoseEstimate = null;
 	private final VisionIOConfig config;
 
 	protected StructPublisher<Pose2d> visPose = NetworkTableInstance.getDefault()
@@ -28,29 +29,49 @@ public class VisionIOLimelight extends VisionIO {
 		this.config = config;
 	}
 
+	/**
+	 * Stores the pose estimate locally without pushing to drivetrain.
+	 * Call pushToDrivetrain() to actually send the update.
+	 */
 	@Override
 	public void setLatestEstimate(PoseEstimate poseEstimate, int minTagNum) {
 
 		SmartDashboard.putNumber(config.name + "/FGPA Timestamp", Timer.getFPGATimestamp());
 
 		if(poseEstimate == null){
+			latestPoseEstimate = null;
 			return;
 		}
 		SmartDashboard.putNumber(config.name + "/Tag Count", poseEstimate.tagCount);
 
-
 		SmartDashboard.putNumber(
 				config.name + "/Estimate to FGPA Timestamp", Utils.fpgaToCurrentTime(poseEstimate.timestampSeconds));
+
 		if (poseEstimate.tagCount >= minTagNum) {
 			latestEstimate = poseEstimate.pose;
 			latestEstimateTime = Units.Seconds.of(poseEstimate.timestampSeconds);
+			latestPoseEstimate = poseEstimate;
 			visPose.set(poseEstimate.pose);
+		} else {
+			latestPoseEstimate = null;
+		}
+	}
+
+	/**
+	 * Pushes the latest valid pose estimate to the drivetrain's vision filter.
+	 */
+	public void pushToDrivetrain() {
+		if (latestPoseEstimate != null) {
 			DriveSubsystem.mInstance.getGeneratedDrive();
 			DriveSubsystem.mInstance.addVisionUpdate(
-					poseEstimate.pose,
-					Units.Seconds.of(poseEstimate.timestampSeconds),
-					LimelightConstants.enabledVisionStdDevs.times(poseEstimate.avgTagDist));
+					latestPoseEstimate.pose,
+					Units.Seconds.of(latestPoseEstimate.timestampSeconds),
+					LimelightConstants.enabledVisionStdDevs.times(latestPoseEstimate.avgTagDist));
 		}
+	}
+
+	public PoseEstimate getLatestPoseEstimate() {
+		return latestPoseEstimate;
 	}
 
 	public Pose2d getLatestEstimate() {

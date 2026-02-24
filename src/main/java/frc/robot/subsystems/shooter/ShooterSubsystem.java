@@ -55,11 +55,11 @@ public class ShooterSubsystem  extends MotorSubsystem<MotorIOTalonFX> {
 
     public Command setManualShooterVelocity(){
 
-        return Commands.runOnce(() -> {
-            this.manualTune = true; 
+        return run(() -> {
+            this.manualTune = true;
             this.applySetpoint(Setpoint.withVelocitySetpoint(
             AngularVelocity.ofBaseUnits(manualShooter.get(), RotationsPerSecond)));
-        
+
         });
 
     }
