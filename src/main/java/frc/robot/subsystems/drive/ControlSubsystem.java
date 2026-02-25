@@ -5,10 +5,12 @@ import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.ShiftHelpers;
 import frc.robot.lib.io.MotorIO.Setpoint;
 import frc.robot.subsystems.SuperSystem;
 import frc.robot.subsystems.climb.ClimbSubsystem;
@@ -47,7 +49,13 @@ public class ControlSubsystem {
 
 		driverControls();
 		operatorControls();
-	
+
+		// Rumble the driver controller 5 seconds before our hub activates
+		ShiftHelpers.hubAboutToActivate(5.0)
+			.onTrue(Commands.startEnd(
+				() -> driver.getHID().setRumble(RumbleType.kBothRumble, 1.0),
+				() -> driver.getHID().setRumble(RumbleType.kBothRumble, 0.0)
+			).withTimeout(1.0));
 	}
 
     public void driverControls() {

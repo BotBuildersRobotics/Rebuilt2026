@@ -189,6 +189,60 @@ public final class ShiftHelpers {
         return new Trigger(ShiftHelpers::isBothHubsActive);
     }
 
+    /**
+     * Returns true during the window [warningSeconds, 0] before our hub
+     * becomes active (i.e. hub is currently inactive but will activate soon).
+     */
+    private static boolean isOurHubAboutToActivate(double warningSeconds) {
+        if (!DriverStation.isTeleopEnabled()) return false;
+
+        // If our hub is already active, no warning needed
+        if (isOurHubActive()) return false;
+
+        double t = Timer.getMatchTime();
+        if (t <= 0) return false;
+
+        // Check if our hub will be active at (t - warningSeconds) into the future
+        // getMatchTime counts down, so future = lower value
+        double futureT = t - warningSeconds;
+        if (futureT <= 0) return false;
+
+        // Compute what the shift index would be at that future time
+        double futureEff = futureT - SHIFT_LEAD_SECONDS;
+        int futureShift;
+        if (futureEff > SHIFT_BOUNDARIES[0] + TIME_EPS) futureShift = 0;
+        else if (futureEff > SHIFT_BOUNDARIES[1] + TIME_EPS) futureShift = 1;
+        else if (futureEff > SHIFT_BOUNDARIES[2] + TIME_EPS) futureShift = 2;
+        else if (futureEff > SHIFT_BOUNDARIES[3] + TIME_EPS) futureShift = 3;
+        else if (futureEff > SHIFT_BOUNDARIES[4] + TIME_EPS) futureShift = 4;
+        else futureShift = 5;
+
+        // Check if our hub would be active in that future shift
+        var ourAllianceOpt = DriverStation.getAlliance();
+        if (ourAllianceOpt.isEmpty()) return false;
+
+        DriverStation.Alliance alliance = ourAllianceOpt.get();
+        if (futureShift == 0 || futureShift == 5) return true;
+
+        char firstInactive = getLatchedFirstInactiveAllianceChar();
+        if (firstInactive == '\0') return true;
+
+        boolean isFirstInactiveAlliance =
+            (firstInactive == 'R' && alliance == DriverStation.Alliance.Red) ||
+            (firstInactive == 'B' && alliance == DriverStation.Alliance.Blue);
+
+        boolean firstInactiveHubActive = (futureShift == 2 || futureShift == 4);
+        return isFirstInactiveAlliance == firstInactiveHubActive;
+    }
+
+    /**
+     * Trigger that fires when our hub is currently inactive but will become
+     * active within the given number of seconds.
+     */
+    public static Trigger hubAboutToActivate(double warningSeconds) {
+        return new Trigger(() -> isOurHubAboutToActivate(warningSeconds));
+    }
+
     public static boolean isRedHubActive() {
         return isHubActiveForAlliance(DriverStation.Alliance.Red);
     }
