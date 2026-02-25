@@ -55,6 +55,7 @@ public class SuperSystem extends SubsystemBase {
 		
 		shooter.setDefaultCommand(shooter.runTrackTargetActiveShootingCommand());
 		turret.setDefaultCommand(turret.runTrackTargetActiveShootingCommand());
+		hood.setDefaultCommand(hood.runTrackTargetActiveShootingCommand());
 
 	}
 
@@ -68,11 +69,9 @@ public class SuperSystem extends SubsystemBase {
 
     @Override
 	public void periodic() {
-		
-		 // Clear shooting parameters
+
+		 // Clear shooting parameters so they are recalculated each tick
     	shotCalc.clearShootingParameters();
-		shooter.periodic();
-		hood.periodic();
 	}
 
 	 public Command idleIntakes() {
@@ -111,6 +110,34 @@ public class SuperSystem extends SubsystemBase {
 
 	public Command AimAtPassingZone(){
 		return turret.pointAtFieldPosition((frc.robot.FieldConstants.Outpost.centerPoint));
+	}
+
+	public Command stowTurret(){
+		return turret.stowCommand();
+	}
+
+	public Command passLeft(){
+		return Commands.parallel(
+			turret.passLeftCommand(),
+			shooter.runPassingCommand(),
+			hood.runPassingCommand()
+		);
+	}
+
+	public Command passRight(){
+		return Commands.parallel(
+			turret.passRightCommand(),
+			shooter.runPassingCommand(),
+			hood.runPassingCommand()
+		);
+	}
+
+	public Command passAuto(){
+		return Commands.parallel(
+			turret.passAutoCommand(),
+			shooter.runPassingCommand(),
+			hood.runPassingCommand()
+		);
 	}
 
 

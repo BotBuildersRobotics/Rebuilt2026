@@ -20,12 +20,14 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.lib.io.MotorIOTalonFX;
 import frc.robot.lib.io.MotorSubsystem;
 import frc.robot.subsystems.turret.ShotCalculator;
+import org.littletonrobotics.junction.Logger;
 
 public class ShooterSubsystem  extends MotorSubsystem<MotorIOTalonFX> {
 	
     public static final Setpoint IDLE = Setpoint.withNeutralSetpoint();
 
     private static final LoggedTunableNumber manualShooter = new LoggedTunableNumber("Shooter/Manual");
+    private static final LoggedTunableNumber passingSpeed = new LoggedTunableNumber("Shooter/PassingSpeed");
 
     private boolean manualTune = false;
     
@@ -42,6 +44,7 @@ public class ShooterSubsystem  extends MotorSubsystem<MotorIOTalonFX> {
 	public ShooterSubsystem() {
 		super(ShooterConstants.getMotorIO(), "Shooter Rollers");
         manualShooter.initDefault(200);
+        passingSpeed.initDefault(80);
 	}
 
     public void setShotCalculator(ShotCalculator shotCalc){
@@ -68,7 +71,10 @@ public class ShooterSubsystem  extends MotorSubsystem<MotorIOTalonFX> {
         super.periodic();
          SmartDashboard.putNumber("Shooter/Speed",this.getVelocity().baseUnitMagnitude());
          SmartDashboard.putBoolean("Shooter/Manual", manualTune);
-        
+
+         // AdvantageKit structured logging for replay
+         Logger.recordOutput("Shooter/VelocityRPS", this.getVelocity().baseUnitMagnitude());
+         Logger.recordOutput("Shooter/ManualTune", manualTune);
      }
 
     public Command resetAutoMap(){
@@ -97,6 +103,10 @@ public class ShooterSubsystem  extends MotorSubsystem<MotorIOTalonFX> {
                 runVelocity(velocity.getAsDouble());
             
             });
+    }
+
+    public Command runPassingCommand() {
+        return run(() -> runVelocity(passingSpeed.get()));
     }
 
     public Command stopCommand()

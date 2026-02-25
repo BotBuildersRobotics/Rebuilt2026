@@ -9,6 +9,8 @@ import frc.robot.lib.LoggedTunableNumber;
 import frc.robot.Robot;
 import frc.robot.subsystems.vision.LimelightHelpers.PoseEstimate;
 
+import org.littletonrobotics.junction.Logger;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -96,6 +98,20 @@ public class LimelightSubsystem extends SubsystemBase {
 
 	public void outputTelemetry() {
 		LoggedTracer.record("Vision");
+
+		// AdvantageKit structured logging for replay
+		Logger.recordOutput("Vision/SingleCameraMode", singleCameraMode.get() >= 1.0);
+		Logger.recordOutput("Vision/CameraCount", ios.size());
+		for (int i = 0; i < ios.size(); i++) {
+			PoseEstimate est = ios.get(i).getLatestPoseEstimate();
+			String prefix = "Vision/Camera" + i + "/";
+			Logger.recordOutput(prefix + "Name", ios.get(i).getName());
+			if (est != null) {
+				Logger.recordOutput(prefix + "Pose", est.pose);
+				Logger.recordOutput(prefix + "TagCount", est.tagCount);
+				Logger.recordOutput(prefix + "AvgTagDist", est.avgTagDist);
+			}
+		}
 	}
 
 }

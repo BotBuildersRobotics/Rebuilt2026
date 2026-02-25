@@ -3,6 +3,8 @@ package frc.robot.subsystems.turret;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.FieldConstants;
+import frc.robot.lib.AllianceFlipUtil;
 import frc.robot.lib.LoggedTunableNumber;
 import frc.robot.lib.io.MotorIO;
 import frc.robot.lib.io.MotorIO.Setpoint;
@@ -23,6 +25,7 @@ import java.util.function.Supplier;
 import org.littletonrobotics.junction.AutoLogOutput;
 
 import com.fasterxml.jackson.core.format.MatchStrength;
+import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.SlewRateLimiter;
@@ -221,6 +224,16 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
 
     SmartDashboard.putString("State", shootState.toString());
 
+    // AdvantageKit structured logging for replay
+    Logger.recordOutput("Turret/RobotRelativeAngleDeg", robotRelativeAngleDeg);
+    Logger.recordOutput("Turret/FieldRelativeAngleDeg", fieldRelativeAngleDeg);
+    Logger.recordOutput("Turret/AimPose", turretAimPose);
+    Logger.recordOutput("Turret/ShootState", shootState.toString());
+    Logger.recordOutput("Turret/GoalAngleDeg", goalAngle.getDegrees());
+    Logger.recordOutput("Turret/SetpointPositionRad", setpoint.position);
+    Logger.recordOutput("Turret/SetpointVelocityRadPerSec", setpoint.velocity);
+    Logger.recordOutput("Turret/Offset", turretOffset);
+
    }
 
    private void setFieldRelativeTarget(Rotation2d angle, double velocity) {
@@ -243,7 +256,7 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
   }
 
   public double getTurretAngle() {
-    return  turretOffset + getPosition().in(Radians); 
+    return  Units.degreesToRadians(turretOffset) + getPosition().in(Radians);
   }
 
   public double getTurretVelocity() {
@@ -291,15 +304,17 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
       // Store target for visualization
       currentTarget = targetPosition;
 
-      // Get robot's current position on the field
+      // Get turret's actual field position (not robot center)
       Pose2d robotPose = DriveSubsystem.mInstance.getState().Pose;
-      Translation2d robotPosition = robotPose.getTranslation();
+      Pose2d turretPose = robotPose.transformBy(
+          ShotCalculator.getInstance().toTransform2d(ShotCalculator.robotToTurret));
+      Translation2d turretPosition = turretPose.getTranslation();
 
-      // Calculate vector from robot to target
-      Translation2d toTarget = targetPosition.minus(robotPosition);
+      // Calculate vector from turret to target
+      Translation2d toTarget = targetPosition.minus(turretPosition);
 
       // Calculate angle to target (in field coordinates)
-      Rotation2d angleToTarget = new Rotation2d(toTarget.getX(), toTarget.getY());
+      Rotation2d angleToTarget = toTarget.getAngle();
 
       // Calculate angular velocity if target or robot is moving (0 for stationary target)
       double angularVelocity = 0.0;
@@ -319,6 +334,76 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
 
   public Command zeroCommand() {
     return runOnce(this::zero).ignoringDisable(true);
+  }
+
+  /**
+   * Holds the turret at 0° robot-relative (straight ahead) for climbing.
+   * Overrides the tracking default command until interrupted.
+   */
+  public Command stowCommand() {
+    return run(() -> {
+      Rotation2d robotAngle = DriveSubsystem.mInstance.getState().Pose.getRotation();
+      // Set field-relative goal to match robot heading = 0° robot-relative
+      setFieldRelativeTarget(robotAngle, 0.0);
+      setShootState(ShootState.ACTIVE_SHOOTING);
+    });
+  }
+
+  /**
+   * Aim to pass fuel over the left bump into the alliance zone.
+   * Alliance-flipped so it works for both blue and red.
+   */
+  public Command passLeftCommand() {
+    return pointAtFieldPosition(
+        AllianceFlipUtil.apply(FieldConstants.PassingTargets.leftPassTarget));
+  }
+
+  /**
+   * Aim to pass fuel over the right bump into the alliance zone.
+   * Alliance-flipped so it works for both blue and red.
+   */
+  public Command passRightCommand() {
+    return pointAtFieldPosition(
+        AllianceFlipUtil.apply(FieldConstants.PassingTargets.rightPassTarget));
+  }
+
+  /**
+   * Auto-selects left or right passing target based on which side of the
+   * field the robot is currently on (relative to field center Y).
+   */
+  public Command passAutoCommand() {
+    return run(() -> {
+      Pose2d robotPose = DriveSubsystem.mInstance.getState().Pose;
+      double robotY = robotPose.getY();
+      double centerY = FieldConstants.fieldWidth / 2.0;
+
+      // Pick the pass target on the same side of the field as the robot
+      Translation2d target;
+      if (AllianceFlipUtil.shouldFlip()) {
+        // Red alliance: Y is flipped
+        target = (robotY < centerY)
+            ? AllianceFlipUtil.apply(FieldConstants.PassingTargets.leftPassTarget)
+            : AllianceFlipUtil.apply(FieldConstants.PassingTargets.rightPassTarget);
+      } else {
+        // Blue alliance
+        target = (robotY > centerY)
+            ? FieldConstants.PassingTargets.leftPassTarget
+            : FieldConstants.PassingTargets.rightPassTarget;
+      }
+
+      currentTarget = target;
+
+      Pose2d turretPose = robotPose.transformBy(
+          ShotCalculator.getInstance().toTransform2d(ShotCalculator.robotToTurret));
+      Translation2d toTarget = target.minus(turretPose.getTranslation());
+
+      setFieldRelativeTarget(toTarget.getAngle(), 0.0);
+      setShootState(ShootState.ACTIVE_SHOOTING);
+
+      SmartDashboard.putNumber("Turret/PassTargetX", target.getX());
+      SmartDashboard.putNumber("Turret/PassTargetY", target.getY());
+      SmartDashboard.putNumber("Turret/PassDistance", toTarget.getNorm());
+    });
   }
 
 

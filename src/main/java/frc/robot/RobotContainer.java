@@ -84,6 +84,7 @@ public class RobotContainer {
 
 	public RobotContainer() {
 		
+		//Super system owns the shooter, hood, turret
 		for (SubsystemBase s : new SubsystemBase[] {
 			
 			DriveSubsystem.mInstance,
@@ -91,13 +92,10 @@ public class RobotContainer {
 			IntakeSubsystem.mInstance,
 			PivotSubsystem.mInstance,
 			ClimbSubsystem.mInstance,
-			//TurretSubsystem.mInstance,
-			//HoodSubsystem.mInstance,
-			//ShooterSubsystem.mInstance,
 			ChuteSubsystem.mInstance,
 			ShufflaSubsystem.mInstance,
-			SuperSystem.mInstance,
-			LedSubsystem.mInstance
+			SuperSystem.mInstance
+			
 			
 		}) {
 			SmartDashboard.putData(s);
@@ -107,11 +105,6 @@ public class RobotContainer {
 
 		CommandScheduler.getInstance().setPeriod(0.02);
 
-		//DriveSubsystem.mInstance.getDrivetrain().seedFieldCentric();
-
-		
-		
-		
 		
 		autoChooser = AutoBuilder.buildAutoChooser();
 		/*if(SmartDashboard.containsKey("Auto Mode")) {

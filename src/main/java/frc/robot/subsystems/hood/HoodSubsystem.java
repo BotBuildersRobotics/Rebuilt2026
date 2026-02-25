@@ -18,6 +18,7 @@ import frc.robot.lib.io.MotorIO.Setpoint;
 import frc.robot.lib.io.MotorIOTalonFX;
 import frc.robot.lib.io.ServoMotorSubsystem;
 import frc.robot.subsystems.turret.ShotCalculator;
+import org.littletonrobotics.junction.Logger;
 
 
 public class HoodSubsystem extends ServoMotorSubsystem<MotorIOTalonFX> {
@@ -30,6 +31,7 @@ public class HoodSubsystem extends ServoMotorSubsystem<MotorIOTalonFX> {
 
     private boolean manualTune = false;
     private static final LoggedTunableNumber manualHood = new LoggedTunableNumber("Hood/Manual");
+    private static final LoggedTunableNumber passingAngle = new LoggedTunableNumber("Hood/PassingAngle");
 
     private ShotCalculator shotCalc;
 
@@ -42,7 +44,8 @@ public class HoodSubsystem extends ServoMotorSubsystem<MotorIOTalonFX> {
 		setCurrentPosition(HoodConstants.converter.toAngle(HoodConstants.kStowPosition));
 
         manualHood.initDefault(0);
-		
+        passingAngle.initDefault(Units.degreesToRadians(15));
+
 	}
 
     public void setShotCalculator(ShotCalculator shotCalc){
@@ -60,6 +63,11 @@ public class HoodSubsystem extends ServoMotorSubsystem<MotorIOTalonFX> {
             this.applySetpoint(Setpoint.withPositionVelocitySetpoint(Radians.of(positionInRadians), RadiansPerSecond.of(goalVelocity)));
         }
        SmartDashboard.putNumber("Hood/Position",this.getPosition().baseUnitMagnitude());
+
+       // AdvantageKit structured logging for replay
+       Logger.recordOutput("Hood/PositionRad", this.getPosition().baseUnitMagnitude());
+       Logger.recordOutput("Hood/GoalAngleRad", goalAngle);
+       Logger.recordOutput("Hood/ManualTune", manualTune);
     }
 
     private void setGoalParams(double angle, double velocity){
@@ -90,6 +98,10 @@ public class HoodSubsystem extends ServoMotorSubsystem<MotorIOTalonFX> {
                 setGoalParams(params.hoodAngle(), params.hoodVelocity());
             
             });
+    }
+
+    public Command runPassingCommand() {
+        return run(() -> setGoalParams(passingAngle.get(), 0.0));
     }
 
     public Command runFixedCommand(DoubleSupplier angle, DoubleSupplier velocity) {

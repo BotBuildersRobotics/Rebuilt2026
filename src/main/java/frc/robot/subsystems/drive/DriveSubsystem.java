@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
 import frc.robot.Telemetry;
 import frc.robot.generated.TunerConstants;
+import org.littletonrobotics.junction.Logger;
 
 import java.util.function.UnaryOperator;
 
@@ -70,6 +71,12 @@ public class DriveSubsystem extends SubsystemBase {
 		SmartDashboard.putData("Drive", this);
 		elasticPose.setRobotPose(getPose());
 		SmartDashboard.putData("Elastic Field 2D", elasticPose);
+
+		// AdvantageKit structured logging for replay
+		Logger.recordOutput("Drive/Pose", getPose());
+		Logger.recordOutput("Drive/VelocityX", lastReadState.Speeds.vxMetersPerSecond);
+		Logger.recordOutput("Drive/VelocityY", lastReadState.Speeds.vyMetersPerSecond);
+		Logger.recordOutput("Drive/OmegaRadPerSec", lastReadState.Speeds.omegaRadiansPerSecond);
 	}
 
 	@Override

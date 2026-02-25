@@ -76,9 +76,6 @@ public class ShotCalculator {
 
   public static Transform3d robotToTurret = new Transform3d(-0.19685, 0.0, 0.44, Rotation3d.kZero);
   
-  public static Transform3d turretToCamera =
-      new Transform3d(
-          -0.1314196, 0.0, 0.2770674, new Rotation3d(0.0, Units.degreesToRadians(-22.5), 0.0));
 
   static {
 
@@ -97,14 +94,14 @@ public class ShotCalculator {
     launchHoodAngleMap.put(5.57, Rotation2d.fromDegrees(3.5));
     launchHoodAngleMap.put(5.60, Rotation2d.fromDegrees(3.5));
 
-    launchFlywheelSpeedMap.put(1.34, 210.0);
-    launchFlywheelSpeedMap.put(1.78, 220.0);
-    launchFlywheelSpeedMap.put(2.17, 220.0);
-    launchFlywheelSpeedMap.put(2.81, 230.0);
-    launchFlywheelSpeedMap.put(3.82, 250.0);
-    launchFlywheelSpeedMap.put(4.09, 255.0);
-    launchFlywheelSpeedMap.put(4.40, 260.0);
-    launchFlywheelSpeedMap.put(4.77, 155.0);
+    launchFlywheelSpeedMap.put(1.34, 110.0);
+    launchFlywheelSpeedMap.put(1.78, 115.0);
+    launchFlywheelSpeedMap.put(2.17, 120.0);
+    launchFlywheelSpeedMap.put(2.81, 125.0);
+    launchFlywheelSpeedMap.put(3.82, 130.0);
+    launchFlywheelSpeedMap.put(4.09, 135.0);
+    launchFlywheelSpeedMap.put(4.40, 140.0);
+    launchFlywheelSpeedMap.put(4.77, 150.0);
     launchFlywheelSpeedMap.put(5.57, 155.0);
     launchFlywheelSpeedMap.put(5.60, 150.0);
 
@@ -123,16 +120,9 @@ public class ShotCalculator {
     // Calculate distance from turret to target
      // Calculate estimated pose while accounting for phase delay
     Pose2d estimatedPose = DriveSubsystem.mInstance.getPose();
-    Rotation2d robotAngleRotation = estimatedPose.getRotation();
-    ChassisSpeeds chassisSpeeds = DriveSubsystem.mInstance.getGeneratedDrive().getState().Speeds;
-    
-    ChassisSpeeds robotRelativeVelocity = new ChassisSpeeds(
-        chassisSpeeds.vxMetersPerSecond * robotAngleRotation.getCos() - chassisSpeeds.vyMetersPerSecond * robotAngleRotation.getSin(),
-        chassisSpeeds.vyMetersPerSecond * robotAngleRotation.getCos() + chassisSpeeds.vxMetersPerSecond * robotAngleRotation.getSin(),
-        chassisSpeeds.omegaRadiansPerSecond);
+    // getState().Speeds is already robot-relative; exp() expects robot-relative
+    ChassisSpeeds robotRelativeVelocity = DriveSubsystem.mInstance.getGeneratedDrive().getState().Speeds;
 
-    //ChassisSpeeds robotRelativeVelocity = DriveSubsystem.mInstance.getGeneratedDrive().getState().Speeds. .getRobotVelocity();
-   
     estimatedPose =
         estimatedPose.exp(
             new Twist2d(

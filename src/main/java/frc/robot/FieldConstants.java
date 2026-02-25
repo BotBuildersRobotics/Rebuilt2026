@@ -296,6 +296,21 @@ public class FieldConstants {
         new Translation3d(depth, (fieldWidth / 2) + distanceFromCenterY - (width / 2), height);
   }
 
+  /** Passing target landing zones — alliance side of each bump, in the open trench area */
+  public static class PassingTargets {
+    // Land fuel in the left trench (alliance side, past the left bump)
+    public static final Translation2d leftPassTarget =
+        new Translation2d(
+            LinesVertical.allianceZone,
+            (LinesHorizontal.leftBumpStart + LinesHorizontal.leftTrenchOpenEnd) / 2.0);
+
+    // Land fuel in the right trench (alliance side, past the right bump)
+    public static final Translation2d rightPassTarget =
+        new Translation2d(
+            LinesVertical.allianceZone,
+            (LinesHorizontal.rightBumpEnd + LinesHorizontal.rightTrenchOpenStart) / 2.0);
+  }
+
   public static class Outpost {
     // Dimensions
     public static final double width = Units.inchesToMeters(31.8);
