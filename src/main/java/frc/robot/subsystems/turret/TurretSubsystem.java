@@ -371,6 +371,87 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
    * Auto-selects left or right passing target based on which side of the
    * field the robot is currently on (relative to field center Y).
    */
+  /**
+   * Test commands for turret calibration.
+   * Logs all intermediate values so you can verify each stage of the aiming pipeline.
+   *
+   * testAimStraightAhead: Points turret at 0° robot-relative.
+   *   If turret doesn't face forward, the zero/gear ratio is wrong.
+   *
+   * testAimRobotRelative: Points turret at a tunable robot-relative angle.
+   *   Use to verify gear ratio: set to 90° and measure if turret is actually at 90°.
+   *
+   * testAimAtHub: Points at the hub using field pose, bypassing ShotCalculator.
+   *   Logs the expected field-relative angle so you can compare with what you see.
+   */
+  private static final LoggedTunableNumber testAngleDeg =
+      new LoggedTunableNumber("Turret/TestAngleDeg", 90.0);
+
+  public Command testAimStraightAhead() {
+    return run(() -> {
+      // Command the motor directly to 0 radians — no field math involved
+      this.applySetpoint(Setpoint.withMotionMagicSetpoint(Radians.of(0.0)));
+
+      SmartDashboard.putNumber("Turret/Test/CommandedRad", 0.0);
+      SmartDashboard.putNumber("Turret/Test/ActualRad", getPosition().in(Radians));
+      SmartDashboard.putNumber("Turret/Test/ErrorDeg",
+          Units.radiansToDegrees(getPosition().in(Radians)));
+    });
+  }
+
+  public Command testAimRobotRelative() {
+    return run(() -> {
+      double targetRad = Units.degreesToRadians(testAngleDeg.get());
+      this.applySetpoint(Setpoint.withMotionMagicSetpoint(Radians.of(targetRad)));
+
+      SmartDashboard.putNumber("Turret/Test/CommandedDeg", testAngleDeg.get());
+      SmartDashboard.putNumber("Turret/Test/CommandedRad", targetRad);
+      SmartDashboard.putNumber("Turret/Test/ActualRad", getPosition().in(Radians));
+      SmartDashboard.putNumber("Turret/Test/ActualDeg",
+          Units.radiansToDegrees(getPosition().in(Radians)));
+      SmartDashboard.putNumber("Turret/Test/ErrorDeg",
+          testAngleDeg.get() - Units.radiansToDegrees(getPosition().in(Radians)));
+    });
+  }
+
+  public Command testAimAtHub() {
+    return run(() -> {
+      Pose2d robotPose = DriveSubsystem.mInstance.getState().Pose;
+      Rotation2d robotAngle = robotPose.getRotation();
+
+      // Compute turret field position
+      Pose2d turretPose = robotPose.transformBy(
+          ShotCalculator.getInstance().toTransform2d(ShotCalculator.robotToTurret));
+
+      // Angle from turret to hub (field-relative)
+      Translation2d hubTarget =
+          AllianceFlipUtil.apply(FieldConstants.Hub.topCenterPoint.toTranslation2d());
+      Translation2d toHub = hubTarget.minus(turretPose.getTranslation());
+      Rotation2d fieldAngleToHub = toHub.getAngle();
+
+      // Convert to robot-relative
+      double robotRelativeRad = fieldAngleToHub.minus(robotAngle).getRadians();
+
+      // Send directly to motor (no trapezoid profile, no offset)
+      this.applySetpoint(Setpoint.withMotionMagicSetpoint(Radians.of(robotRelativeRad)));
+
+      // Log everything for debugging
+      SmartDashboard.putNumber("Turret/Test/RobotX", robotPose.getX());
+      SmartDashboard.putNumber("Turret/Test/RobotY", robotPose.getY());
+      SmartDashboard.putNumber("Turret/Test/RobotHeadingDeg", robotAngle.getDegrees());
+      SmartDashboard.putNumber("Turret/Test/TurretFieldX", turretPose.getX());
+      SmartDashboard.putNumber("Turret/Test/TurretFieldY", turretPose.getY());
+      SmartDashboard.putNumber("Turret/Test/HubX", hubTarget.getX());
+      SmartDashboard.putNumber("Turret/Test/HubY", hubTarget.getY());
+      SmartDashboard.putNumber("Turret/Test/FieldAngleToHubDeg", fieldAngleToHub.getDegrees());
+      SmartDashboard.putNumber("Turret/Test/RobotRelativeToHubDeg",
+          Units.radiansToDegrees(robotRelativeRad));
+      SmartDashboard.putNumber("Turret/Test/ActualPositionDeg",
+          Units.radiansToDegrees(getPosition().in(Radians)));
+      SmartDashboard.putNumber("Turret/Test/DistToHub", toHub.getNorm());
+    });
+  }
+
   public Command passAutoCommand() {
     return run(() -> {
       Pose2d robotPose = DriveSubsystem.mInstance.getState().Pose;

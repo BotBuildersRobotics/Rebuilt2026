@@ -140,6 +140,8 @@ public class ControlSubsystem {
 			SuperSystem.mInstance.offsetTurretRight()
 		);
 
+		operator.y().whileTrue(SuperSystem.mInstance.testTurretAimAtHub());
+
 		operator.x().onTrue(LedSubsystem.mInstance.setBlue());
 
 		operator.leftBumper().onTrue(ClimbSubsystem.mInstance.setpointCommand(ClimbSubsystem.CLIMB) ).onFalse(ClimbSubsystem.mInstance.setpointCommand(ClimbSubsystem.STOP));

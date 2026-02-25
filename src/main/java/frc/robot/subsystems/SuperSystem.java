@@ -141,6 +141,19 @@ public class SuperSystem extends SubsystemBase {
 	}
 
 
+	// --- Turret calibration test commands ---
+	public Command testTurretStraightAhead(){
+		return turret.testAimStraightAhead();
+	}
+
+	public Command testTurretRobotRelative(){
+		return turret.testAimRobotRelative();
+	}
+
+	public Command testTurretAimAtHub(){
+		return turret.testAimAtHub();
+	}
+
 	public Command setManualShooterVelocity(){
 		//use the tunable value;
 
