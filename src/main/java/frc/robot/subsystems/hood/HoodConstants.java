@@ -13,7 +13,7 @@ import frc.robot.lib.io.MotorIOTalonFX;
 
 public class HoodConstants {
     
-    public static final Distance kStowPosition = Units.Centimeters.of(0.5);
+    public static final Distance kStowPosition = Units.Centimeters.of(0);
     public static final Distance kEpsilonThreshold = Units.Centimeters.of(0.1);
 
     public static final Util.DistanceAngleConverter converter = new Util.DistanceAngleConverter(Units.Centimeters.of(2.0));

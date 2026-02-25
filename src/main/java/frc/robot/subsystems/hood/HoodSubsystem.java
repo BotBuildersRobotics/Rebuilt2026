@@ -60,9 +60,11 @@ public class HoodSubsystem extends ServoMotorSubsystem<MotorIOTalonFX> {
      
         if(!this.manualTune){
             //this.applySetpoint(Setpoint.withMotionMagicSetpoint(Radians.of(positionInRadians)));
-            this.applySetpoint(Setpoint.withPositionVelocitySetpoint(Radians.of(positionInRadians), RadiansPerSecond.of(goalVelocity)));
+            this.applySetpoint(Setpoint.withMotionMagicSetpoint(Radians.of(positionInRadians)));
         }
        SmartDashboard.putNumber("Hood/Position",this.getPosition().baseUnitMagnitude());
+       SmartDashboard.putNumber("Hood/GoalAngleRad",goalAngle);
+       SmartDashboard.putBoolean("Hood/ManualTune", manualTune);
 
        // AdvantageKit structured logging for replay
        Logger.recordOutput("Hood/PositionRad", this.getPosition().baseUnitMagnitude());
@@ -82,7 +84,8 @@ public class HoodSubsystem extends ServoMotorSubsystem<MotorIOTalonFX> {
         return run(() -> {
             this.manualTune = true;
            double positionInRadians = MathUtil.clamp(manualHood.get(), minAngle, maxAngle);
-            this.applySetpoint(Setpoint.withPositionVelocitySetpoint(Radians.of(positionInRadians), RadiansPerSecond.of(1)));
+           // this.applySetpoint(Setpoint.withPositionVelocitySetpoint(Radians.of(positionInRadians), RadiansPerSecond.of(1)));
+             this.applySetpoint(Setpoint.withMotionMagicSetpoint(Radians.of(positionInRadians)));
 
         });
 
