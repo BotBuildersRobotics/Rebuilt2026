@@ -35,6 +35,18 @@ public class HoodConstants {
 		config.Feedback.SensorToMechanismRatio = 0.3214; //roughly per degree of movement
 		config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
+		// PID gains for position control (tune these)
+		config.Slot0.kP = 50.0;
+		config.Slot0.kI = 0.0;
+		config.Slot0.kD = 0.5;
+		config.Slot0.kS = 0.0;
+		config.Slot0.kV = 0.0;
+		config.Slot0.kG = 0.0;
+
+		// Motion Magic profile constraints
+		config.MotionMagic.MotionMagicCruiseVelocity = 5.0;
+		config.MotionMagic.MotionMagicAcceleration = 10.0;
+
 		return config;
 	}
 
