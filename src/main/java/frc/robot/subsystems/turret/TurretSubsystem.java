@@ -1,8 +1,6 @@
 package frc.robot.subsystems.turret;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
 import frc.robot.FieldConstants;
 import frc.robot.lib.AllianceFlipUtil;
 import frc.robot.lib.LoggedTunableNumber;
@@ -10,34 +8,19 @@ import frc.robot.lib.io.MotorIO;
 import frc.robot.lib.io.MotorIO.Setpoint;
 import frc.robot.lib.io.MotorSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem;
-import frc.robot.subsystems.intake.IntakeConstants;
-import frc.robot.subsystems.intake.IntakeSubsystem;
-import frc.robot.subsystems.turret.TurretSubsystem.ShootState;
 
-import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Radians;
-import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 
-import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
-import org.littletonrobotics.junction.AutoLogOutput;
-
-import com.fasterxml.jackson.core.format.MatchStrength;
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.AngleUnit;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
@@ -54,31 +37,9 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
   private static final double trackMinAngle = trackCenterRads - Math.PI - trackOverlapMargin;
   private static final double trackMaxAngle = trackCenterRads + Math.PI + trackOverlapMargin;
 
-  private static final LoggedTunableNumber maxVelocity =
-      new LoggedTunableNumber("Turret/MaxVelocity");
-
-      
-  private static final LoggedTunableNumber maxAcceleration =
-      new LoggedTunableNumber("Turret/MaxAcceleration");
-  private static final LoggedTunableNumber kP = new LoggedTunableNumber("Turret/kP");
-  private static final LoggedTunableNumber kD = new LoggedTunableNumber("Turret/kD");
-  private static final LoggedTunableNumber kA = new LoggedTunableNumber("Turret/kA");
-
-  static {
-        maxVelocity.initDefault(12.0);
-        maxAcceleration.initDefault(24.0);
-        kP.initDefault(2000.0);
-        kD.initDefault(50.0);
-        kA.initDefault(0.0);
-  }
-
-
   private Rotation2d goalAngle = Rotation2d.kZero;
-  private double goalVelocity = 0.0;
   private double lastGoalAngle = 0.0;
 
-
-  TrapezoidProfile profile = new TrapezoidProfile(new TrapezoidProfile.Constraints(maxVelocity.get(), maxAcceleration.get()));
   private double turretOffset;
   private boolean turretZeroed = true;
 
@@ -88,8 +49,6 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
   private MechanismLigament2d turretLigament;
   private Field2d fieldViz;
   private Translation2d currentTarget = null;
-
-  private State setpoint = new State();
 
   public enum ShootState {
     ACTIVE_SHOOTING,
@@ -131,26 +90,16 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
         SmartDashboard.putNumber("Turret/MaxVelocity", maxVelocity.get());
         SmartDashboard.putNumber("Turret/MaxAcceleration", maxAcceleration.get());*/
 
-        // Update profile constraints
-        if (maxVelocity.hasChanged(hashCode()) || maxAcceleration.hasChanged(hashCode())) {
-            profile = new TrapezoidProfile(new TrapezoidProfile.Constraints(maxVelocity.get(), maxAcceleration.get()));
-        }
-
-
-
         if(DriverStation.isEnabled() && turretZeroed){
           Rotation2d robotAngle = DriveSubsystem.mInstance.getState().Pose.getRotation();
-          double robotAngularVelocity =
-          DriveSubsystem.mInstance.getState().Speeds.omegaRadiansPerSecond;
 
           Rotation2d robotRelativeGoalAngle = goalAngle.minus(robotAngle);
-          double robotRelativeGoalVelocity = goalVelocity - robotAngularVelocity;
 
           // Debug telemetry
           SmartDashboard.putNumber("Turret/RobotAngleDeg", robotAngle.getDegrees());
           SmartDashboard.putNumber("Turret/GoalAngleDeg", goalAngle.getDegrees());
-          SmartDashboard.putNumber("Turret/RobotAngularVelRadPerSec", robotAngularVelocity);
 
+          // Find best wrapped angle within mechanical limits
           boolean hasBestAngle = false;
           double bestAngle = 0;
 
@@ -180,23 +129,15 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
       }
       lastGoalAngle = bestAngle;
 
-      State goalState = new State(MathUtil.clamp(bestAngle, minLegalAngle, maxLegalAngle), robotRelativeGoalVelocity);
+      double clampedAngle = MathUtil.clamp(bestAngle, minLegalAngle, maxLegalAngle);
 
-      setpoint = profile.calculate(Constants.loopPeriodSecs, setpoint, goalState);
+      // Send directly to Motion Magic — the TalonFX handles the profiling
+      this.applySetpoint(Setpoint.withMotionMagicSetpoint(Radians.of(clampedAngle)));
 
       SmartDashboard.putNumber("Turret/BestAngleRad", bestAngle);
-      SmartDashboard.putNumber("Turret/SetpointPositionRad", setpoint.position);
-      SmartDashboard.putNumber("Turret/SetpointVelocityRadPerSec", setpoint.velocity);
-     
-      SmartDashboard.putNumber("Turret/Offset",turretOffset);
+      SmartDashboard.putNumber("Turret/SetpointPositionRad", clampedAngle);
+      SmartDashboard.putNumber("Turret/Offset", turretOffset);
 
-      this.applySetpoint(Setpoint.withMotionMagicSetpoint(Radians.of(setpoint.position)));
-      //this.applySetpoint(Setpoint.withPositionVelocitySetpoint(Radians.of(setpoint.position), RadiansPerSecond.of(setpoint.velocity)));
-      
-      
-      SmartDashboard.putNumber("Turret/GoalPositionRad", bestAngle);
-      SmartDashboard.putNumber("Turret/SetpointPositionRad", setpoint.position);
-     
     }
 
     // Always update the turret mechanism visual (even when disabled)
@@ -230,15 +171,12 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
     Logger.recordOutput("Turret/AimPose", turretAimPose);
     Logger.recordOutput("Turret/ShootState", shootState.toString());
     Logger.recordOutput("Turret/GoalAngleDeg", goalAngle.getDegrees());
-    Logger.recordOutput("Turret/SetpointPositionRad", setpoint.position);
-    Logger.recordOutput("Turret/SetpointVelocityRadPerSec", setpoint.velocity);
     Logger.recordOutput("Turret/Offset", turretOffset);
 
    }
 
-   private void setFieldRelativeTarget(Rotation2d angle, double velocity) {
+   private void setFieldRelativeTarget(Rotation2d angle) {
     this.goalAngle = angle;
-    this.goalVelocity = velocity;
   }
 
   private void zero() {
@@ -271,7 +209,7 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
     return run(
         () -> {
           var params = shotCalc.getParameters();
-          setFieldRelativeTarget(params.turretAngle().plus(Rotation2d.fromDegrees(turretOffset)), params.turretVelocity());
+          setFieldRelativeTarget(params.turretAngle().plus(Rotation2d.fromDegrees(turretOffset)));
           setShootState(ShootState.TRACKING);
         });
   }
@@ -280,15 +218,15 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
     return run(
         () -> {
           var params = shotCalc.getParameters();
-          setFieldRelativeTarget(params.turretAngle().plus(Rotation2d.fromDegrees(turretOffset)), params.turretVelocity());
+          setFieldRelativeTarget(params.turretAngle().plus(Rotation2d.fromDegrees(turretOffset)));
           setShootState(ShootState.ACTIVE_SHOOTING);
         });
   }
 
-  public Command runFixedCommand(Supplier<Rotation2d> angle, DoubleSupplier velocity) {
+  public Command runFixedCommand(Supplier<Rotation2d> angle) {
     return run(
         () -> {
-          setFieldRelativeTarget(angle.get().plus(Rotation2d.fromDegrees(turretOffset)), velocity.getAsDouble());
+          setFieldRelativeTarget(angle.get().plus(Rotation2d.fromDegrees(turretOffset)));
           setShootState(ShootState.TRACKING);
         });
   }
@@ -316,11 +254,8 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
       // Calculate angle to target (in field coordinates)
       Rotation2d angleToTarget = toTarget.getAngle();
 
-      // Calculate angular velocity if target or robot is moving (0 for stationary target)
-      double angularVelocity = 0.0;
-
       // Set the turret goal
-      setFieldRelativeTarget(angleToTarget, angularVelocity);
+      setFieldRelativeTarget(angleToTarget);
       setShootState(ShootState.ACTIVE_SHOOTING);
 
       // Debug telemetry
@@ -344,7 +279,7 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
     return run(() -> {
       Rotation2d robotAngle = DriveSubsystem.mInstance.getState().Pose.getRotation();
       // Set field-relative goal to match robot heading = 0° robot-relative
-      setFieldRelativeTarget(robotAngle, 0.0);
+      setFieldRelativeTarget(robotAngle);
       setShootState(ShootState.ACTIVE_SHOOTING);
     });
   }
@@ -478,7 +413,7 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
           ShotCalculator.getInstance().toTransform2d(ShotCalculator.robotToTurret));
       Translation2d toTarget = target.minus(turretPose.getTranslation());
 
-      setFieldRelativeTarget(toTarget.getAngle(), 0.0);
+      setFieldRelativeTarget(toTarget.getAngle());
       setShootState(ShootState.ACTIVE_SHOOTING);
 
       SmartDashboard.putNumber("Turret/PassTargetX", target.getX());
