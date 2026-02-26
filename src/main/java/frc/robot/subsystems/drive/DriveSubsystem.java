@@ -73,6 +73,7 @@ public class DriveSubsystem extends SubsystemBase {
 		SmartDashboard.putData("Elastic Field 2D", elasticPose);
 
 		// AdvantageKit structured logging for replay
+		
 		Logger.recordOutput("Drive/Pose", getPose());
 		Logger.recordOutput("Drive/VelocityX", lastReadState.Speeds.vxMetersPerSecond);
 		Logger.recordOutput("Drive/VelocityY", lastReadState.Speeds.vyMetersPerSecond);

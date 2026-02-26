@@ -39,8 +39,8 @@ public class TurretConstants {
 		config.CurrentLimits.SupplyCurrentLowerTime = 0.1;
 
 
-		config.MotionMagic.MotionMagicCruiseVelocity =  80 * 2 * Math.PI; // rotations/sec at mechanism
-   		config.MotionMagic.MotionMagicAcceleration = 160 * 2 * Math.PI; // rotations/sec² at mechanism
+		config.MotionMagic.MotionMagicCruiseVelocity =  200 * 2 * Math.PI; // rotations/sec at mechanism
+   		config.MotionMagic.MotionMagicAcceleration = 290 * 2 * Math.PI; // rotations/sec² at mechanism
     	
 
 
@@ -50,7 +50,7 @@ public class TurretConstants {
 		config.Feedback.SensorToMechanismRatio = 40;
 		config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
-		config.Slot0.kP = 35.0; //TODO - Tune for turret
+		config.Slot0.kP = 155.0; //TODO - Tune for turret
 		config.Slot0.kI = 0.0;
 		config.Slot0.kD = 0.5;
 		
