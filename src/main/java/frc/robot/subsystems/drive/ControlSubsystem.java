@@ -102,7 +102,7 @@ public class ControlSubsystem {
 		);*/
 
 		driver.rightBumper().onTrue(
-			PivotSubsystem.mInstance.resetDeployPosition()
+			PivotSubsystem.mInstance.findDeployLimitCommand()
 		);
 
 		driver.start().onTrue(DriveSubsystem.mInstance.runOnce( () ->DriveSubsystem.mInstance.getDrivetrain().seedFieldCentric()));

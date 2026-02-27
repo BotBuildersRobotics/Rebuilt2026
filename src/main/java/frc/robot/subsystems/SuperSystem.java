@@ -104,6 +104,10 @@ public class SuperSystem extends SubsystemBase {
 		);
 	}
 
+	public Command DeployIntake(){
+		return PivotSubsystem.mInstance.findDeployLimitCommand();
+	}
+
 	public Command AimAtCenterHub(){
 		return turret.pointAtFieldPosition(frc.robot.FieldConstants.Hub.innerCenterPoint.toTranslation2d());
 	}

@@ -11,6 +11,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.Rotations;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.lib.LoggedTunableNumber;
@@ -55,15 +57,13 @@ public class HoodSubsystem extends ServoMotorSubsystem<MotorIOTalonFX> {
     public void periodic() {
         super.periodic();
 
-        //work out the distance the hood should be
-        double positionInRadians = MathUtil.clamp(goalAngle, minAngle, maxAngle);
-     
+       
         if(!this.manualTune){
             //this.applySetpoint(Setpoint.withMotionMagicSetpoint(Radians.of(positionInRadians)));
-            this.applySetpoint(Setpoint.withMotionMagicSetpoint(Radians.of(positionInRadians)));
+            this.applySetpoint(Setpoint.withMotionMagicSetpoint(Rotations.of(goalAngle * 5)));
         }
        SmartDashboard.putNumber("Hood/Position",this.getPosition().baseUnitMagnitude());
-       SmartDashboard.putNumber("Hood/GoalAngleRad",goalAngle);
+       SmartDashboard.putNumber("Hood/GoalAngleRotations",Rotations.of(goalAngle *5 ).baseUnitMagnitude());
        SmartDashboard.putBoolean("Hood/ManualTune", manualTune);
 
        // AdvantageKit structured logging for replay
@@ -83,9 +83,9 @@ public class HoodSubsystem extends ServoMotorSubsystem<MotorIOTalonFX> {
 
         return run(() -> {
             this.manualTune = true;
-           double positionInRadians = MathUtil.clamp(manualHood.get(), minAngle, maxAngle);
+           
            // this.applySetpoint(Setpoint.withPositionVelocitySetpoint(Radians.of(positionInRadians), RadiansPerSecond.of(1)));
-             this.applySetpoint(Setpoint.withMotionMagicSetpoint(Radians.of(positionInRadians)));
+             this.applySetpoint(Setpoint.withMotionMagicSetpoint(Degrees.of(manualHood.get())));
 
         });
 

@@ -105,6 +105,35 @@ public class RobotContainer {
 
 		CommandScheduler.getInstance().setPeriod(0.02);
 
+		NamedCommands.registerCommand("DeployIntake",
+		
+			SuperSystem.mInstance.DeployIntake()
+		
+		);
+
+		NamedCommands.registerCommand("Intake",
+		
+			SuperSystem.mInstance.Intake()
+		
+		);
+
+		NamedCommands.registerCommand("idleIntakes",
+		
+			SuperSystem.mInstance.idleIntakes()
+		
+		);
+
+		NamedCommands.registerCommand("Shoot",
+		
+			SuperSystem.mInstance.Shoot()
+		
+		);
+
+		NamedCommands.registerCommand("idleShooter",
+		
+			SuperSystem.mInstance.idleShooter()
+		
+		);
 		
 		autoChooser = AutoBuilder.buildAutoChooser();
 		/*if(SmartDashboard.containsKey("Auto Mode")) {
@@ -145,7 +174,7 @@ public class RobotContainer {
 	 */
 	public Command getAutonomousCommand() {
 		
-		//return autoChooser.getSelected();
-		 return Commands.print("Auto command selected");
+		return autoChooser.getSelected();
+		// return Commands.print("Auto command selected");
 	}
 }
