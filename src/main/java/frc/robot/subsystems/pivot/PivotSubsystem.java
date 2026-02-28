@@ -5,6 +5,7 @@ import frc.robot.lib.io.ServoMotorSubsystem;
 import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -68,17 +69,24 @@ public class PivotSubsystem extends ServoMotorSubsystem<MotorIOTalonFX> {
 		final double homingVolts = -3.0;
 		// Current threshold indicating the mechanism has hit the hard stop
 		final double currentThresholdAmps = 6.0;
+		// Ignore current for this long to get past inrush spike
+		final double ignoreCurrentSecs = 0.25;
+
+		Timer timer = new Timer();
 
 		return
-			// Phase 1: Drive down until current spikes
-			run(() -> {
+			// Drive down, ignoring current for the first 250ms
+			runOnce(() -> timer.restart())
+			.andThen(run(() -> {
 				applySetpoint(Setpoint.withVoltageSetpoint(Volts.of(homingVolts)));
 				SmartDashboard.putNumber("Pivot/HomingCurrent",
 					getStatorCurrent().in(Units.Amps));
 			})
-			.until(() -> getStatorCurrent().in(Units.Amps) > currentThresholdAmps)
-			// Phase 2: Stop, mark this as the deploy position, hold it
+			.until(() -> timer.hasElapsed(ignoreCurrentSecs)
+				&& getStatorCurrent().in(Units.Amps) > currentThresholdAmps))
+			// Stop, mark this as the deploy position, hold it
 			.andThen(runOnce(() -> {
+				timer.stop();
 				Angle foundPosition = getPosition();
 				setCurrentPosition(PivotConstants.kDeployPosition);
 				applySetpoint(DEPLOY);
