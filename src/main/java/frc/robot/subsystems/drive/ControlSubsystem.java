@@ -74,32 +74,13 @@ public class ControlSubsystem {
 			s.idleShooter()
 		);
 
+		driver.a().onTrue(s.toggleStow());
+
+		driver.b().whileTrue(s.passAuto());
+
 		//driver.x().onTrue(TurretSubsystem.mInstance.zeroCommand());
-		//driver.y().onTrue(TurretSubsystem.mInstance.runTrackTargetCommand());
-
-		//driver.x().onTrue(PivotSubsystem.mInstance.setpointCommand(PivotSubsystem.mInstance.DEPLOY));
-		//driver.y().onTrue(PivotSubsystem.mInstance.setpointCommand(PivotSubsystem.mInstance.AGITATE));
-
-		//driver.b().onTrue(SuperSystem.mInstance.AimAtCenterHub());
-		//driver.rightBumper().onTrue(SuperSystem.mInstance.AimAtPassingZone());
-
-	
-		//driver.leftBumper().onTrue(ShooterSubsystem.mInstance.runFixedCommand(() -> 10.0));
-		/*driver.leftBumper().onTrue(ShooterSubsystem.mInstance.setpointCommand(
-			Setpoint.withVelocitySetpoint(AngularVelocity.ofBaseUnits(10, RadiansPerSecond))
-		));*/
 		
-		//driver.leftBumper().onTrue(ShooterSubsystem.mInstance.setpointCommand(ShooterSubsystem.SHOOT));
-		//driver.leftBumper().onTrue(ShooterSubsystem.mInstance.runTrackTargetActiveShootingCommand());
-		//driver.a().onTrue(ShooterSubsystem.mInstance.stopCommand());
-		//driver.a().onTrue(ShooterSubsystem.mInstance.setpointCommand(ShooterSubsystem.IDLE));
 
-		/*driver.leftBumper().onTrue(
-			//Commands.parallel(
-				SuperSystem.mInstance.agitateCommand()//,
-			//	s.Shoot()
-			//)
-		);*/
 
 		driver.rightBumper().onTrue(
 			PivotSubsystem.mInstance.findDeployLimitCommand()
@@ -142,7 +123,8 @@ public class ControlSubsystem {
 
 		operator.y().whileTrue(SuperSystem.mInstance.testTurretAimAtHub());
 
-		operator.x().onTrue(LedSubsystem.mInstance.setBlue());
+		
+		operator.x().onTrue(SuperSystem.mInstance.zeroTurretCommand());
 
 		operator.leftBumper().onTrue(ClimbSubsystem.mInstance.setpointCommand(ClimbSubsystem.CLIMB) ).onFalse(ClimbSubsystem.mInstance.setpointCommand(ClimbSubsystem.STOP));
 		operator.rightBumper().onTrue(ClimbSubsystem.mInstance.setpointCommand(ClimbSubsystem.REVERSE) ).onFalse(ClimbSubsystem.mInstance.setpointCommand(ClimbSubsystem.STOP));

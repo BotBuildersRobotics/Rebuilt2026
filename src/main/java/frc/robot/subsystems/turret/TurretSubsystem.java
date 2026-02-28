@@ -44,6 +44,7 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
   private boolean turretZeroed = true;
 
   private ShootState shootState = ShootState.ACTIVE_SHOOTING;
+  private boolean stowed = false;
 
   private Mechanism2d turretMech;
   private MechanismLigament2d turretLigament;
@@ -170,6 +171,7 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
     Logger.recordOutput("Turret/FieldRelativeAngleDeg", fieldRelativeAngleDeg);
     Logger.recordOutput("Turret/AimPose", turretAimPose);
     Logger.recordOutput("Turret/ShootState", shootState.toString());
+    Logger.recordOutput("Turret/Stowed", stowed);
     Logger.recordOutput("Turret/GoalAngleDeg", goalAngle.getDegrees());
     Logger.recordOutput("Turret/Offset", turretOffset);
 
@@ -217,10 +219,25 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
   public Command runTrackTargetActiveShootingCommand() {
     return run(
         () -> {
-          var params = shotCalc.getParameters();
-          setFieldRelativeTarget(params.turretAngle().plus(Rotation2d.fromDegrees(turretOffset)));
-          setShootState(ShootState.ACTIVE_SHOOTING);
+          if (stowed) {
+            // Hold 0° robot-relative (straight ahead)
+            Rotation2d robotAngle = DriveSubsystem.mInstance.getState().Pose.getRotation();
+            setFieldRelativeTarget(robotAngle);
+            setShootState(ShootState.ACTIVE_SHOOTING);
+          } else {
+            var params = shotCalc.getParameters();
+            setFieldRelativeTarget(params.turretAngle().plus(Rotation2d.fromDegrees(turretOffset)));
+            setShootState(ShootState.ACTIVE_SHOOTING);
+          }
         });
+  }
+
+  public void setStowed(boolean stowed) {
+    this.stowed = stowed;
+  }
+
+  public boolean isStowed() {
+    return stowed;
   }
 
   public Command runFixedCommand(Supplier<Rotation2d> angle) {
