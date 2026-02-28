@@ -11,7 +11,6 @@ package frc.robot.subsystems.turret;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -22,13 +21,11 @@ import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.interpolation.InterpolatingTreeMap;
 import edu.wpi.first.math.interpolation.InverseInterpolator;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 import frc.robot.FieldConstants;
 import frc.robot.lib.AllianceFlipUtil;
 import frc.robot.subsystems.drive.DriveSubsystem;
-import edu.wpi.first.math.util.Units;
 
 
 import org.littletonrobotics.junction.Logger;
@@ -119,6 +116,110 @@ public class ShotCalculator {
     timeOfFlightMap.put(1.38, 0.90);
   }
 
+  private Double lastContinuousTurretAngleDeg = null;
+
+  public LaunchingParameters getAltParameters(){
+     if (latestParameters != null) {
+      return latestParameters;
+    }
+
+        Translation2d target = AllianceFlipUtil.apply(FieldConstants.Hub.topCenterPoint.toTranslation2d());
+
+        Pose2d robotPose = DriveSubsystem.mInstance.getDrivetrain().getState().Pose;
+        Translation2d turretOffsetRobot = robotToTurret.getTranslation().toTranslation2d();
+        Translation2d turretOffsetField = turretOffsetRobot.rotateBy(robotPose.getRotation());
+        Translation2d turretPosField = robotPose.getTranslation().plus(turretOffsetField);
+        Pose2d turretPoseField = new Pose2d(turretPosField, robotPose.getRotation());
+
+        double turretToTargetDistance = target.getDistance(turretPoseField.getTranslation());
+
+        // Field-relative velocity of the robot
+        ChassisSpeeds v = DriveSubsystem.mInstance.getDrivetrain().getFieldVelocity();
+
+        // Compute turret's *field-relative* translational velocity:
+        // v_turret = v_robot + omega x r
+        // r is robotToTurret rotated into field frame.
+        double omega = v.omegaRadiansPerSecond;
+
+        // robotToTurret in *robot frame* is (x,y). In field, r_field = R(theta)*r_robot
+        double rfx = turretOffsetField.getX();
+        double rfy = turretOffsetField.getY();
+
+        // omega x r = (-omega*rfy, omega*rfx)
+        double turretVelX = v.vxMetersPerSecond + (-omega * rfy);
+        double turretVelY = v.vyMetersPerSecond + ( omega * rfx);
+
+        // Lookahead based on time of flight (distance -> tof)
+        double tof = timeOfFlightMap.get(turretToTargetDistance);
+        Translation2d offset = new Translation2d(turretVelX * tof, turretVelY * tof);
+
+        // Clamp the lookahead so it never crosses past the hub.
+        // Decompose offset into radial (toward target) and lateral components.
+        // The lateral component is preserved for shoot-on-the-fly correctness.
+        // The radial component is clamped so the lookahead stays at least
+        // kMinLookaheadDistance from the target.
+        final double kMinLookaheadDistance = 0.5; // meters
+        Translation2d toTarget = target.minus(turretPoseField.getTranslation());
+        double rx = toTarget.getX() / turretToTargetDistance;
+        double ry = toTarget.getY() / turretToTargetDistance;
+
+        double radialOffset  =  rx * offset.getX() + ry * offset.getY();
+        double lateralOffset = -ry * offset.getX() + rx * offset.getY();
+
+        double clampedRadial = Math.min(radialOffset, turretToTargetDistance - kMinLookaheadDistance);
+
+        Translation2d clampedOffset = new Translation2d(
+            clampedRadial * rx - lateralOffset * ry,
+            clampedRadial * ry + lateralOffset * rx
+        );
+
+        Pose2d lookaheadPose = new Pose2d(turretPoseField.getTranslation().plus(clampedOffset), turretPoseField.getRotation());
+
+        double lookaheadDistance = target.getDistance(lookaheadPose.getTranslation());
+
+        // Aim from lookahead position to target (FIELD angle, wrapped)
+        double turretFieldAngleWrappedDeg =
+            target.minus(lookaheadPose.getTranslation()).getAngle().getDegrees();
+
+        // Unwrap to continuous degrees
+        if (lastContinuousTurretAngleDeg == null) {
+            lastContinuousTurretAngleDeg = turretFieldAngleWrappedDeg;
+        }
+
+        double turretFieldAngleDeg = unwrapToNearestDeg(lastContinuousTurretAngleDeg, turretFieldAngleWrappedDeg);
+
+        lastContinuousTurretAngleDeg = turretFieldAngleDeg;
+
+        // Hood and flywheel from lookahead distance
+        Rotation2d hoodAngleRot = launchHoodAngleMap.get(lookaheadDistance);
+        double flywheelSpeed = launchFlywheelSpeedMap.get(lookaheadDistance);
+
+    Logger.recordOutput("LaunchCalculator/Alt/LookaheadPose", lookaheadPose);
+    Logger.recordOutput("LaunchCalculator/Alt/TurretToTargetDistance", lookaheadDistance);
+
+    latestParameters =
+        new LaunchingParameters(
+            lookaheadDistance >= minDistance
+                && lookaheadDistance <= maxDistance,
+            Rotation2d.fromDegrees(turretFieldAngleDeg),
+            0.0,
+            hoodAngleRot.getRadians(),
+            0.0,
+            flywheelSpeed);
+
+    return latestParameters;
+  }
+
+  private static double unwrapToNearestDeg(double referenceDeg, double candidateWrappedDeg) {
+        double delta = MathUtil.inputModulus(
+            candidateWrappedDeg - referenceDeg,
+            -180.0,
+            180.0
+        );
+        return referenceDeg + delta;
+    }
+
+
   public LaunchingParameters getParameters() {
     if (latestParameters != null) {
       return latestParameters;
@@ -126,7 +227,7 @@ public class ShotCalculator {
 
     // Calculate distance from turret to target
      // Calculate estimated pose while accounting for phase delay
-    Pose2d estimatedPose = DriveSubsystem.mInstance.getPose();
+    Pose2d estimatedPose = DriveSubsystem.mInstance.getDrivetrain().getState().Pose;
     // getState().Speeds is already robot-relative; exp() expects robot-relative
     ChassisSpeeds robotRelativeVelocity = DriveSubsystem.mInstance.getGeneratedDrive().getState().Speeds;
 
