@@ -117,7 +117,7 @@ public class RobotContainer {
 		
 		);
 
-		NamedCommands.registerCommand("idleIntakes",
+		NamedCommands.registerCommand("idleIntake",
 		
 			SuperSystem.mInstance.idleIntakes()
 		

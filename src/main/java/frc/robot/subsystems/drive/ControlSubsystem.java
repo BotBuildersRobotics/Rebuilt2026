@@ -74,6 +74,8 @@ public class ControlSubsystem {
 			s.idleShooter()
 		);
 
+		driver.a().whileTrue(SuperSystem.mInstance.turretStow());
+
 		//driver.x().onTrue(TurretSubsystem.mInstance.zeroCommand());
 		//driver.y().onTrue(TurretSubsystem.mInstance.runTrackTargetCommand());
 

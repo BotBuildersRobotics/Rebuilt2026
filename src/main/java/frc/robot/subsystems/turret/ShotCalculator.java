@@ -85,23 +85,26 @@ public class ShotCalculator {
 
    launchHoodAngleMap.put(1.34, Rotation2d.fromDegrees(0.0));
     launchHoodAngleMap.put(1.78, Rotation2d.fromDegrees(0.0));
-    launchHoodAngleMap.put(2.17, Rotation2d.fromDegrees(0.0));
-    launchHoodAngleMap.put(2.81, Rotation2d.fromDegrees(0.0));
-    launchHoodAngleMap.put(3.82, Rotation2d.fromDegrees(0.0));
+    launchHoodAngleMap.put(2.17, Rotation2d.fromDegrees(15.0));
+    launchHoodAngleMap.put(2.81, Rotation2d.fromDegrees(15.0));
+    launchHoodAngleMap.put(3.0, Rotation2d.fromDegrees(15.0));
+    launchHoodAngleMap.put(3.43, Rotation2d.fromDegrees(15));
+    launchHoodAngleMap.put(3.82, Rotation2d.fromDegrees(12));
     launchHoodAngleMap.put(4.09, Rotation2d.fromDegrees(15.0));
-    launchHoodAngleMap.put(4.09, Rotation2d.fromDegrees(20.0));
-    launchHoodAngleMap.put(4.40, Rotation2d.fromDegrees(20.0));
-    launchHoodAngleMap.put(4.77, Rotation2d.fromDegrees(25.0));
-    launchHoodAngleMap.put(5.57, Rotation2d.fromDegrees(25.5));
-    launchHoodAngleMap.put(5.60, Rotation2d.fromDegrees(25.5));
-    launchHoodAngleMap.put(5.70, Rotation2d.fromDegrees(35.5));
+    launchHoodAngleMap.put(4.09, Rotation2d.fromDegrees(17));
+    launchHoodAngleMap.put(4.40, Rotation2d.fromDegrees(19));
+    launchHoodAngleMap.put(4.77, Rotation2d.fromDegrees(21.0));
+    launchHoodAngleMap.put(5.57, Rotation2d.fromDegrees(23.5));
+    launchHoodAngleMap.put(5.60, Rotation2d.fromDegrees(25.0));
+    launchHoodAngleMap.put(5.70, Rotation2d.fromDegrees(25.0));
 
-    launchFlywheelSpeedMap.put(1.34, 180.0);
+    launchFlywheelSpeedMap.put(1.68, 167.0); //gud
     launchFlywheelSpeedMap.put(1.78, 185.0);
-    launchFlywheelSpeedMap.put(2.17, 185.0); //good
-    launchFlywheelSpeedMap.put(2.81, 190.0);
+    launchFlywheelSpeedMap.put(2.13, 185.0); //gud
+    launchFlywheelSpeedMap.put(2.69, 210.0); //gud
+    launchFlywheelSpeedMap.put(3.23, 225.0); //gud
     launchFlywheelSpeedMap.put(3.42, 210.0);
-    launchFlywheelSpeedMap.put(3.82, 220.0); //good
+    launchFlywheelSpeedMap.put(3.82, 220.0);
     launchFlywheelSpeedMap.put(4.09, 225.0);
     launchFlywheelSpeedMap.put(4.20, 225.0);
     launchFlywheelSpeedMap.put(4.77, 230.0);
