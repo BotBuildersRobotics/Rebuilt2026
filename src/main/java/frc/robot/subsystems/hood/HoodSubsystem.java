@@ -32,6 +32,7 @@ public class HoodSubsystem extends ServoMotorSubsystem<MotorIOTalonFX> {
     private double goalVelocity = 0.0;
 
     private boolean manualTune = false;
+    private boolean stowed = false;
     private static final LoggedTunableNumber manualHood = new LoggedTunableNumber("Hood/Manual");
     private static final LoggedTunableNumber passingAngle = new LoggedTunableNumber("Hood/PassingAngle");
 
@@ -97,10 +98,21 @@ public class HoodSubsystem extends ServoMotorSubsystem<MotorIOTalonFX> {
     public Command runTrackTargetActiveShootingCommand() {
         return run(
             () -> {
-            var params = this.shotCalc.getParameters();
+            if (stowed) {
+                setGoalParams(0.0, 0.0);
+            } else {
+                var params = this.shotCalc.getParameters();
                 setGoalParams(params.hoodAngle(), params.hoodVelocity());
-            
+            }
             });
+    }
+
+    public void setStowed(boolean stowed) {
+        this.stowed = stowed;
+    }
+
+    public boolean isStowed() {
+        return stowed;
     }
 
     public Command runPassingCommand() {

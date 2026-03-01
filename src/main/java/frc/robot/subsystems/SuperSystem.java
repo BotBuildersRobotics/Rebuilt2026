@@ -124,6 +124,18 @@ public class SuperSystem extends SubsystemBase {
 		return turret.stowCommand();
 	}
 
+	public Command zeroTurretCommand(){
+		return turret.zeroCommand();
+	}
+
+	public Command toggleStow(){
+		return Commands.runOnce(() -> {
+			boolean newState = !turret.isStowed();
+			turret.setStowed(newState);
+			hood.setStowed(newState);
+		});
+	}
+
 	public Command passLeft(){
 		return Commands.parallel(
 			turret.passLeftCommand(),
