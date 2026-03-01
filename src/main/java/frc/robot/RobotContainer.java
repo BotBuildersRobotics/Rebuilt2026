@@ -117,19 +117,7 @@ public class RobotContainer {
 		
 		);
 
-		NamedCommands.registerCommand("stowTurret",
-
-			SuperSystem.mInstance.enableStow()
-
-		);
-
-		NamedCommands.registerCommand("aimTurret",
-
-			SuperSystem.mInstance.disableStow()
-
-		);
-
-		NamedCommands.registerCommand("idleIntakes",
+		NamedCommands.registerCommand("idleIntake",
 		
 			SuperSystem.mInstance.idleIntakes()
 		
