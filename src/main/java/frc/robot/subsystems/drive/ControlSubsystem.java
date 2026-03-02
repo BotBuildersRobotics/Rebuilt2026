@@ -69,9 +69,15 @@ public class ControlSubsystem {
 		);
 
 		driver.leftTrigger().onTrue(
-			s.Shoot()
+			Commands.parallel(
+				s.Shoot(),
+				Commands.runOnce(() -> DriveConstants.setShootingSpeedLimited(true))
+			)
 		).onFalse(
-			s.idleShooter()
+			Commands.parallel(
+				s.idleShooter(),
+				Commands.runOnce(() -> DriveConstants.setShootingSpeedLimited(false))
+			)
 		);
 
 		driver.a().onTrue(s.toggleStow());

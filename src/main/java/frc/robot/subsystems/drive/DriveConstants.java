@@ -19,6 +19,7 @@ import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import frc.robot.generated.TunerConstants;
+import frc.robot.lib.LoggedTunableNumber;
 
 import java.util.function.UnaryOperator;
 
@@ -31,6 +32,19 @@ public class DriveConstants {
 	public static final AngularVelocity kMaxAngularRateFAST = kMaxAngularRate.times(2.0);
 	public static final AngularAcceleration kMaxAngularAcceleration =
 			kMaxAngularRate.div(0.1).per(Units.Second);
+
+	// Fraction of max speed allowed while shooting (0.0 to 1.0)
+	private static final LoggedTunableNumber shootingSpeedFraction =
+			new LoggedTunableNumber("Drive/ShootingSpeedFraction", 0.3);
+	private static boolean shootingSpeedLimited = false;
+
+	public static void setShootingSpeedLimited(boolean limited) {
+		shootingSpeedLimited = limited;
+	}
+
+	public static boolean isShootingSpeedLimited() {
+		return shootingSpeedLimited;
+	}
 
 
 	public static final SwerveRequest.FieldCentric teleopRequest =
@@ -47,24 +61,24 @@ public class DriveConstants {
 
 				SmartDashboard.putNumber("Sticks/hypot/raw", Math.hypot(xDesiredRaw, yDesiredRaw));
 
-				return request.withVelocityX((ControlBoardConstants.mDriverController
-												.leftStick()
-												.getAsBoolean()
-										? DriveConstants.kMaxSpeedFAST
-										: DriveConstants.kMaxSpeed)
-								.times(xFancy))
-						.withVelocityY((ControlBoardConstants.mDriverController
-												.leftStick()
-												.getAsBoolean()
-										? DriveConstants.kMaxSpeedFAST
-										: DriveConstants.kMaxSpeed)
-								.times(yFancy))
-						.withRotationalRate((ControlBoardConstants.mDriverController
-												.rightStick()
-												.getAsBoolean()
-										? DriveConstants.kMaxAngularRateFAST
-										: DriveConstants.kMaxAngularRate)
-								.times(rotFancy));
+				LinearVelocity speedLimit;
+				AngularVelocity rotLimit;
+
+				if (shootingSpeedLimited) {
+					double fraction = shootingSpeedFraction.get();
+					speedLimit = DriveConstants.kMaxSpeed.times(fraction);
+					rotLimit = DriveConstants.kMaxAngularRate.times(fraction);
+				} else if (ControlBoardConstants.mDriverController.leftStick().getAsBoolean()) {
+					speedLimit = DriveConstants.kMaxSpeedFAST;
+					rotLimit = DriveConstants.kMaxAngularRateFAST;
+				} else {
+					speedLimit = DriveConstants.kMaxSpeed;
+					rotLimit = DriveConstants.kMaxAngularRate;
+				}
+
+				return request.withVelocityX(speedLimit.times(xFancy))
+						.withVelocityY(speedLimit.times(yFancy))
+						.withRotationalRate(rotLimit.times(rotFancy));
 			};
 
 	public static double getDeadbandedStick(double rawValue) {

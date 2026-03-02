@@ -136,6 +136,20 @@ public class SuperSystem extends SubsystemBase {
 		});
 	}
 
+	public Command enableStow(){
+		return Commands.runOnce(() -> {
+			turret.setStowed(true);
+			hood.setStowed(true);
+		});
+	}
+
+	public Command disableStow(){
+		return Commands.runOnce(() -> {
+			turret.setStowed(false);
+			hood.setStowed(false);
+		});
+	}
+
 	public Command passLeft(){
 		return Commands.parallel(
 			turret.passLeftCommand(),
