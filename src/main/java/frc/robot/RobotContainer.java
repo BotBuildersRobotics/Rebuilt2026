@@ -134,6 +134,18 @@ public class RobotContainer {
 			SuperSystem.mInstance.idleShooter()
 		
 		);
+
+		NamedCommands.registerCommand("stowTurret",
+		
+			SuperSystem.mInstance.turretStow()
+		
+		);
+
+		NamedCommands.registerCommand("aimTurret",
+		
+			SuperSystem.mInstance.toggleStow()
+		
+		);
 		
 		autoChooser = AutoBuilder.buildAutoChooser();
 		/*if(SmartDashboard.containsKey("Auto Mode")) {

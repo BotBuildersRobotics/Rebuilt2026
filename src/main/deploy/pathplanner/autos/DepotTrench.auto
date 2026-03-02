@@ -42,12 +42,6 @@
                       "data": {
                         "waitTime": 3.0
                       }
-                    },
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "idleIntake"
-                      }
                     }
                   ]
                 }
@@ -63,6 +57,18 @@
                 "type": "path",
                 "data": {
                   "pathName": "TrenchReturn"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "ReturnForShot"
+                }
+              },
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 0.25
                 }
               },
               {
