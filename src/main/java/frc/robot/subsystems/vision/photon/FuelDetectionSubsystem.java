@@ -57,7 +57,7 @@ public class FuelDetectionSubsystem extends SubsystemBase {
 
             // Convert total area to a percentage of full capacity
             // area is percentage of image (0-100 from PhotonVision)
-            double maxExpectedArea = SINGLE_FUEL_AREA * MAX_FUEL_CAPACITY * 100.0;
+            double maxExpectedArea = 60;//SINGLE_FUEL_AREA * MAX_FUEL_CAPACITY * 100.0;
             fuelPercentage = Math.min(100.0, (totalArea / maxExpectedArea) * 100.0);
         } else {
             detectedFuelCount = 0;

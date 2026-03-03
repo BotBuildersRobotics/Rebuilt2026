@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 7.442,
-        "y": 5.568185053380782
+        "x": 7.657680180180179,
+        "y": 5.318896396396396
       },
       "prevControl": null,
       "nextControl": {
-        "x": 8.442,
-        "y": 5.568185053380782
+        "x": 7.528569859895483,
+        "y": 6.061280738033407
       },
       "isLocked": false,
       "linkedName": "TrenchIntake"
@@ -41,7 +41,7 @@
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 0,
+    "velocity": 3.0,
     "rotation": 0.0
   },
   "reversed": false,

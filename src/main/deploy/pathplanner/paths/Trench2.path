@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 8.14161036036036,
-        "y": 7.580529279279279
+        "x": 7.934211711711713,
+        "y": 7.649662162162162
       },
       "isLocked": false,
       "linkedName": null
@@ -28,27 +28,8 @@
       "linkedName": "TrenchIntake"
     }
   ],
-  "rotationTargets": [
-    {
-      "waypointRelativePos": 0.48947368421052717,
-      "rotationDegrees": -80.0
-    }
-  ],
-  "constraintZones": [
-    {
-      "name": "Constraints Zone",
-      "minWaypointRelativePos": 0.7685492801771914,
-      "maxWaypointRelativePos": 1.0,
-      "constraints": {
-        "maxVelocity": 1.2,
-        "maxAcceleration": 3.0,
-        "maxAngularVelocity": 540.0,
-        "maxAngularAcceleration": 720.0,
-        "nominalVoltage": 12.0,
-        "unlimited": false
-      }
-    }
-  ],
+  "rotationTargets": [],
+  "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {

@@ -8,20 +8,20 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.720676156583631,
-        "y": 7.332692763938315
+        "x": 5.590960854092527,
+        "y": 7.354211150652431
       },
       "isLocked": false,
       "linkedName": "PreTrench"
     },
     {
       "anchor": {
-        "x": 2.9334400948991703,
-        "y": 7.440284697508897
+        "x": 3.658,
+        "y": 7.531
       },
       "prevControl": {
-        "x": 1.9334400948991703,
-        "y": 7.440284697508897
+        "x": 4.658604982206408,
+        "y": 7.520240806642941
       },
       "nextControl": null,
       "isLocked": false,
@@ -29,7 +29,21 @@
     }
   ],
   "rotationTargets": [],
-  "constraintZones": [],
+  "constraintZones": [
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 0,
+      "maxWaypointRelativePos": 0.48726467331118406,
+      "constraints": {
+        "maxVelocity": 3.0,
+        "maxAcceleration": 5.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
@@ -47,7 +61,7 @@
   "reversed": false,
   "folder": null,
   "idealStartingState": {
-    "velocity": 0,
+    "velocity": 3.0,
     "rotation": 0.0
   },
   "useDefaultConstraints": true
