@@ -41,13 +41,15 @@ public class ShooterSubsystem  extends MotorSubsystem<MotorIOTalonFX> {
 	
     private ShotCalculator shotCalc;
 
+    private double setpointVal = 0.0;
+
 	public ShooterSubsystem() {
 		super(ShooterConstants.getMotorIO(), "Shooter Rollers");
         manualShooter.initDefault(200);
         passingSpeed.initDefault(222);
 	}
 
-    
+
     public void setShotCalculator(ShotCalculator shotCalc){
         this.shotCalc = shotCalc;
     }
@@ -58,11 +60,11 @@ public class ShooterSubsystem  extends MotorSubsystem<MotorIOTalonFX> {
     response. */
 
     private void runVelocity(double velocityRadsPerSec) {
-        this.applySetpoint(Setpoint.withVelocitySetpoint(
-            AngularVelocity.ofBaseUnits(velocityRadsPerSec, RotationsPerSecond)));
+       // this.applySetpoint(Setpoint.withVelocitySetpoint(
+       //     AngularVelocity.ofBaseUnits(velocityRadsPerSec, RotationsPerSecond)));
 
-        // this.applySetpoint(Setpoint.withVelocityFOCSetpoint(
-        //    AngularVelocity.ofBaseUnits(velocityRadsPerSec, RotationsPerSecond)));
+         this.applySetpoint(Setpoint.withVelocityFOCSetpoint(
+            AngularVelocity.ofBaseUnits(velocityRadsPerSec, RotationsPerSecond)));
     }
 
     public Command setManualShooterVelocity(){
@@ -70,11 +72,11 @@ public class ShooterSubsystem  extends MotorSubsystem<MotorIOTalonFX> {
         return run(() -> {
             this.manualTune = true;
             
-            this.applySetpoint(Setpoint.withVelocitySetpoint(
-            AngularVelocity.ofBaseUnits(manualShooter.get(), RotationsPerSecond)));
+           // this.applySetpoint(Setpoint.withVelocitySetpoint(
+           // AngularVelocity.ofBaseUnits(manualShooter.get(), RotationsPerSecond)));
 
-             // this.applySetpoint(Setpoint.withVelocityFOCSetpoint(
-        //    AngularVelocity.ofBaseUnits(velocityRadsPerSec, RotationsPerSecond)));
+              this.applySetpoint(Setpoint.withVelocityFOCSetpoint(
+            AngularVelocity.ofBaseUnits(manualShooter.get(), RotationsPerSecond)));
 
         });
 
@@ -84,9 +86,11 @@ public class ShooterSubsystem  extends MotorSubsystem<MotorIOTalonFX> {
         super.periodic();
          SmartDashboard.putNumber("Shooter/Speed",this.getVelocity().baseUnitMagnitude());
          SmartDashboard.putBoolean("Shooter/Manual", manualTune);
+        SmartDashboard.putNumber("Shooter/VelocitySetPoint",setpointVal );
 
          // AdvantageKit structured logging for replay
          Logger.recordOutput("Shooter/VelocityRPS", this.getVelocity().baseUnitMagnitude());
+          Logger.recordOutput("Shooter/VelocitySetPoint",setpointVal );
          Logger.recordOutput("Shooter/ManualTune", manualTune);
      }
 
@@ -103,7 +107,8 @@ public class ShooterSubsystem  extends MotorSubsystem<MotorIOTalonFX> {
             () -> {
                 if(!this.manualTune){
                     var params = shotCalc.getParameters();
-                    runVelocity( params.flywheelSpeed());
+                    setpointVal = params.flywheelSpeed();
+                    runVelocity( setpointVal);
                 }
             
             });

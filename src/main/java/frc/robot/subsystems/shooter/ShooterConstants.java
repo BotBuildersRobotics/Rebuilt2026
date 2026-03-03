@@ -41,9 +41,9 @@ public class ShooterConstants {
 
 		// Slot 0: Torque current FOC velocity control (VelocityTorqueCurrentFOC)
 		// Units are in Amps instead of Volts
-		config.Slot0.kS = 3.0;   // static friction compensation in amps
-		config.Slot0.kP = 0.5;   // amps per RPS of error
-		config.Slot0.kV = 1.2;   // amps per RPS of target velocity
+		config.Slot0.kS = 0.085;   // static friction compensation in amps
+		config.Slot0.kP = 3.85;   // amps per RPS of error
+		config.Slot0.kV = 0.38;   // amps per RPS of target velocity
 		
 		
 

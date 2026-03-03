@@ -62,7 +62,7 @@ public class HoodSubsystem extends ServoMotorSubsystem<MotorIOTalonFX> {
         if(!this.manualTune){
             this.applySetpoint(Setpoint.withMotionMagicSetpoint(Degrees.of(goalAngleDeg)));
         }
-       SmartDashboard.putNumber("Hood/Position",this.getPosition().baseUnitMagnitude());
+       SmartDashboard.putNumber("Hood/Position",this.getPosition().in(Degrees));
        SmartDashboard.putNumber("Hood/GoalAngleDeg", goalAngleDeg);
        SmartDashboard.putBoolean("Hood/ManualTune", manualTune);
 
