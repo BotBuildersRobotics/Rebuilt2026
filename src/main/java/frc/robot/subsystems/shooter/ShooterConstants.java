@@ -33,9 +33,17 @@ public class ShooterConstants {
 		//config.MotionMagic.MotionMagicExpo_kA = 0.0074516;
 		config.MotionMagic.MotionMagicExpo_kA = 0.074516;
 		config.MotionMagic.MotionMagicExpo_kV = 0.12034;
+		
+		// Slot 1: Voltage-based velocity control (VelocityVoltage)
 		config.Slot1.kS = 0.30532;
 		config.Slot1.kP = 0.053558;
 		config.Slot1.kV = 0.12034;
+
+		// Slot 0: Torque current FOC velocity control (VelocityTorqueCurrentFOC)
+		// Units are in Amps instead of Volts
+		config.Slot0.kS = 3.0;   // static friction compensation in amps
+		config.Slot0.kP = 0.5;   // amps per RPS of error
+		config.Slot0.kV = 1.2;   // amps per RPS of target velocity
 		
 		
 

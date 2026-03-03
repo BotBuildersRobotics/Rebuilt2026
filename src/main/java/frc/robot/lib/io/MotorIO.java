@@ -89,6 +89,13 @@ public abstract class MotorIO implements Sendable {
 	protected abstract void setVelocitySetpoint(AngularVelocity mechanismVelocity);
 
 	/**
+	 * Sets the motor to go to a velocity using FOC torque current control. Should not be called directly, only applied through Setpoints.
+	 *
+	 * @param mechanismVelocity Mechanism velocity to go to.
+	 */
+	protected abstract void setVelocityFOCSetpoint(AngularVelocity mechanismVelocity);
+
+	/**
 	 * Sets the motor to run at a percentage of it's max voltage. Should not be called directly, only applied through Setpoints.
 	 *
 	 * @param percent Percentage of max voltage to run at.
@@ -352,6 +359,7 @@ public abstract class MotorIO implements Sendable {
 		VOLTAGE,
 		MOTIONMAGIC,
 		VELOCITY,
+		VELOCITY_FOC,
 		DUTY_CYCLE,
 		POSITIONPID;
 
@@ -487,6 +495,14 @@ public abstract class MotorIO implements Sendable {
 				return io;
 			};
 			return new Setpoint(applier, Mode.VELOCITY, velocitySetpoint.baseUnitMagnitude());
+		}
+
+		public static Setpoint withVelocityFOCSetpoint(AngularVelocity velocitySetpoint) {
+			UnaryOperator<MotorIO> applier = (MotorIO io) -> {
+				io.setVelocityFOCSetpoint(velocitySetpoint);
+				return io;
+			};
+			return new Setpoint(applier, Mode.VELOCITY_FOC, velocitySetpoint.baseUnitMagnitude());
 		}
 
 		/**

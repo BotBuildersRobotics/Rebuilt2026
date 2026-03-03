@@ -220,6 +220,12 @@ public class MotorIOSim extends MotorIO {
 	}
 
 	@Override
+	protected void setVelocityFOCSetpoint(AngularVelocity mechanismVelocity) {
+		// In sim, FOC behaves the same as voltage-based velocity control
+		setVelocitySetpoint(mechanismVelocity);
+	}
+
+	@Override
 	protected void setDutyCycleSetpoint(Dimensionless percent) {
 		double percentValue = percent.in(Units.Percent) / 100.0;
 		appliedVoltage = percentValue * 12.0;

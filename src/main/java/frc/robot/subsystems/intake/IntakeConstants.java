@@ -9,7 +9,6 @@ import com.ctre.phoenix6.signals.MotorArrangementValue;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Voltage;
 import frc.robot.lib.io.MotorIOTalonFX;
-import frc.robot.lib.io.MotorIOTalonFXS;
 import frc.robot.Ports;
 import frc.robot.Robot;
 

@@ -121,6 +121,11 @@ public class MotorIOTalonFX extends MotorIO {
 	}
 
 	@Override
+	protected void setVelocityFOCSetpoint(AngularVelocity mechanismVelocity) {
+		setControl(requestGetter.getVelocityFOCRequest(mechanismVelocity));
+	}
+
+	@Override
 	protected void setPositionSetpoint(Angle mechanismPosition) {
 		setControl(requestGetter.getPositionRequest(mechanismPosition));
 	}
@@ -270,9 +275,11 @@ public class MotorIOTalonFX extends MotorIO {
 		}
 
 		public ControlRequest getVelocityRequest(AngularVelocity mechanismVelocity) {
-			//return new MotionMagicVelocityVoltage(mechanismVelocity).withSlot(1);
 			return new VelocityVoltage(mechanismVelocity).withSlot(1);
-			//return new VelocityTorqueCurrentFOC(mechanismVelocity).withSlot(1);
+		}
+
+		public ControlRequest getVelocityFOCRequest(AngularVelocity mechanismVelocity) {
+			return new VelocityTorqueCurrentFOC(mechanismVelocity).withSlot(0);
 		}
 
 		public ControlRequest getPositionRequest(Angle mechanismPosition) {
