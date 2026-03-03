@@ -44,8 +44,8 @@ public class HoodConstants {
 		config.Slot0.kG = 0.0;
 
 		// Motion Magic profile constraints
-		config.MotionMagic.MotionMagicCruiseVelocity =  10; // rotations/sec at mechanism
-   		config.MotionMagic.MotionMagicAcceleration = 10; // rotations/sec² at mechanism
+		config.MotionMagic.MotionMagicCruiseVelocity =  100; // rotations/sec at mechanism
+   		config.MotionMagic.MotionMagicAcceleration = 100; // rotations/sec² at mechanism
     	
 
 		return config;
