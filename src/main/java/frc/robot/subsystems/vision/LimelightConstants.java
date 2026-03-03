@@ -47,7 +47,7 @@ Z = 481.82229676
 			kRobotToCameraOffsetLeft = new Pose3d(
 					new Translation3d(
 							Units.Centimeters.of(-31.32),
-							Units.Centimeters.of(-31.1),
+							Units.Centimeters.of(31.1),
 							Units.Centimeters.of(39.24)
 						),
 					new Rotation3d(
@@ -60,7 +60,7 @@ Z = 481.82229676
 			kRobotToCameraOffsetRight = new Pose3d(
 					new Translation3d(
 							Units.Centimeters.of(-31.32),
-							Units.Centimeters.of(31.1),
+							Units.Centimeters.of(-31.1),
 							Units.Centimeters.of(39.24)
 						),
 					new Rotation3d(

@@ -25,10 +25,10 @@ import org.littletonrobotics.junction.Logger;
 
 public class HoodSubsystem extends ServoMotorSubsystem<MotorIOTalonFX> {
 
-    private static final double minAngle = Units.degreesToRadians(0);
-    private static final double maxAngle = Units.degreesToRadians(50);
+    private static final double minAngleDeg = 0;
+    private static final double maxAngleDeg = 50;
 
-    private double goalAngle = 0.0;
+    private double goalAngleDeg = 0.0;
     private double goalVelocity = 0.0;
 
     private boolean manualTune = false;
@@ -47,7 +47,7 @@ public class HoodSubsystem extends ServoMotorSubsystem<MotorIOTalonFX> {
 		setCurrentPosition(HoodConstants.converter.toAngle(HoodConstants.kStowPosition));
 
         manualHood.initDefault(0);
-        passingAngle.initDefault(Units.degreesToRadians(15));
+        passingAngle.initDefault(15);
 
 	}
 
@@ -60,22 +60,21 @@ public class HoodSubsystem extends ServoMotorSubsystem<MotorIOTalonFX> {
 
        
         if(!this.manualTune){
-            //this.applySetpoint(Setpoint.withMotionMagicSetpoint(Radians.of(positionInRadians)));
-            this.applySetpoint(Setpoint.withMotionMagicSetpoint(Rotations.of(goalAngle * 5)));
+            this.applySetpoint(Setpoint.withMotionMagicSetpoint(Degrees.of(goalAngleDeg)));
         }
        SmartDashboard.putNumber("Hood/Position",this.getPosition().baseUnitMagnitude());
-       SmartDashboard.putNumber("Hood/GoalAngleRotations",Rotations.of(goalAngle *5 ).baseUnitMagnitude());
+       SmartDashboard.putNumber("Hood/GoalAngleDeg", goalAngleDeg);
        SmartDashboard.putBoolean("Hood/ManualTune", manualTune);
 
        // AdvantageKit structured logging for replay
-       Logger.recordOutput("Hood/PositionRad", this.getPosition().baseUnitMagnitude());
-       Logger.recordOutput("Hood/GoalAngleRad", goalAngle);
+       Logger.recordOutput("Hood/PositionDeg", this.getPosition().in(Degrees));
+       Logger.recordOutput("Hood/GoalAngleDeg", goalAngleDeg);
        Logger.recordOutput("Hood/ManualTune", manualTune);
     }
 
-    private void setGoalParams(double angle, double velocity){
+    private void setGoalParamsDeg(double angleDeg, double velocity){
 
-        goalAngle = angle;
+        goalAngleDeg = angleDeg;
         goalVelocity = velocity;
 
     }
@@ -84,11 +83,7 @@ public class HoodSubsystem extends ServoMotorSubsystem<MotorIOTalonFX> {
 
         return run(() -> {
             this.manualTune = true;
-           
-           // this.applySetpoint(Setpoint.withPositionVelocitySetpoint(Radians.of(positionInRadians), RadiansPerSecond.of(1)));
-            // this.applySetpoint(Setpoint.withMotionMagicSetpoint(Degrees.of(manualHood.get())));
-              this.applySetpoint(Setpoint.withPositionSetpoint(Degrees.of(manualHood.get())));
-
+            this.applySetpoint(Setpoint.withMotionMagicSetpoint(Degrees.of(manualHood.get())));
         });
 
     }
@@ -100,10 +95,10 @@ public class HoodSubsystem extends ServoMotorSubsystem<MotorIOTalonFX> {
         return run(
             () -> {
             if (stowed) {
-                setGoalParams(0.0, 0.0);
+                setGoalParamsDeg(0.0, 0.0);
             } else {
                 var params = this.shotCalc.getParameters();
-                setGoalParams(params.hoodAngle(), params.hoodVelocity());
+                setGoalParamsDeg(Units.radiansToDegrees(params.hoodAngle()), params.hoodVelocity());
             }
             });
     }
@@ -117,15 +112,15 @@ public class HoodSubsystem extends ServoMotorSubsystem<MotorIOTalonFX> {
     }
 
     public Command runPassingCommand() {
-        return run(() -> setGoalParams(passingAngle.get(), 0.0));
+        return run(() -> setGoalParamsDeg(passingAngle.get(), 0.0));
     }
 
-    public Command runFixedCommand(DoubleSupplier angle, DoubleSupplier velocity) {
+    public Command runFixedCommand(DoubleSupplier angleDeg, DoubleSupplier velocity) {
         return run(
             () -> {
-            
-                setGoalParams(angle.getAsDouble(), velocity.getAsDouble());
-            
+
+                setGoalParamsDeg(angleDeg.getAsDouble(), velocity.getAsDouble());
+
             });
     }
     
