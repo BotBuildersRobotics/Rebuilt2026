@@ -86,7 +86,8 @@ public class HoodSubsystem extends ServoMotorSubsystem<MotorIOTalonFX> {
             this.manualTune = true;
            
            // this.applySetpoint(Setpoint.withPositionVelocitySetpoint(Radians.of(positionInRadians), RadiansPerSecond.of(1)));
-             this.applySetpoint(Setpoint.withMotionMagicSetpoint(Degrees.of(manualHood.get())));
+            // this.applySetpoint(Setpoint.withMotionMagicSetpoint(Degrees.of(manualHood.get())));
+              this.applySetpoint(Setpoint.withPositionSetpoint(Degrees.of(manualHood.get())));
 
         });
 

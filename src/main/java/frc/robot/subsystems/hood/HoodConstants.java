@@ -32,7 +32,7 @@ public class HoodConstants {
 		config.Voltage.PeakForwardVoltage = 12.0;
 		config.Voltage.PeakReverseVoltage = -12.0;
 		
-		config.Feedback.SensorToMechanismRatio = 0.3;
+		config.Feedback.SensorToMechanismRatio = 6.43;
 		config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
 		// PID gains for position control 
