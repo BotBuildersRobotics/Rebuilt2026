@@ -11,6 +11,10 @@ import frc.robot.subsystems.vision.LimelightHelpers.PoseEstimate;
 
 import org.littletonrobotics.junction.Logger;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,6 +24,9 @@ public class LimelightSubsystem extends SubsystemBase {
 	// 0 = all cameras push updates, 1 = only best camera pushes
 	private static final LoggedTunableNumber singleCameraMode =
 			new LoggedTunableNumber("Vision/SingleCameraMode", 0);
+
+	// Calibration mode: cameras still update but don't push to drivetrain
+	private boolean calibrationMode = false;
 
 	public LimelightSubsystem(VisionIOConfig... configs) {
 		super("Limelight");
@@ -50,6 +57,13 @@ public class LimelightSubsystem extends SubsystemBase {
 		// Fetch estimates from all cameras
 		for (VisionIOLimelight io : ios) {
 			io.update();
+		}
+
+		if (calibrationMode) {
+			// In calibration mode: log per-camera poses but don't push to drivetrain
+			outputCalibrationTelemetry();
+			outputTelemetry();
+			return;
 		}
 
 		// Decide which camera(s) push to drivetrain
@@ -94,6 +108,67 @@ public class LimelightSubsystem extends SubsystemBase {
 
 	public boolean getDisabled() {
 		return !ios.isEmpty() && ios.get(0).getDisabled();
+	}
+
+	/**
+	 * Toggles calibration mode. In calibration mode, cameras still update
+	 * but pose estimates are NOT pushed to the drivetrain. Each camera's
+	 * estimated pose is logged individually so you can compare them while
+	 * rotating the robot in place.
+	 *
+	 * Look at VisionCal/{camera-name}/X, Y, HeadingDeg on SmartDashboard.
+	 * At a known position, rotate the robot 180°. If a camera's X or Y
+	 * shifts significantly, its offset is wrong.
+	 */
+	public Command toggleCalibrationMode() {
+		return Commands.runOnce(() -> {
+			calibrationMode = !calibrationMode;
+			SmartDashboard.putBoolean("VisionCal/Active", calibrationMode);
+		}).ignoringDisable(true);
+	}
+
+	public Command enableCalibrationMode() {
+		return Commands.runOnce(() -> {
+			calibrationMode = true;
+			SmartDashboard.putBoolean("VisionCal/Active", calibrationMode);
+		}).ignoringDisable(true);
+	}
+
+	public Command disableCalibrationMode() {
+		return Commands.runOnce(() -> {
+			calibrationMode = false;
+			SmartDashboard.putBoolean("VisionCal/Active", calibrationMode);
+		}).ignoringDisable(true);
+	}
+
+	private void outputCalibrationTelemetry() {
+		Pose2d odomPose = frc.robot.subsystems.drive.DriveSubsystem.mInstance.getPose();
+		SmartDashboard.putNumber("VisionCal/Odometry/X", odomPose.getX());
+		SmartDashboard.putNumber("VisionCal/Odometry/Y", odomPose.getY());
+		SmartDashboard.putNumber("VisionCal/Odometry/HeadingDeg", odomPose.getRotation().getDegrees());
+
+		for (VisionIOLimelight io : ios) {
+			PoseEstimate est = io.getLatestPoseEstimate();
+			String prefix = "VisionCal/" + io.getName() + "/";
+
+			if (est != null) {
+				SmartDashboard.putNumber(prefix + "X", est.pose.getX());
+				SmartDashboard.putNumber(prefix + "Y", est.pose.getY());
+				SmartDashboard.putNumber(prefix + "HeadingDeg", est.pose.getRotation().getDegrees());
+				SmartDashboard.putNumber(prefix + "TagCount", est.tagCount);
+				SmartDashboard.putNumber(prefix + "AvgTagDist", est.avgTagDist);
+
+				// Show error vs odometry
+				SmartDashboard.putNumber(prefix + "ErrorX", est.pose.getX() - odomPose.getX());
+				SmartDashboard.putNumber(prefix + "ErrorY", est.pose.getY() - odomPose.getY());
+
+				Logger.recordOutput(prefix + "Pose", est.pose);
+				Logger.recordOutput(prefix + "ErrorX", est.pose.getX() - odomPose.getX());
+				Logger.recordOutput(prefix + "ErrorY", est.pose.getY() - odomPose.getY());
+			} else {
+				SmartDashboard.putNumber(prefix + "TagCount", 0);
+			}
+		}
 	}
 
 	public void outputTelemetry() {
