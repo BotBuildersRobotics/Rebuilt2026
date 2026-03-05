@@ -24,7 +24,7 @@ public class TurretVisionSubsystem extends SubsystemBase {
     );
 
     private static final LoggedTunableNumber maxCorrectionDeg =
-        new LoggedTunableNumber("TurretVision/MaxCorrectionDeg", 15.0);
+        new LoggedTunableNumber("TurretVision/MaxCorrectionDeg", 10.0);
     private static final LoggedTunableNumber ambiguityThreshold =
         new LoggedTunableNumber("TurretVision/AmbiguityThreshold", 0.2);
     // How many degrees to nudge the correction per tick toward the measured error.
