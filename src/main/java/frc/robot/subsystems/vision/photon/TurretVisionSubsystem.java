@@ -17,7 +17,7 @@ public class TurretVisionSubsystem extends SubsystemBase {
     public static final TurretVisionSubsystem mInstance = new TurretVisionSubsystem();
 
     private final PhotonCamera camera;
-    private final LinearFilter yawFilter = LinearFilter.movingAverage(5);
+    private final LinearFilter yawFilter = LinearFilter.movingAverage(15);
 
     // Hub AprilTag IDs (both alliance sides)
     private static final Set<Integer> HUB_TAG_IDS = Set.of(
@@ -29,6 +29,9 @@ public class TurretVisionSubsystem extends SubsystemBase {
         new LoggedTunableNumber("TurretVision/MaxCorrectionDeg", 15.0);
     private static final LoggedTunableNumber ambiguityThreshold =
         new LoggedTunableNumber("TurretVision/AmbiguityThreshold", 0.2);
+    // Max degrees the correction can change per tick (50Hz = 0.02s)
+    private static final LoggedTunableNumber maxRateDegPerTick =
+        new LoggedTunableNumber("TurretVision/MaxRateDegPerTick", 0.5);
 
     private double filteredCorrectionDeg = 0.0;
     private double rawYaw = 0.0;
@@ -86,7 +89,12 @@ public class TurretVisionSubsystem extends SubsystemBase {
         rawYaw = yawSum / count;
 
         double clamped = MathUtil.clamp(rawYaw, -maxCorrectionDeg.get(), maxCorrectionDeg.get());
-        filteredCorrectionDeg = yawFilter.calculate(clamped);
+        double smoothed = yawFilter.calculate(clamped);
+
+        // Rate-limit: clamp how fast the output can change per tick
+        double maxDelta = maxRateDegPerTick.get();
+        filteredCorrectionDeg += MathUtil.clamp(
+            smoothed - filteredCorrectionDeg, -maxDelta, maxDelta);
 
         logValues();
     }
@@ -95,7 +103,11 @@ public class TurretVisionSubsystem extends SubsystemBase {
         hasTarget = false;
         targetCount = 0;
         rawYaw = 0.0;
-        filteredCorrectionDeg = yawFilter.calculate(0.0);
+        // Don't snap correction to 0 — just hold last value.
+        // The rate limiter will gently decay it if tags stay gone,
+        // and the moving average is still being fed 0s so it will
+        // pull the smoothed value toward 0 over time.
+        yawFilter.calculate(filteredCorrectionDeg);
     }
 
     private void logValues() {
