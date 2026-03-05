@@ -59,17 +59,22 @@ public class TurretVisionSubsystem extends SubsystemBase {
             return;
         }
 
-        // Find the best hub tag: lowest ambiguity among hub tags below threshold
+        // Find the best hub tag: closest to camera center (lowest absolute yaw)
+        // among hub tags below ambiguity threshold. This prevents oscillation
+        // when both front and side tags are visible.
         PhotonTrackedTarget bestTarget = null;
-        double bestAmbiguity = Double.MAX_VALUE;
+        double bestAbsYaw = Double.MAX_VALUE;
 
         for (PhotonTrackedTarget target : result.getTargets()) {
             if (!HUB_TAG_IDS.contains(target.getFiducialId())) {
                 continue;
             }
-            double amb = target.getPoseAmbiguity();
-            if (amb < bestAmbiguity && amb < ambiguityThreshold.get()) {
-                bestAmbiguity = amb;
+            if (target.getPoseAmbiguity() >= ambiguityThreshold.get()) {
+                continue;
+            }
+            double absYaw = Math.abs(target.getYaw());
+            if (absYaw < bestAbsYaw) {
+                bestAbsYaw = absYaw;
                 bestTarget = target;
             }
         }
@@ -83,7 +88,7 @@ public class TurretVisionSubsystem extends SubsystemBase {
         // We have a valid hub tag
         hasTarget = true;
         targetId = bestTarget.getFiducialId();
-        targetAmbiguity = bestAmbiguity;
+        targetAmbiguity = bestTarget.getPoseAmbiguity();
         rawYaw = bestTarget.getYaw();
 
         double clamped = MathUtil.clamp(rawYaw, -maxCorrectionDeg.get(), maxCorrectionDeg.get());
