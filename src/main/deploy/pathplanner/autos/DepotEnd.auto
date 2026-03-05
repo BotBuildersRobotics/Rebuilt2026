@@ -13,12 +13,6 @@
                 "data": {
                   "name": "DeployIntake"
                 }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "stowTurret"
-                }
               }
             ]
           }
@@ -72,12 +66,6 @@
                 }
               },
               {
-                "type": "named",
-                "data": {
-                  "name": "aimTurret"
-                }
-              },
-              {
                 "type": "wait",
                 "data": {
                   "waitTime": 0.25
@@ -92,16 +80,28 @@
               {
                 "type": "wait",
                 "data": {
-                  "waitTime": 4.0
+                  "waitTime": 1.0
                 }
               }
             ]
           }
         },
         {
+          "type": "path",
+          "data": {
+            "pathName": "ShotToDepot"
+          }
+        },
+        {
           "type": "sequential",
           "data": {
             "commands": [
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 4.0
+                }
+              },
               {
                 "type": "named",
                 "data": {
@@ -112,81 +112,6 @@
                 "type": "named",
                 "data": {
                   "name": "idleShooter"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "stowTurret"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "parallel",
-          "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "Trench2"
-                }
-              },
-              {
-                "type": "sequential",
-                "data": {
-                  "commands": [
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "Intake"
-                      }
-                    },
-                    {
-                      "type": "wait",
-                      "data": {
-                        "waitTime": 3.0
-                      }
-                    }
-                  ]
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "sequential",
-          "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "TrenchReturn"
-                }
-              },
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "ReturnForShot"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "aimTurret"
-                }
-              },
-              {
-                "type": "wait",
-                "data": {
-                  "waitTime": 0.25
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Shoot"
                 }
               }
             ]

@@ -60,6 +60,7 @@ import frc.robot.subsystems.vision.LimelightSubsystem;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
 import frc.robot.subsystems.vision.photon.FuelDetectionSubsystem;
+import frc.robot.subsystems.vision.photon.TurretVisionSubsystem;
 
 
 /**
@@ -96,8 +97,9 @@ public class RobotContainer {
 			ChuteSubsystem.mInstance,
 			ShufflaSubsystem.mInstance,
 			SuperSystem.mInstance,
-			FuelDetectionSubsystem.mInstance
-			
+			FuelDetectionSubsystem.mInstance,
+			TurretVisionSubsystem.mInstance
+
 		}) {
 			SmartDashboard.putData(s);
 		}
@@ -138,13 +140,13 @@ public class RobotContainer {
 
 		NamedCommands.registerCommand("stowTurret",
 		
-			SuperSystem.mInstance.turretStow()
+			SuperSystem.mInstance.enableStow()
 		
 		);
 
 		NamedCommands.registerCommand("aimTurret",
 		
-			SuperSystem.mInstance.toggleStow()
+			SuperSystem.mInstance.disableStow()
 		
 		);
 		
