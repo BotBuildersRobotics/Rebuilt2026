@@ -14,6 +14,7 @@ import frc.robot.subsystems.shooter.ShooterSubsystem;
 import frc.robot.subsystems.shuffla.ShufflaSubsystem;
 import frc.robot.subsystems.turret.ShotCalculator;
 import frc.robot.subsystems.turret.TurretSubsystem;
+import frc.robot.subsystems.vision.photon.TurretVisionSubsystem;
 
 
 
@@ -52,6 +53,7 @@ public class SuperSystem extends SubsystemBase {
 		hood.setShotCalculator(shotCalc);
 		turret.setShotCalculator(shotCalc);
 		shooter.setShotCalculator(shotCalc);
+		turret.setTurretVision(TurretVisionSubsystem.mInstance);
 		
 		shooter.setDefaultCommand(shooter.runTrackTargetActiveShootingCommand());
 		turret.setDefaultCommand(turret.runTrackTargetActiveShootingCommand());

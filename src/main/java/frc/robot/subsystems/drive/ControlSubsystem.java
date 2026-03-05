@@ -21,6 +21,7 @@ import frc.robot.subsystems.pivot.PivotSubsystem;
 import frc.robot.subsystems.shooter.ShooterConstants;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
 import frc.robot.subsystems.turret.TurretSubsystem;
+import frc.robot.subsystems.vision.Limelight;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 
 
@@ -134,6 +135,9 @@ public class ControlSubsystem {
 
 		operator.leftBumper().onTrue(ClimbSubsystem.mInstance.setpointCommand(ClimbSubsystem.CLIMB) ).onFalse(ClimbSubsystem.mInstance.setpointCommand(ClimbSubsystem.STOP));
 		operator.rightBumper().onTrue(ClimbSubsystem.mInstance.setpointCommand(ClimbSubsystem.REVERSE) ).onFalse(ClimbSubsystem.mInstance.setpointCommand(ClimbSubsystem.STOP));
+
+		// Vision calibration mode - toggle with operator back button
+		operator.back().onTrue(Limelight.mInstance.toggleCalibrationMode());
 	}
 
     public void setRumble(boolean on) {
