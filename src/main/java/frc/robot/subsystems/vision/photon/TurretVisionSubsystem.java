@@ -32,8 +32,7 @@ public class TurretVisionSubsystem extends SubsystemBase {
 
     private double filteredCorrectionDeg = 0.0;
     private double rawYaw = 0.0;
-    private int targetId = -1;
-    private double targetAmbiguity = 1.0;
+    private int targetCount = 0;
     private boolean hasTarget = false;
     private boolean cameraConnected = false;
 
@@ -59,11 +58,11 @@ public class TurretVisionSubsystem extends SubsystemBase {
             return;
         }
 
-        // Find the best hub tag: closest to camera center (lowest absolute yaw)
-        // among hub tags below ambiguity threshold. This prevents oscillation
-        // when both front and side tags are visible.
-        PhotonTrackedTarget bestTarget = null;
-        double bestAbsYaw = Double.MAX_VALUE;
+        // Average the yaw of all visible hub tags that pass ambiguity.
+        // When we see two tags (e.g. 26+21 or 26+18), the average yaw
+        // points toward the hub center rather than one face, preventing oscillation.
+        double yawSum = 0.0;
+        int count = 0;
 
         for (PhotonTrackedTarget target : result.getTargets()) {
             if (!HUB_TAG_IDS.contains(target.getFiducialId())) {
@@ -72,24 +71,19 @@ public class TurretVisionSubsystem extends SubsystemBase {
             if (target.getPoseAmbiguity() >= ambiguityThreshold.get()) {
                 continue;
             }
-            double absYaw = Math.abs(target.getYaw());
-            if (absYaw < bestAbsYaw) {
-                bestAbsYaw = absYaw;
-                bestTarget = target;
-            }
+            yawSum += target.getYaw();
+            count++;
         }
 
-        if (bestTarget == null) {
+        if (count == 0) {
             clearTarget();
             logValues();
             return;
         }
 
-        // We have a valid hub tag
         hasTarget = true;
-        targetId = bestTarget.getFiducialId();
-        targetAmbiguity = bestTarget.getPoseAmbiguity();
-        rawYaw = bestTarget.getYaw();
+        targetCount = count;
+        rawYaw = yawSum / count;
 
         double clamped = MathUtil.clamp(rawYaw, -maxCorrectionDeg.get(), maxCorrectionDeg.get());
         filteredCorrectionDeg = yawFilter.calculate(clamped);
@@ -99,8 +93,7 @@ public class TurretVisionSubsystem extends SubsystemBase {
 
     private void clearTarget() {
         hasTarget = false;
-        targetId = -1;
-        targetAmbiguity = 1.0;
+        targetCount = 0;
         rawYaw = 0.0;
         filteredCorrectionDeg = yawFilter.calculate(0.0);
     }
@@ -108,15 +101,13 @@ public class TurretVisionSubsystem extends SubsystemBase {
     private void logValues() {
         SmartDashboard.putBoolean("TurretVision/CameraConnected", cameraConnected);
         SmartDashboard.putBoolean("TurretVision/HasTarget", hasTarget);
-        SmartDashboard.putNumber("TurretVision/TargetId", targetId);
-        SmartDashboard.putNumber("TurretVision/Ambiguity", targetAmbiguity);
+        SmartDashboard.putNumber("TurretVision/TargetCount", targetCount);
         SmartDashboard.putNumber("TurretVision/RawYaw", rawYaw);
         SmartDashboard.putNumber("TurretVision/CorrectionDeg", filteredCorrectionDeg);
 
         Logger.recordOutput("TurretVision/CameraConnected", cameraConnected);
         Logger.recordOutput("TurretVision/HasTarget", hasTarget);
-        Logger.recordOutput("TurretVision/TargetId", targetId);
-        Logger.recordOutput("TurretVision/Ambiguity", targetAmbiguity);
+        Logger.recordOutput("TurretVision/TargetCount", targetCount);
         Logger.recordOutput("TurretVision/RawYaw", rawYaw);
         Logger.recordOutput("TurretVision/CorrectionDeg", filteredCorrectionDeg);
     }
