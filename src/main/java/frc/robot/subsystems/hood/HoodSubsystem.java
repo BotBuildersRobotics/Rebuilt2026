@@ -83,7 +83,7 @@ public class HoodSubsystem extends ServoMotorSubsystem<MotorIOTalonFX> {
 
         return run(() -> {
             this.manualTune = true;
-            this.applySetpoint(Setpoint.withMotionMagicSetpoint(Degrees.of(manualHood.get() * 5)));
+            this.applySetpoint(Setpoint.withMotionMagicSetpoint(Degrees.of(manualHood.get() * HoodConstants.fudgeFactor)));
         });
 
     }
@@ -98,7 +98,7 @@ public class HoodSubsystem extends ServoMotorSubsystem<MotorIOTalonFX> {
                 setGoalParamsDeg(0.0, 0.0);
             } else {
                 var params = this.shotCalc.getParameters();
-                setGoalParamsDeg(Units.radiansToDegrees(params.hoodAngle() * 5), params.hoodVelocity());
+                setGoalParamsDeg(Units.radiansToDegrees(params.hoodAngle() * HoodConstants.fudgeFactor), params.hoodVelocity());
             }
             });
     }

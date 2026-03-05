@@ -60,11 +60,11 @@ public class ShooterSubsystem  extends MotorSubsystem<MotorIOTalonFX> {
     response. */
 
     private void runVelocity(double velocityRadsPerSec) {
-       // this.applySetpoint(Setpoint.withVelocitySetpoint(
-       //     AngularVelocity.ofBaseUnits(velocityRadsPerSec, RotationsPerSecond)));
-
-         this.applySetpoint(Setpoint.withVelocityFOCSetpoint(
+        this.applySetpoint(Setpoint.withVelocitySetpoint(
             AngularVelocity.ofBaseUnits(velocityRadsPerSec, RotationsPerSecond)));
+
+        // this.applySetpoint(Setpoint.withVelocityFOCSetpoint(
+        //    AngularVelocity.ofBaseUnits(velocityRadsPerSec, RotationsPerSecond)));
     }
 
     public Command setManualShooterVelocity(){
@@ -72,11 +72,11 @@ public class ShooterSubsystem  extends MotorSubsystem<MotorIOTalonFX> {
         return run(() -> {
             this.manualTune = true;
             
-           // this.applySetpoint(Setpoint.withVelocitySetpoint(
-           // AngularVelocity.ofBaseUnits(manualShooter.get(), RotationsPerSecond)));
-
-              this.applySetpoint(Setpoint.withVelocityFOCSetpoint(
+            this.applySetpoint(Setpoint.withVelocitySetpoint(
             AngularVelocity.ofBaseUnits(manualShooter.get(), RotationsPerSecond)));
+
+           //   this.applySetpoint(Setpoint.withVelocityFOCSetpoint(
+            //AngularVelocity.ofBaseUnits(manualShooter.get(), RotationsPerSecond)));
 
         });
 

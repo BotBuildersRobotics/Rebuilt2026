@@ -13,8 +13,8 @@ import frc.robot.Robot;
 
 public class ChuteConstants {
 	
-	public static final Voltage kShootVoltage = Units.Volts.of( 4);
-	public static final Voltage kReverseVoltage = Units.Volts.of(-1);
+	public static final Voltage kShootVoltage = Units.Volts.of( 5);
+	public static final Voltage kReverseVoltage = Units.Volts.of(-2);
 
 	public static TalonFXConfiguration getFXConfig() {
 		TalonFXConfiguration config = new TalonFXConfiguration();
