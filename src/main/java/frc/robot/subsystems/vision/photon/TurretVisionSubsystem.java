@@ -27,18 +27,15 @@ public class TurretVisionSubsystem extends SubsystemBase {
         new LoggedTunableNumber("TurretVision/MaxCorrectionDeg", 15.0);
     private static final LoggedTunableNumber ambiguityThreshold =
         new LoggedTunableNumber("TurretVision/AmbiguityThreshold", 0.2);
-    // Max degrees the correction can change per tick (50Hz = 0.02s)
-    private static final LoggedTunableNumber maxRateDegPerTick =
-        new LoggedTunableNumber("TurretVision/MaxRateDegPerTick", 0.2);
-    // EMA smoothing factor (0-1). Lower = smoother/slower. 0.1 = heavy smoothing.
-    private static final LoggedTunableNumber emaAlpha =
-        new LoggedTunableNumber("TurretVision/EmaAlpha", 0.08);
+    // How many degrees to nudge the correction per tick toward the measured error.
+    // At 0.05 deg/tick and 50Hz, full correction of 5° takes ~2 seconds.
+    private static final LoggedTunableNumber integralStepDeg =
+        new LoggedTunableNumber("TurretVision/IntegralStepDeg", 0.05);
     // Deadband: ignore raw yaw below this (degrees). Prevents hunting near center.
     private static final LoggedTunableNumber deadbandDeg =
-        new LoggedTunableNumber("TurretVision/DeadbandDeg", 1.0);
+        new LoggedTunableNumber("TurretVision/DeadbandDeg", 1.5);
 
-    private double emaYaw = 0.0;
-    private double filteredCorrectionDeg = 0.0;
+    private double correctionDeg = 0.0;
     private double rawYaw = 0.0;
     private int targetCount = 0;
     private boolean hasTarget = false;
@@ -91,19 +88,23 @@ public class TurretVisionSubsystem extends SubsystemBase {
         targetCount = count;
         rawYaw = yawSum / count;
 
-        // Deadband: treat small errors as zero to prevent hunting
-        double deadbanded = Math.abs(rawYaw) < deadbandDeg.get() ? 0.0 : rawYaw;
-
-        double clamped = MathUtil.clamp(deadbanded, -maxCorrectionDeg.get(), maxCorrectionDeg.get());
-
-        // Exponential moving average — much smoother than a windowed average
-        double alpha = MathUtil.clamp(emaAlpha.get(), 0.01, 1.0);
-        emaYaw = alpha * clamped + (1.0 - alpha) * emaYaw;
-
-        // Rate-limit: clamp how fast the output can change per tick
-        double maxDelta = maxRateDegPerTick.get();
-        filteredCorrectionDeg += MathUtil.clamp(
-            emaYaw - filteredCorrectionDeg, -maxDelta, maxDelta);
+        // Integral accumulator: nudge correction toward the error each tick.
+        // When the tag is centered (yaw inside deadband), stop nudging — hold value.
+        // This avoids the feedback loop where tracking yaw directly causes
+        // the turret to overshoot, lose the tag, and snap back.
+        if (Math.abs(rawYaw) > deadbandDeg.get()) {
+            double step = integralStepDeg.get();
+            // Nudge in the direction of the error
+            if (rawYaw > 0) {
+                correctionDeg += step;
+            } else {
+                correctionDeg -= step;
+            }
+            // Clamp to max range
+            correctionDeg = MathUtil.clamp(correctionDeg,
+                -maxCorrectionDeg.get(), maxCorrectionDeg.get());
+        }
+        // If inside deadband: do nothing, hold current correction
 
         logValues();
     }
@@ -112,9 +113,8 @@ public class TurretVisionSubsystem extends SubsystemBase {
         hasTarget = false;
         targetCount = 0;
         rawYaw = 0.0;
-        // Gently decay EMA toward 0 when no target visible
-        double alpha = MathUtil.clamp(emaAlpha.get(), 0.01, 1.0);
-        emaYaw = (1.0 - alpha) * emaYaw;
+        // Hold correction — don't decay when tags disappear briefly.
+        // Only resetCorrection() (called on stow) zeroes it out.
     }
 
     private void logValues() {
@@ -122,27 +122,24 @@ public class TurretVisionSubsystem extends SubsystemBase {
         SmartDashboard.putBoolean("TurretVision/HasTarget", hasTarget);
         SmartDashboard.putNumber("TurretVision/TargetCount", targetCount);
         SmartDashboard.putNumber("TurretVision/RawYaw", rawYaw);
-        SmartDashboard.putNumber("TurretVision/EmaYaw", emaYaw);
-        SmartDashboard.putNumber("TurretVision/CorrectionDeg", filteredCorrectionDeg);
+        SmartDashboard.putNumber("TurretVision/CorrectionDeg", correctionDeg);
 
         Logger.recordOutput("TurretVision/CameraConnected", cameraConnected);
         Logger.recordOutput("TurretVision/HasTarget", hasTarget);
         Logger.recordOutput("TurretVision/TargetCount", targetCount);
         Logger.recordOutput("TurretVision/RawYaw", rawYaw);
-        Logger.recordOutput("TurretVision/EmaYaw", emaYaw);
-        Logger.recordOutput("TurretVision/CorrectionDeg", filteredCorrectionDeg);
+        Logger.recordOutput("TurretVision/CorrectionDeg", correctionDeg);
     }
 
-    /** Resets the correction to zero and clears the filter history. */
+    /** Resets the correction to zero. Called on stow. */
     public void resetCorrection() {
-        filteredCorrectionDeg = 0.0;
-        emaYaw = 0.0;
+        correctionDeg = 0.0;
         rawYaw = 0.0;
     }
 
-    /** Returns the filtered aim correction in degrees. 0 if no valid target. */
+    /** Returns the accumulated aim correction in degrees. */
     public double getAimCorrectionDeg() {
-        return filteredCorrectionDeg;
+        return correctionDeg;
     }
 
     /** Returns true if a valid hub AprilTag is currently visible. */
