@@ -61,8 +61,10 @@ public class MotorIOTalonFX extends MotorIO {
 	public void updateInputs() {
 		updateMotorInputs(inputs, main);
 
-		/*for (int i = 0; i < followers.length; i++) {
-			updateMotorInputs(followerInputs[i], followers[i]);
+		/*if(followers != null){
+			for (int i = 0; i < followers.length; i++) {
+				updateMotorInputs(followerInputs[i], followers[i]);
+			}
 		}*/
 	}
 
@@ -79,6 +81,7 @@ public class MotorIOTalonFX extends MotorIO {
 		inputsToUpdate.supplyCurrent = motor.getSupplyCurrent().getValue();
 		inputsToUpdate.motorVoltage = motor.getMotorVoltage().getValue();
 		inputsToUpdate.motorTemperature = motor.getDeviceTemp().getValue();
+		inputsToUpdate.isOK = motor.isConnected();
 	}
 
 	private void setControl(ControlRequest request) {

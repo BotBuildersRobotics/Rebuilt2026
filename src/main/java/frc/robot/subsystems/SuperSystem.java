@@ -1,10 +1,14 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.ShiftHelpers;
 import frc.robot.lib.AllianceFlipUtil;
 import frc.robot.subsystems.chute.ChuteSubsystem;
 import frc.robot.subsystems.hood.HoodSubsystem;
@@ -74,6 +78,10 @@ public class SuperSystem extends SubsystemBase {
 
 		 // Clear shooting parameters so they are recalculated each tick
     	shotCalc.clearShootingParameters();
+		SmartDashboard.putBoolean("Hub/BlueActive", ShiftHelpers.isBlueHubActive());
+		SmartDashboard.putBoolean("Hub/RedActive", ShiftHelpers.isRedHubActive());
+		SmartDashboard.putBoolean("Hub/AreWeRedActive", ShiftHelpers.isRedHubActive() && DriverStation.getAlliance().get() == DriverStation.Alliance.Red);
+		SmartDashboard.putBoolean("Hub/AreWeActive", (ShiftHelpers.isRedHubActive() && DriverStation.getAlliance().get() == DriverStation.Alliance.Red) || (ShiftHelpers.isBlueHubActive() && DriverStation.getAlliance().get() == DriverStation.Alliance.Blue));
 	}
 
 	 public Command idleIntakes() {

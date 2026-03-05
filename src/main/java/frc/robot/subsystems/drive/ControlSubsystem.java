@@ -63,13 +63,13 @@ public class ControlSubsystem {
 
 		SuperSystem s = SuperSystem.mInstance;
 
-		driver.rightTrigger().onTrue(
+		driver.leftTrigger().onTrue(
 			s.Intake()
 		).onFalse(
 			s.idleIntakes()
 		);
 
-		driver.leftTrigger().onTrue(
+		driver.rightTrigger().onTrue(
 			Commands.parallel(
 				s.Shoot(),
 				Commands.runOnce(() -> DriveConstants.setShootingSpeedLimited(true))
@@ -86,10 +86,8 @@ public class ControlSubsystem {
 		driver.b().whileTrue(s.passAuto());
 
 		//driver.x().onTrue(TurretSubsystem.mInstance.zeroCommand());
-		
 
-
-		driver.rightBumper().onTrue(
+		driver.leftBumper().onTrue(
 			PivotSubsystem.mInstance.findDeployLimitCommand()
 		);
 

@@ -323,6 +323,17 @@ public abstract class MotorIO implements Sendable {
 						return motorTemperatures;
 					},
 					null);
+
+			builder.addBooleanProperty(
+					"Followers/isOK:",
+					() -> {
+						boolean isOK = false;
+						for (int i = 0; i < followerInputs.length; i++) {
+							isOK = followerInputs[i].isOK;
+						}
+						return isOK;
+					},
+					null);
 		}
 	}
 
@@ -336,6 +347,7 @@ public abstract class MotorIO implements Sendable {
 		public Current supplyCurrent = BaseUnits.CurrentUnit.of(0.0);
 		public Voltage motorVoltage = BaseUnits.VoltageUnit.of(0.0);
 		public Temperature motorTemperature = BaseUnits.TemperatureUnit.of(0.0);
+		public boolean isOK = false;
 
 		@Override
 		public void initSendable(SendableBuilder builder) {
@@ -348,6 +360,7 @@ public abstract class MotorIO implements Sendable {
 			builder.addDoubleProperty("Supply Current Amps:", () -> supplyCurrent.in(Units.Amps), null);
 			builder.addDoubleProperty("Motor Voltage:", () -> motorVoltage.in(Units.Volts), null);
 			builder.addDoubleProperty("Motor Temperature Celsius:", () -> motorTemperature.in(Units.Celsius), null);
+			builder.addBooleanProperty("OK:", () -> isOK, null);
 		}
 	}
 

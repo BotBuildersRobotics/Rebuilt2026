@@ -171,6 +171,7 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
     double fieldRelativeAngleDeg = robotAngle.getDegrees() + robotRelativeAngleDeg;
     SmartDashboard.putNumber("Turret/RobotRelativeAngleDeg", robotRelativeAngleDeg);
     SmartDashboard.putNumber("Turret/FieldRelativeAngleDeg", fieldRelativeAngleDeg);
+    SmartDashboard.putBoolean("Turret/Stowed", stowed);
 
     // Update field visualization for AdvantageScope
     // Create a pose at the robot's position with the turret's field-relative angle
