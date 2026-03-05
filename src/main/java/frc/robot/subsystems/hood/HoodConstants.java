@@ -18,6 +18,8 @@ public class HoodConstants {
 
     public static final Util.DistanceAngleConverter converter = new Util.DistanceAngleConverter(Units.Centimeters.of(2.0));
 	
+	public static final double fudgeFactor = 6.5;
+
 	public static TalonFXConfiguration getFXConfig() {
 		TalonFXConfiguration config = new TalonFXConfiguration();
 

@@ -230,7 +230,7 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
     return run(
         () -> {
           var params = shotCalc.getParameters();
-          double totalOffset = turretOffset + getVisionCorrectionDeg();
+          double totalOffset = turretOffset - getVisionCorrectionDeg();
           setFieldRelativeTarget(params.turretAngle().plus(Rotation2d.fromDegrees(totalOffset)));
           setShootState(ShootState.TRACKING);
         });
@@ -246,7 +246,7 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
             setShootState(ShootState.ACTIVE_SHOOTING);
           } else {
             var params = shotCalc.getParameters();
-            double totalOffset = turretOffset + getVisionCorrectionDeg();
+            double totalOffset = turretOffset - getVisionCorrectionDeg();
             setFieldRelativeTarget(params.turretAngle().plus(Rotation2d.fromDegrees(totalOffset)));
             setShootState(ShootState.ACTIVE_SHOOTING);
           }

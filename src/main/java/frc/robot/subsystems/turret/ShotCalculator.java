@@ -71,7 +71,7 @@ public class ShotCalculator {
   private static final InterpolatingDoubleTreeMap timeOfFlightMap =
       new InterpolatingDoubleTreeMap();
 
-  public static Transform3d robotToTurret = new Transform3d(-0.06073, 0.103, 0.44, Rotation3d.kZero);
+  public static Transform3d robotToTurret = new Transform3d(-0.06073, 0.5103, 0.44, Rotation3d.kZero);
   
 
   static {
@@ -83,29 +83,31 @@ public class ShotCalculator {
    launchHoodAngleMap.put(1.34, Rotation2d.fromDegrees(0.0));
     launchHoodAngleMap.put(1.78, Rotation2d.fromDegrees(0.0));
     launchHoodAngleMap.put(2.17, Rotation2d.fromDegrees(15.0));
-    launchHoodAngleMap.put(2.81, Rotation2d.fromDegrees(15.0));
-    launchHoodAngleMap.put(3.0, Rotation2d.fromDegrees(15.0));
-    launchHoodAngleMap.put(3.43, Rotation2d.fromDegrees(15));
-    launchHoodAngleMap.put(3.82, Rotation2d.fromDegrees(12));
-    launchHoodAngleMap.put(4.09, Rotation2d.fromDegrees(15.0));
-    launchHoodAngleMap.put(4.09, Rotation2d.fromDegrees(17));
-    launchHoodAngleMap.put(4.40, Rotation2d.fromDegrees(19));
-    launchHoodAngleMap.put(4.77, Rotation2d.fromDegrees(21.0));
-    launchHoodAngleMap.put(5.57, Rotation2d.fromDegrees(23.5));
-    launchHoodAngleMap.put(5.60, Rotation2d.fromDegrees(25.0));
-    launchHoodAngleMap.put(5.70, Rotation2d.fromDegrees(25.0));
+    launchHoodAngleMap.put(2.81, Rotation2d.fromDegrees(20.0)); // in front of climb
+    launchHoodAngleMap.put(3.0, Rotation2d.fromDegrees(25.0));
+    launchHoodAngleMap.put(3.35, Rotation2d.fromDegrees(40)); //AUTO
+    launchHoodAngleMap.put(3.82, Rotation2d.fromDegrees(45));
+    launchHoodAngleMap.put(4.09, Rotation2d.fromDegrees(45.0));
+    launchHoodAngleMap.put(4.09, Rotation2d.fromDegrees(45));
+    launchHoodAngleMap.put(4.40, Rotation2d.fromDegrees(45)); // Near Depot
+    launchHoodAngleMap.put(4.77, Rotation2d.fromDegrees(50.0));
+    launchHoodAngleMap.put(5.57, Rotation2d.fromDegrees(40.5));
+    launchHoodAngleMap.put(5.60, Rotation2d.fromDegrees(40.0));
+    launchHoodAngleMap.put(5.70, Rotation2d.fromDegrees(45.0));
 
     launchFlywheelSpeedMap.put(1.68, 167.0); //gud
     launchFlywheelSpeedMap.put(2.13, 185.0); //gud
-    launchFlywheelSpeedMap.put(2.69, 210.0); //gud
-    launchFlywheelSpeedMap.put(3.23, 225.0); //gud
-    launchFlywheelSpeedMap.put(3.42, 250.0); //gud
-    launchFlywheelSpeedMap.put(3.82, 250.0);
-    launchFlywheelSpeedMap.put(4.09, 260.0);
-    launchFlywheelSpeedMap.put(4.20, 260.0);
-    launchFlywheelSpeedMap.put(4.77, 260.0);
+    launchFlywheelSpeedMap.put(2.81, 190.0); //in front of climb
+    launchFlywheelSpeedMap.put(3.08, 200.0); //AUTO 
+    launchFlywheelSpeedMap.put(3.35, 205.0); //AUTO 
+    launchFlywheelSpeedMap.put(3.42, 205.0); //gud
+    launchFlywheelSpeedMap.put(3.82, 207.0);
+    launchFlywheelSpeedMap.put(4.09, 220.0);
+    launchFlywheelSpeedMap.put(4.20, 223.0);
+     launchFlywheelSpeedMap.put(4.40, 225.0); // near depot
+    launchFlywheelSpeedMap.put(4.77, 227.0);
     launchFlywheelSpeedMap.put(5.57, 235.0);
-    launchFlywheelSpeedMap.put(5.60, 240.0);
+    launchFlywheelSpeedMap.put(5.60, 238.0);
     launchFlywheelSpeedMap.put(5.70, 240.0);
 
     timeOfFlightMap.put(5.68, 1.16);

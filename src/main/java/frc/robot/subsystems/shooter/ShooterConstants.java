@@ -22,7 +22,7 @@ public class ShooterConstants {
 		config.CurrentLimits.SupplyCurrentLimitEnable = true;
 		config.CurrentLimits.SupplyCurrentLimit = 60.0;
 		config.CurrentLimits.SupplyCurrentLowerLimit = 60.0;
-		//config.CurrentLimits.SupplyCurrentLowerTime = 0.1;
+		config.CurrentLimits.SupplyCurrentLowerTime = 0.1;
 
 		config.Voltage.PeakForwardVoltage = 12.0;
 		config.Voltage.PeakReverseVoltage = -12.0;
@@ -37,13 +37,13 @@ public class ShooterConstants {
 		// Slot 1: Voltage-based velocity control (VelocityVoltage)
 		config.Slot1.kS = 0.30532;
 		config.Slot1.kP = 0.053558;
-		config.Slot1.kV = 0.12034;
+		config.Slot1.kV = 0.12034;//0.12034;
 
 		// Slot 0: Torque current FOC velocity control (VelocityTorqueCurrentFOC)
 		// Units are in Amps instead of Volts
 		config.Slot0.kS = 0.085;   // static friction compensation in amps
-		config.Slot0.kP = 3.85;   // amps per RPS of error
-		config.Slot0.kV = 0.38;   // amps per RPS of target velocity
+		config.Slot0.kP = 3.35;   // amps per RPS of error
+		config.Slot0.kV = 0.25;   // amps per RPS of target velocity
 		
 		
 
