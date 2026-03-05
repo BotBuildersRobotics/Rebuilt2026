@@ -1,7 +1,6 @@
 package frc.robot.subsystems.vision.photon;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.lib.LoggedTunableNumber;
@@ -17,7 +16,6 @@ public class TurretVisionSubsystem extends SubsystemBase {
     public static final TurretVisionSubsystem mInstance = new TurretVisionSubsystem();
 
     private final PhotonCamera camera;
-    private final LinearFilter yawFilter = LinearFilter.movingAverage(15);
 
     // Hub AprilTag IDs (both alliance sides)
     private static final Set<Integer> HUB_TAG_IDS = Set.of(
@@ -31,8 +29,15 @@ public class TurretVisionSubsystem extends SubsystemBase {
         new LoggedTunableNumber("TurretVision/AmbiguityThreshold", 0.2);
     // Max degrees the correction can change per tick (50Hz = 0.02s)
     private static final LoggedTunableNumber maxRateDegPerTick =
-        new LoggedTunableNumber("TurretVision/MaxRateDegPerTick", 0.5);
+        new LoggedTunableNumber("TurretVision/MaxRateDegPerTick", 0.2);
+    // EMA smoothing factor (0-1). Lower = smoother/slower. 0.1 = heavy smoothing.
+    private static final LoggedTunableNumber emaAlpha =
+        new LoggedTunableNumber("TurretVision/EmaAlpha", 0.08);
+    // Deadband: ignore raw yaw below this (degrees). Prevents hunting near center.
+    private static final LoggedTunableNumber deadbandDeg =
+        new LoggedTunableNumber("TurretVision/DeadbandDeg", 1.0);
 
+    private double emaYaw = 0.0;
     private double filteredCorrectionDeg = 0.0;
     private double rawYaw = 0.0;
     private int targetCount = 0;
@@ -62,8 +67,6 @@ public class TurretVisionSubsystem extends SubsystemBase {
         }
 
         // Average the yaw of all visible hub tags that pass ambiguity.
-        // When we see two tags (e.g. 26+21 or 26+18), the average yaw
-        // points toward the hub center rather than one face, preventing oscillation.
         double yawSum = 0.0;
         int count = 0;
 
@@ -88,13 +91,19 @@ public class TurretVisionSubsystem extends SubsystemBase {
         targetCount = count;
         rawYaw = yawSum / count;
 
-        double clamped = MathUtil.clamp(rawYaw, -maxCorrectionDeg.get(), maxCorrectionDeg.get());
-        double smoothed = yawFilter.calculate(clamped);
+        // Deadband: treat small errors as zero to prevent hunting
+        double deadbanded = Math.abs(rawYaw) < deadbandDeg.get() ? 0.0 : rawYaw;
+
+        double clamped = MathUtil.clamp(deadbanded, -maxCorrectionDeg.get(), maxCorrectionDeg.get());
+
+        // Exponential moving average — much smoother than a windowed average
+        double alpha = MathUtil.clamp(emaAlpha.get(), 0.01, 1.0);
+        emaYaw = alpha * clamped + (1.0 - alpha) * emaYaw;
 
         // Rate-limit: clamp how fast the output can change per tick
         double maxDelta = maxRateDegPerTick.get();
         filteredCorrectionDeg += MathUtil.clamp(
-            smoothed - filteredCorrectionDeg, -maxDelta, maxDelta);
+            emaYaw - filteredCorrectionDeg, -maxDelta, maxDelta);
 
         logValues();
     }
@@ -103,11 +112,9 @@ public class TurretVisionSubsystem extends SubsystemBase {
         hasTarget = false;
         targetCount = 0;
         rawYaw = 0.0;
-        // Don't snap correction to 0 — just hold last value.
-        // The rate limiter will gently decay it if tags stay gone,
-        // and the moving average is still being fed 0s so it will
-        // pull the smoothed value toward 0 over time.
-        yawFilter.calculate(filteredCorrectionDeg);
+        // Gently decay EMA toward 0 when no target visible
+        double alpha = MathUtil.clamp(emaAlpha.get(), 0.01, 1.0);
+        emaYaw = (1.0 - alpha) * emaYaw;
     }
 
     private void logValues() {
@@ -115,13 +122,22 @@ public class TurretVisionSubsystem extends SubsystemBase {
         SmartDashboard.putBoolean("TurretVision/HasTarget", hasTarget);
         SmartDashboard.putNumber("TurretVision/TargetCount", targetCount);
         SmartDashboard.putNumber("TurretVision/RawYaw", rawYaw);
+        SmartDashboard.putNumber("TurretVision/EmaYaw", emaYaw);
         SmartDashboard.putNumber("TurretVision/CorrectionDeg", filteredCorrectionDeg);
 
         Logger.recordOutput("TurretVision/CameraConnected", cameraConnected);
         Logger.recordOutput("TurretVision/HasTarget", hasTarget);
         Logger.recordOutput("TurretVision/TargetCount", targetCount);
         Logger.recordOutput("TurretVision/RawYaw", rawYaw);
+        Logger.recordOutput("TurretVision/EmaYaw", emaYaw);
         Logger.recordOutput("TurretVision/CorrectionDeg", filteredCorrectionDeg);
+    }
+
+    /** Resets the correction to zero and clears the filter history. */
+    public void resetCorrection() {
+        filteredCorrectionDeg = 0.0;
+        emaYaw = 0.0;
+        rawYaw = 0.0;
     }
 
     /** Returns the filtered aim correction in degrees. 0 if no valid target. */

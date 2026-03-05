@@ -256,6 +256,12 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
 
   public void setStowed(boolean stowed) {
     this.stowed = stowed;
+    if (stowed) {
+      turretOffset = 0.0;
+      if (turretVision != null) {
+        turretVision.resetCorrection();
+      }
+    }
   }
 
   public boolean isStowed() {
