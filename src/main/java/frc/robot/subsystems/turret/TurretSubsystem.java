@@ -46,7 +46,7 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
 
   private TurretVisionSubsystem turretVision;
   private static final LoggedTunableNumber visionCorrectionEnabled =
-      new LoggedTunableNumber("Turret/VisionCorrectionEnabled", 1.0);
+      new LoggedTunableNumber("Turret/VisionCorrectionEnabled", 0.0);
 
   private ShootState shootState = ShootState.ACTIVE_SHOOTING;
   private boolean stowed = false;
