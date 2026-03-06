@@ -11,6 +11,7 @@ import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.FieldConstants;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.vision.LimelightHelpers.PoseEstimate;
 
@@ -59,15 +60,23 @@ public class VisionIOLimelight extends VisionIO {
 
 	/**
 	 * Pushes the latest valid pose estimate to the drivetrain's vision filter.
+	 * Rejects poses outside the field boundary.
 	 */
 	public void pushToDrivetrain() {
-		if (latestPoseEstimate != null) {
+		if (latestPoseEstimate != null && isInsideField(latestPoseEstimate.pose)) {
 			DriveSubsystem.mInstance.getGeneratedDrive();
 			DriveSubsystem.mInstance.addVisionUpdate(
 					latestPoseEstimate.pose,
 					Units.Seconds.of(latestPoseEstimate.timestampSeconds),
 					LimelightConstants.enabledVisionStdDevs.times(latestPoseEstimate.avgTagDist));
 		}
+	}
+
+	private static boolean isInsideField(Pose2d pose) {
+		double x = pose.getX();
+		double y = pose.getY();
+		return x >= 0 && x <= FieldConstants.fieldLength
+			&& y >= 0 && y <= FieldConstants.fieldWidth;
 	}
 
 	public PoseEstimate getLatestPoseEstimate() {

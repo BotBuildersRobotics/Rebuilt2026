@@ -111,30 +111,28 @@ public class ControlSubsystem {
 
 	public void operatorControls(){
 
-		operator.a().onTrue(
-			SuperSystem.mInstance.setManualShooterVelocity()
-		);	
-		operator.b().onTrue(
-			SuperSystem.mInstance.resetAutoMap()
-		);	
+		SuperSystem s = SuperSystem.mInstance;
 
-		operator.leftTrigger().onTrue(
-			SuperSystem.mInstance.offsetTurretLeft()
-		);
+		// Turret offset correction
+		operator.leftTrigger().onTrue(s.offsetTurretLeft());
+		operator.rightTrigger().onTrue(s.offsetTurretRight());
 
-		operator.rightTrigger().onTrue(
-			SuperSystem.mInstance.offsetTurretRight()
-		);
+		// Climb: left bumper = climb to position, right bumper = stow back to zero
+		operator.leftBumper().onTrue(s.climbUp());
+		operator.rightBumper().onTrue(s.climbStow());
 
-		operator.y().whileTrue(SuperSystem.mInstance.testTurretAimAtHub());
+		// Zero turret
+		operator.x().onTrue(s.zeroTurretCommand());
 
-		
-		operator.x().onTrue(SuperSystem.mInstance.zeroTurretCommand());
+		// Reverse all systems (intake, shuffla, chute) — hold to reverse
+		operator.y()
+			.onTrue(s.reverseAllSystems())
+			.onFalse(s.idleAllSystems());
 
-		operator.leftBumper().onTrue(ClimbSubsystem.mInstance.setpointCommand(ClimbSubsystem.CLIMB) ).onFalse(ClimbSubsystem.mInstance.setpointCommand(ClimbSubsystem.STOP));
-		operator.rightBumper().onTrue(ClimbSubsystem.mInstance.setpointCommand(ClimbSubsystem.REVERSE) ).onFalse(ClimbSubsystem.mInstance.setpointCommand(ClimbSubsystem.STOP));
+		// Stow intake
+		operator.a().onTrue(s.stowIntake());
 
-		// Vision calibration mode - toggle with operator back button
+		// Vision calibration mode
 		operator.back().onTrue(Limelight.mInstance.toggleCalibrationMode());
 	}
 

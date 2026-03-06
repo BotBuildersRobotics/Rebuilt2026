@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.ShiftHelpers;
 import frc.robot.lib.AllianceFlipUtil;
 import frc.robot.subsystems.chute.ChuteSubsystem;
+import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.hood.HoodSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.pivot.PivotSubsystem;
@@ -226,6 +227,38 @@ public class SuperSystem extends SubsystemBase {
 		return Commands.runOnce(() ->
 			turret.offsetRight()
 		);
+	}
+
+	public Command reverseAllSystems(){
+		return Commands.parallel(
+			IntakeSubsystem.mInstance.setpointCommand(IntakeSubsystem.REVERSE),
+			ShufflaSubsystem.mInstance.setpointCommand(ShufflaSubsystem.REVERSE),
+			ChuteSubsystem.mInstance.setpointCommand(ChuteSubsystem.REVERSE)
+		);
+	}
+
+	public Command idleAllSystems(){
+		return Commands.parallel(
+			IntakeSubsystem.mInstance.setpointCommand(IntakeSubsystem.IDLE),
+			ShufflaSubsystem.mInstance.setpointCommand(ShufflaSubsystem.IDLE),
+			ChuteSubsystem.mInstance.setpointCommand(ChuteSubsystem.IDLE)
+		);
+	}
+
+	public Command stowIntake(){
+		return PivotSubsystem.mInstance.setpointCommand(PivotSubsystem.STOW_FULL);
+	}
+
+	public Command climbUp(){
+		return ClimbSubsystem.mInstance.climbCommand();
+	}
+
+	public Command climbStow(){
+		return ClimbSubsystem.mInstance.stowCommand();
+	}
+
+	public Command zeroClimb(){
+		return ClimbSubsystem.mInstance.zeroCommand();
 	}
 
 	public Command agitateCommand(){

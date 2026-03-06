@@ -8,6 +8,7 @@ import com.ctre.phoenix6.controls.CoastOut;
 import com.ctre.phoenix6.controls.ControlRequest;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.Follower;
+import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.controls.MotionMagicExpoVoltage;
 import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 import com.ctre.phoenix6.controls.NeutralOut;
@@ -61,11 +62,9 @@ public class MotorIOTalonFX extends MotorIO {
 	public void updateInputs() {
 		updateMotorInputs(inputs, main);
 
-		/*if(followers != null){
-			for (int i = 0; i < followers.length; i++) {
-				updateMotorInputs(followerInputs[i], followers[i]);
-			}
-		}*/
+		for (int i = 0; i < followers.length; i++) {
+			updateMotorInputs(followerInputs[i], followers[i]);
+		}
 	}
 
 	/**
@@ -233,12 +232,14 @@ public class MotorIOTalonFX extends MotorIO {
 		setMainConfig(config.mainConfig);
 
 		followers = new TalonFX[config.followerIDs.length];
-		// TODO: Follower setup disabled due to Phoenix 6 API changes
-		// Uncomment and update when follower motors are needed
-		// for (int i = 0; i < config.followerIDs.length; i++) {
-		// 	followers[i] = new TalonFX(config.followerIDs[i], config.followerBuses[i]);
-		// 	// Phoenix 6 Follower API: followers[i].setControl(new Follower(config.mainID, opposeDirection));
-		// }
+		for (int i = 0; i < config.followerIDs.length; i++) {
+			followers[i] = new TalonFX(config.followerIDs[i], new CANBus(config.followerBuses[i]));
+			boolean oppose = config.followerOpposeMain.length > i && config.followerOpposeMain[i];
+			MotorAlignmentValue alignment = oppose
+				? MotorAlignmentValue.Opposed
+				: MotorAlignmentValue.Aligned;
+			followers[i].setControl(new Follower(config.mainID, alignment));
+		}
 
 		setFollowerConfig(followerConfig);
 	}

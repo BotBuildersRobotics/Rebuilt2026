@@ -145,11 +145,29 @@ public class RobotContainer {
 		);
 
 		NamedCommands.registerCommand("aimTurret",
-		
+
 			SuperSystem.mInstance.disableStow()
-		
+
 		);
-		
+
+		NamedCommands.registerCommand("idleAllSystems",
+
+			SuperSystem.mInstance.idleAllSystems()
+
+		);
+
+		NamedCommands.registerCommand("extendClimb",
+
+			SuperSystem.mInstance.climbUp()
+
+		);
+
+		NamedCommands.registerCommand("climb",
+
+			SuperSystem.mInstance.climbStow()
+
+		);
+
 		autoChooser = AutoBuilder.buildAutoChooser();
 		/*if(SmartDashboard.containsKey("Auto Mode")) {
 			SmartDashboard.getEntry("Auto Mode").close();
