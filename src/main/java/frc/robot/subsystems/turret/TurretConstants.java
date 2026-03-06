@@ -53,6 +53,7 @@ public class TurretConstants {
 		config.Slot0.kP = 155.0; //TODO - Tune for turret
 		config.Slot0.kI = 0.0;
 		config.Slot0.kD = 0.5;
+		config.Slot0.kV = 0.12; // Velocity feedforward for position+velocity mode — tune on robot
 		
 
 		

@@ -39,6 +39,7 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
   private static final double trackMaxAngle = trackCenterRads + Math.PI + trackOverlapMargin;
 
   private Rotation2d goalAngle = Rotation2d.kZero;
+  private double goalVelocityRadPerSec = 0.0;
   private double lastGoalAngle = 0.0;
 
   private double turretOffset;
@@ -47,6 +48,9 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
   private TurretVisionSubsystem turretVision;
   private static final LoggedTunableNumber visionCorrectionEnabled =
       new LoggedTunableNumber("Turret/VisionCorrectionEnabled", 1.0);
+  // 1.0 = use position+velocity feedforward, 0.0 = use Motion Magic
+  private static final LoggedTunableNumber useVelocityFeedforward =
+      new LoggedTunableNumber("Turret/UseVelocityFeedforward", 0.0);
 
   private ShootState shootState = ShootState.ACTIVE_SHOOTING;
   private boolean stowed = false;
@@ -151,8 +155,15 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
 
       double clampedAngle = MathUtil.clamp(bestAngle, minLegalAngle, maxLegalAngle);
 
-      // Send directly to Motion Magic — the TalonFX handles the profiling
-      this.applySetpoint(Setpoint.withMotionMagicSetpoint(Radians.of(clampedAngle)));
+      // Choose control mode: position+velocity feedforward for shoot-on-the-move,
+      // or Motion Magic for smooth profiled movement
+      if (useVelocityFeedforward.get() >= 0.5 && goalVelocityRadPerSec != 0.0) {
+        this.applySetpoint(Setpoint.withPositionVelocitySetpoint(
+            Radians.of(clampedAngle),
+            RadiansPerSecond.of(goalVelocityRadPerSec)));
+      } else {
+        this.applySetpoint(Setpoint.withMotionMagicSetpoint(Radians.of(clampedAngle)));
+      }
 
       SmartDashboard.putNumber("Turret/BestAngleRad", bestAngle);
       SmartDashboard.putNumber("Turret/SetpointPositionRad", clampedAngle);
@@ -199,6 +210,12 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
 
    private void setFieldRelativeTarget(Rotation2d angle) {
     this.goalAngle = angle;
+    this.goalVelocityRadPerSec = 0.0;
+  }
+
+  private void setFieldRelativeTarget(Rotation2d angle, double velocityRadPerSec) {
+    this.goalAngle = angle;
+    this.goalVelocityRadPerSec = velocityRadPerSec;
   }
 
   private void zero() {
@@ -232,7 +249,9 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
         () -> {
           var params = shotCalc.getParameters();
           double totalOffset = turretOffset - getVisionCorrectionDeg();
-          setFieldRelativeTarget(params.turretAngle().plus(Rotation2d.fromDegrees(totalOffset)));
+          setFieldRelativeTarget(
+              params.turretAngle().plus(Rotation2d.fromDegrees(totalOffset)),
+              params.turretVelocity());
           setShootState(ShootState.TRACKING);
         });
   }
@@ -248,7 +267,9 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
           } else {
             var params = shotCalc.getParameters();
             double totalOffset = turretOffset - getVisionCorrectionDeg();
-            setFieldRelativeTarget(params.turretAngle().plus(Rotation2d.fromDegrees(totalOffset)));
+            setFieldRelativeTarget(
+                params.turretAngle().plus(Rotation2d.fromDegrees(totalOffset)),
+                params.turretVelocity());
             setShootState(ShootState.ACTIVE_SHOOTING);
           }
         });

@@ -106,6 +106,10 @@ public class RobotContainer {
 
 		Limelight.mInstance.disable(false);
 
+		// Dashboard buttons for zeroing mechanisms
+		SmartDashboard.putData("Zero Turret", SuperSystem.mInstance.zeroTurretCommand());
+		SmartDashboard.putData("Zero Climb", SuperSystem.mInstance.zeroClimb());
+
 		CommandScheduler.getInstance().setPeriod(0.02);
 
 		NamedCommands.registerCommand("DeployIntake",
