@@ -39,10 +39,10 @@ public class TurretConstants {
 		config.CurrentLimits.SupplyCurrentLowerTime = 0.1;
 
 
-		config.MotionMagic.MotionMagicCruiseVelocity =  200 * 2 * Math.PI; // rotations/sec at mechanism
-   		config.MotionMagic.MotionMagicAcceleration = 290 * 2 * Math.PI; // rotations/sec² at mechanism
-    	
-
+		config.MotionMagic.MotionMagicCruiseVelocity = 1400;//  200 * 2 * Math.PI; // rotations/sec at mechanism
+   		config.MotionMagic.MotionMagicAcceleration = 1400;//290 * 2 * Math.PI; // rotations/sec² at mechanism
+    	//config.MotionMagic.MotionMagicJerk = 1100;
+		
 
 		config.Voltage.PeakForwardVoltage = 12.0;
 		config.Voltage.PeakReverseVoltage = -12.0;
@@ -50,10 +50,12 @@ public class TurretConstants {
 		config.Feedback.SensorToMechanismRatio = 40;
 		config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
-		config.Slot0.kP = 155.0; //TODO - Tune for turret
-		config.Slot0.kI = 0.0;
-		config.Slot0.kD = 0.5;
-		config.Slot0.kV = 0.12; // Velocity feedforward for position+velocity mode — tune on robot
+
+		config.Slot0.kP = 25.88; 
+		config.Slot0.kI = 0.002;
+		config.Slot0.kD = 0.005;
+		config.Slot0.kS = 1.90;
+		//config.Slot0.kA = 0.20;
 		
 
 		
