@@ -71,7 +71,7 @@ public class ShotCalculator {
   private static final InterpolatingDoubleTreeMap timeOfFlightMap =
       new InterpolatingDoubleTreeMap();
 
-  public static Transform3d robotToTurret = new Transform3d(-0.06073, 0.5103, 0.44, Rotation3d.kZero);
+  public static Transform3d robotToTurret = new Transform3d(-0.16073, -0.1103, 0.44, Rotation3d.kZero);
   
 
   static {

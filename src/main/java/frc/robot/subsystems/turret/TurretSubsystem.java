@@ -47,7 +47,7 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
 
   private TurretVisionSubsystem turretVision;
   private static final LoggedTunableNumber visionCorrectionEnabled =
-      new LoggedTunableNumber("Turret/VisionCorrectionEnabled", 1.0);
+      new LoggedTunableNumber("Turret/VisionCorrectionEnabled", 0.0);
   // 1.0 = use position+velocity feedforward, 0.0 = use Motion Magic
   private static final LoggedTunableNumber useVelocityFeedforward =
       new LoggedTunableNumber("Turret/UseVelocityFeedforward", 0.0);
