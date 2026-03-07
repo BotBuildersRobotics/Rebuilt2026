@@ -221,6 +221,15 @@ public abstract class MotorIO implements Sendable {
 	}
 
 	/**
+	 * Gets whether the main motor is connected and healthy.
+	 *
+	 * @return true if the motor is OK.
+	 */
+	public boolean isOK() {
+		return inputs.isOK;
+	}
+
+	/**
 	 * Gets the last applied setpoint of the MotorIO.
 	 *
 	 * @return Last applied Setpoint.

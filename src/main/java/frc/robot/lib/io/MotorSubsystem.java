@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.lib.io.MotorIO;
 import frc.robot.lib.io.MotorIO.Setpoint;
 import frc.robot.lib.LoggedTracer;
+import org.littletonrobotics.junction.Logger;
 import java.util.function.Supplier;
 
 /**
@@ -41,6 +42,7 @@ public class MotorSubsystem<IO extends MotorIO> extends SubsystemBase {
 	 * Outputs subsystem readings and to SmartDashboard.
 	 */
 	public void outputTelemetry() {
+		Logger.recordOutput(name + "/isOK", io.isOK());
 		LoggedTracer.record(name);
 	}
 

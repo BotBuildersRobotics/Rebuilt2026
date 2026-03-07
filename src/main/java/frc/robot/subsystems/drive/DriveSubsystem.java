@@ -78,6 +78,13 @@ public class DriveSubsystem extends SubsystemBase {
 		Logger.recordOutput("Drive/VelocityX", lastReadState.Speeds.vxMetersPerSecond);
 		Logger.recordOutput("Drive/VelocityY", lastReadState.Speeds.vyMetersPerSecond);
 		Logger.recordOutput("Drive/OmegaRadPerSec", lastReadState.Speeds.omegaRadiansPerSecond);
+
+		for (int i = 0; i < 4; i++) {
+			var module = drivetrain.getModules()[i];
+			Logger.recordOutput("Drive/Module" + i + "/Drive/isOK", module.getDriveMotor().isConnected());
+			Logger.recordOutput("Drive/Module" + i + "/Steer/isOK", module.getSteerMotor().isConnected());
+		}
+		Logger.recordOutput("Drive/Pigeon2/isOK", drivetrain.getPigeon2().isConnected());
 	}
 
 	@Override
