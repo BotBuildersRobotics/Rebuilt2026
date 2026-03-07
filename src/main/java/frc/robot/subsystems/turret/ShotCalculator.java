@@ -71,13 +71,13 @@ public class ShotCalculator {
   private static final InterpolatingDoubleTreeMap timeOfFlightMap =
       new InterpolatingDoubleTreeMap();
 
-  public static Transform3d robotToTurret = new Transform3d(-0.16073, -0.1103, 0.44, Rotation3d.kZero);
+  public static Transform3d robotToTurret = new Transform3d(0.0, 0.0, 0.44, Rotation3d.kZero);//new Transform3d(-0.16073, -0.1103, 0.44, Rotation3d.kZero);
   
 
   static {
 
     minDistance = 1.34;
-    maxDistance = 5.60;
+    maxDistance = 5.70;
     phaseDelay = 0.03;
 
    launchHoodAngleMap.put(1.34, Rotation2d.fromDegrees(0.0));
@@ -85,9 +85,9 @@ public class ShotCalculator {
     launchHoodAngleMap.put(2.17, Rotation2d.fromDegrees(15.0));
     launchHoodAngleMap.put(2.81, Rotation2d.fromDegrees(20.0)); // in front of climb
     launchHoodAngleMap.put(3.0, Rotation2d.fromDegrees(25.0));
-    launchHoodAngleMap.put(3.35, Rotation2d.fromDegrees(40)); //AUTO
-    launchHoodAngleMap.put(3.82, Rotation2d.fromDegrees(45));
-    launchHoodAngleMap.put(4.09, Rotation2d.fromDegrees(45.0));
+    launchHoodAngleMap.put(3.35, Rotation2d.fromDegrees(37)); //AUTO
+    launchHoodAngleMap.put(3.82, Rotation2d.fromDegrees(40));
+    launchHoodAngleMap.put(4.09, Rotation2d.fromDegrees(42.0));
     launchHoodAngleMap.put(4.09, Rotation2d.fromDegrees(45));
     launchHoodAngleMap.put(4.40, Rotation2d.fromDegrees(45)); // Near Depot
     launchHoodAngleMap.put(4.77, Rotation2d.fromDegrees(50.0));
@@ -95,21 +95,24 @@ public class ShotCalculator {
     launchHoodAngleMap.put(5.60, Rotation2d.fromDegrees(42.0));
     launchHoodAngleMap.put(5.70, Rotation2d.fromDegrees(45.0));
 
-    launchFlywheelSpeedMap.put(1.68, 167.0); //gud
-    launchFlywheelSpeedMap.put(2.13, 185.0); //gud
-    launchFlywheelSpeedMap.put(2.81, 190.0); //in front of climb
-    launchFlywheelSpeedMap.put(3.08, 200.0); //AUTO 
-    launchFlywheelSpeedMap.put(3.35, 205.0); //AUTO 
-    launchFlywheelSpeedMap.put(3.42, 205.0); //gud
-    launchFlywheelSpeedMap.put(3.82, 207.0);
-    launchFlywheelSpeedMap.put(4.09, 220.0);
-    launchFlywheelSpeedMap.put(4.20, 223.0);
-     launchFlywheelSpeedMap.put(4.40, 225.0); // near depot
+    launchFlywheelSpeedMap.put(1.68, 155.0); //
+    launchFlywheelSpeedMap.put(2.13, 170.0); //
+    launchFlywheelSpeedMap.put(2.81, 175.0); //in front of climb
+    launchFlywheelSpeedMap.put(3.08, 178.0); //AUTO 
+    launchFlywheelSpeedMap.put(3.35, 183.0);  
+    launchFlywheelSpeedMap.put(3.42, 184.0); //
+    launchFlywheelSpeedMap.put(3.6, 188.0); //
+    launchFlywheelSpeedMap.put(3.82, 193.0);
+    launchFlywheelSpeedMap.put(4.09, 197.0);
+    launchFlywheelSpeedMap.put(4.20, 215.0);
+     launchFlywheelSpeedMap.put(4.30, 216.0); // near depot
+     launchFlywheelSpeedMap.put(4.40, 218.0); // near depot
+     launchFlywheelSpeedMap.put(4.60, 220.0); // near depot
     launchFlywheelSpeedMap.put(4.77, 227.0);
-    launchFlywheelSpeedMap.put(5.17, 245.0);
-    launchFlywheelSpeedMap.put(5.57, 248.0);
-    launchFlywheelSpeedMap.put(5.60, 250.0);
-    launchFlywheelSpeedMap.put(5.70, 255.0);
+    launchFlywheelSpeedMap.put(5.17, 230.0);
+    launchFlywheelSpeedMap.put(5.57, 232.0);
+    launchFlywheelSpeedMap.put(5.60, 235.0);
+    launchFlywheelSpeedMap.put(5.70, 240.0);
 
     timeOfFlightMap.put(5.68, 1.16);
     timeOfFlightMap.put(4.55, 1.12);
@@ -253,7 +256,7 @@ public class ShotCalculator {
         robotVelocity.vxMetersPerSecond
             + robotVelocity.omegaRadiansPerSecond
                 * (robotToTurret.getY() * Math.cos(robotAngle)
-                    - robotToTurret.getX() * Math.sin(robotAngle));
+                    + robotToTurret.getX() * Math.sin(robotAngle));
     double turretVelocityY =
         robotVelocity.vyMetersPerSecond
             + robotVelocity.omegaRadiansPerSecond

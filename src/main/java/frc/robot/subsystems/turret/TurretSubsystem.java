@@ -93,13 +93,14 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
   }
 
   private double getVisionCorrectionDeg() {
-    if (turretVision == null || visionCorrectionEnabled.get() < 0.5) {
+   /*if (turretVision == null || visionCorrectionEnabled.get() < 0.5) {
       return 0.0;
     }
     if (!turretVision.hasTarget()) {
       return 0.0;
     }
-    return turretVision.getAimCorrectionDeg();
+    return turretVision.getAimCorrectionDeg();*/
+    return 0.0;
   }
 
    public void periodic() {

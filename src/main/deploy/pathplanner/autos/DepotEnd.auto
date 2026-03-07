@@ -74,6 +74,18 @@
               {
                 "type": "named",
                 "data": {
+                  "name": "aimTurret"
+                }
+              },
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 0.5
+                }
+              },
+              {
+                "type": "named",
+                "data": {
                   "name": "Shoot"
                 }
               },
