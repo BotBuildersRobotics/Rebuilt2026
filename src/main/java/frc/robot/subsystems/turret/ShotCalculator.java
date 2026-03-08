@@ -85,8 +85,8 @@ public class ShotCalculator {
     launchHoodAngleMap.put(2.17, Rotation2d.fromDegrees(15.0));
     launchHoodAngleMap.put(2.81, Rotation2d.fromDegrees(20.0)); // in front of climb
     launchHoodAngleMap.put(3.0, Rotation2d.fromDegrees(25.0));
-    launchHoodAngleMap.put(3.35, Rotation2d.fromDegrees(37)); //AUTO
-    launchHoodAngleMap.put(3.82, Rotation2d.fromDegrees(40));
+    launchHoodAngleMap.put(3.35, Rotation2d.fromDegrees(30)); //AUTO
+    launchHoodAngleMap.put(3.82, Rotation2d.fromDegrees(32));
     launchHoodAngleMap.put(4.09, Rotation2d.fromDegrees(42.0));
     launchHoodAngleMap.put(4.09, Rotation2d.fromDegrees(45));
     launchHoodAngleMap.put(4.40, Rotation2d.fromDegrees(45)); // Near Depot

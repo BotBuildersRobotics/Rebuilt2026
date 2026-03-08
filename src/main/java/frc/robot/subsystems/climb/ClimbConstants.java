@@ -21,7 +21,7 @@ public class ClimbConstants {
 
 	// Position setpoints (in rotations)
 	public static final Angle kStowedPosition = Units.Rotations.of(0.0);
-	public static final Angle kClimbedPosition = Units.Rotations.of(10.0); // Tune this on the robot
+	public static final Angle kClimbedPosition = Units.Rotations.of(-180.0); 
 
 	public static TalonFXConfiguration getFXConfig() {
 		TalonFXConfiguration config = new TalonFXConfiguration();

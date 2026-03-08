@@ -24,7 +24,7 @@ public class ClimbSubsystem extends MotorSubsystem<MotorIOTalonFX> {
 
 	// Tunable climb distance for field testing
 	private static final LoggedTunableNumber climbRotations =
-		new LoggedTunableNumber("Climb/ClimbRotations", 10.0);
+		new LoggedTunableNumber("Climb/ClimbRotations", 180.0);
 
 	public static final ClimbSubsystem mInstance = new ClimbSubsystem();
 

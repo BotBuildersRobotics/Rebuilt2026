@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.ShiftHelpers;
 import frc.robot.lib.io.MotorIO.Setpoint;
 import frc.robot.subsystems.SuperSystem;
+import frc.robot.subsystems.climb.ClimbConstants;
 import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.intake.IntakeConstants;
 import frc.robot.subsystems.intake.IntakeSubsystem;
@@ -120,6 +121,15 @@ public class ControlSubsystem {
 		// Climb: left bumper = climb to position, right bumper = stow back to zero
 		operator.leftBumper().onTrue(s.climbUp());
 		operator.rightBumper().onTrue(s.climbStow());
+		
+		operator.povDown().onTrue(ClimbSubsystem.mInstance.setpointCommand(ClimbSubsystem.CLIMB)).onFalse(
+			ClimbSubsystem.mInstance.setpointCommand(ClimbSubsystem.STOP)
+		);
+
+		operator.povUp().onTrue(ClimbSubsystem.mInstance.setpointCommand(ClimbSubsystem.REVERSE)).onFalse(
+			ClimbSubsystem.mInstance.setpointCommand(ClimbSubsystem.STOP)
+		);
+
 
 		// Zero turret
 		operator.x().onTrue(s.zeroTurretCommand());
