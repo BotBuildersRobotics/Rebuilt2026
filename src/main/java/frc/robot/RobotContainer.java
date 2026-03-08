@@ -97,8 +97,8 @@ public class RobotContainer {
 			ChuteSubsystem.mInstance,
 			ShufflaSubsystem.mInstance,
 			SuperSystem.mInstance,
-			FuelDetectionSubsystem.mInstance//,
-			//TurretVisionSubsystem.mInstance
+			FuelDetectionSubsystem.mInstance,
+			TurretVisionSubsystem.mInstance
 
 		}) {
 			SmartDashboard.putData(s);

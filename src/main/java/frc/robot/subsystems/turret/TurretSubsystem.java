@@ -47,7 +47,7 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
 
   private TurretVisionSubsystem turretVision;
   private static final LoggedTunableNumber visionCorrectionEnabled =
-      new LoggedTunableNumber("Turret/VisionCorrectionEnabled", 0.0);
+      new LoggedTunableNumber("Turret/VisionCorrectionEnabled", 1.0);
   // 1.0 = use position+velocity feedforward, 0.0 = use Motion Magic
   private static final LoggedTunableNumber useVelocityFeedforward =
       new LoggedTunableNumber("Turret/UseVelocityFeedforward", 0.0);
@@ -97,14 +97,14 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
   }
 
   private double getVisionCorrectionDeg() {
-   /*if (turretVision == null || visionCorrectionEnabled.get() < 0.5) {
+   if (turretVision == null || visionCorrectionEnabled.get() < 0.5) {
       return 0.0;
     }
     if (!turretVision.hasTarget()) {
       return 0.0;
     }
-    return turretVision.getAimCorrectionDeg();*/
-    return 0.0;
+    return turretVision.getAimCorrectionDeg();
+    
   }
 
    public void periodic() {

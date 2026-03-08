@@ -24,13 +24,13 @@ public class TurretVisionSubsystem extends SubsystemBase {
     );
 
     private static final LoggedTunableNumber maxCorrectionDeg =
-        new LoggedTunableNumber("TurretVision/MaxCorrectionDeg", 10.0);
+        new LoggedTunableNumber("TurretVision/MaxCorrectionDeg", 20.0);
     private static final LoggedTunableNumber ambiguityThreshold =
         new LoggedTunableNumber("TurretVision/AmbiguityThreshold", 0.2);
     // How many degrees to nudge the correction per tick toward the measured error.
     // At 0.02 deg/tick and 50Hz, full correction of 5° takes ~5 seconds.
     private static final LoggedTunableNumber integralStepDeg =
-        new LoggedTunableNumber("TurretVision/IntegralStepDeg", 0.02);
+        new LoggedTunableNumber("TurretVision/IntegralStepDeg", 0.05);
     // Deadband: ignore raw yaw below this (degrees). Prevents hunting near center.
     private static final LoggedTunableNumber deadbandDeg =
         new LoggedTunableNumber("TurretVision/DeadbandDeg", 2.5);
