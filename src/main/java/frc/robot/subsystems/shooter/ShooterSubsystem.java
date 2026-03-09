@@ -30,6 +30,7 @@ public class ShooterSubsystem  extends MotorSubsystem<MotorIOTalonFX> {
     private static final LoggedTunableNumber passingSpeed = new LoggedTunableNumber("Shooter/PassingSpeed");
 
     private boolean manualTune = false;
+    private double flywheelSpeedOffset = 0.0;
     
     //RPM = radians / second * 9.5493
     // 10 rads / sec = 95.493 RPM
@@ -90,8 +91,9 @@ public class ShooterSubsystem  extends MotorSubsystem<MotorIOTalonFX> {
 
          // AdvantageKit structured logging for replay
          Logger.recordOutput("Shooter/VelocityRPS", this.getVelocity().baseUnitMagnitude());
-          Logger.recordOutput("Shooter/VelocitySetPoint",setpointVal );
+         Logger.recordOutput("Shooter/VelocitySetPoint", setpointVal);
          Logger.recordOutput("Shooter/ManualTune", manualTune);
+         Logger.recordOutput("Shooter/SpeedOffset", flywheelSpeedOffset);
      }
 
     public Command resetAutoMap(){
@@ -102,15 +104,27 @@ public class ShooterSubsystem  extends MotorSubsystem<MotorIOTalonFX> {
         this.applySetpoint(IDLE);
     }
 
+    public void incrementFlywheelOffset() {
+        flywheelSpeedOffset += 5.0;
+    }
+
+    public void decrementFlywheelOffset() {
+        flywheelSpeedOffset -= 5.0;
+    }
+
+    public void resetFlywheelOffset() {
+        flywheelSpeedOffset = 0.0;
+    }
+
     public Command runTrackTargetActiveShootingCommand() {
         return run(
             () -> {
                 if(!this.manualTune){
                     var params = shotCalc.getParameters();
-                    setpointVal = params.flywheelSpeed();
-                    runVelocity( setpointVal);
+                    setpointVal = params.flywheelSpeed() + flywheelSpeedOffset;
+                    runVelocity(setpointVal);
                 }
-            
+
             });
     }
 

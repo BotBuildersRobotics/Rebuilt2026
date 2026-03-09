@@ -220,6 +220,14 @@ public class SuperSystem extends SubsystemBase {
 		);
 	}
 
+	public Command incrementFlywheelSpeed() {
+		return Commands.runOnce(() -> shooter.incrementFlywheelOffset());
+	}
+
+	public Command decrementFlywheelSpeed() {
+		return Commands.runOnce(() -> shooter.decrementFlywheelOffset());
+	}
+
 	public Command offsetTurretLeft(){
 		return Commands.runOnce(() ->
 			turret.offsetLeft()

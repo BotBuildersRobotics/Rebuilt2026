@@ -86,7 +86,10 @@ public class ControlSubsystem {
 
 		driver.b().whileTrue(s.passAuto());
 
-		//driver.x().onTrue(TurretSubsystem.mInstance.zeroCommand());
+
+		driver.povUp().onTrue(s.incrementFlywheelSpeed());
+		driver.povDown().onTrue(s.decrementFlywheelSpeed());
+
 
 		driver.leftBumper().onTrue(
 			PivotSubsystem.mInstance.findDeployLimitCommand()
@@ -94,20 +97,7 @@ public class ControlSubsystem {
 
 		driver.start().onTrue(DriveSubsystem.mInstance.runOnce( () ->DriveSubsystem.mInstance.getDrivetrain().seedFieldCentric()));
 
-		//driver.leftBumper().onTrue(Commands.runOnce(SignalLogger::start));
-		//driver.rightBumper().onTrue(Commands.runOnce(SignalLogger::stop));
-
-		/*
-		* Joystick Y = quasistatic forward
-		* Joystick A = quasistatic reverse
-		* Joystick B = dynamic forward
-		* Joystick X = dyanmic reverse
-		*/
-		/*driver.y().whileTrue(ShooterSubsystem.mInstance.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-		driver.a().whileTrue(ShooterSubsystem.mInstance.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-		driver.b().whileTrue(ShooterSubsystem.mInstance.sysIdDynamic(SysIdRoutine.Direction.kForward));
-		driver.x().whileTrue(ShooterSubsystem.mInstance.sysIdDynamic(SysIdRoutine.Direction.kReverse));*/
-				
+		
     }
 
 	public void operatorControls(){
