@@ -53,7 +53,7 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
       new LoggedTunableNumber("Turret/UseVelocityFeedforward", 0.0);
 
   private ShootState shootState = ShootState.ACTIVE_SHOOTING;
-  private boolean stowed = false;
+  private boolean stowed = true;
 
   private Mechanism2d turretMech;
   private MechanismLigament2d turretLigament;

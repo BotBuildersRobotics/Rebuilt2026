@@ -32,7 +32,7 @@ public class HoodSubsystem extends ServoMotorSubsystem<MotorIOTalonFX> {
     private double goalVelocity = 0.0;
 
     private boolean manualTune = false;
-    private boolean stowed = false;
+    private boolean stowed = true;
     private static final LoggedTunableNumber manualHood = new LoggedTunableNumber("Hood/Manual");
     private static final LoggedTunableNumber passingAngle = new LoggedTunableNumber("Hood/PassingAngle");
 
