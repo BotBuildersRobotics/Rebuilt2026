@@ -105,14 +105,14 @@ public class ShotCalculator {
     launchFlywheelSpeedMap.put(3.82, 193.0);
     launchFlywheelSpeedMap.put(4.09, 197.0);
     launchFlywheelSpeedMap.put(4.20, 199.0);
-     launchFlywheelSpeedMap.put(4.30, 212.0); // near depot
-     launchFlywheelSpeedMap.put(4.40, 215.0); // near depot
-     launchFlywheelSpeedMap.put(4.60, 218.0); // near depot
-    launchFlywheelSpeedMap.put(4.77, 220.0);
-    launchFlywheelSpeedMap.put(5.17, 222.0);
-    launchFlywheelSpeedMap.put(5.57, 225.0);
-    launchFlywheelSpeedMap.put(5.60, 228.0);
-    launchFlywheelSpeedMap.put(5.70, 233.0);
+     launchFlywheelSpeedMap.put(4.30, 205.0); // near depot
+     launchFlywheelSpeedMap.put(4.40, 208.0); // near depot
+     launchFlywheelSpeedMap.put(4.60, 212.0); // near depot
+    launchFlywheelSpeedMap.put(4.77, 215.0);
+    launchFlywheelSpeedMap.put(5.17, 218.0);
+    launchFlywheelSpeedMap.put(5.57, 220.0);
+    launchFlywheelSpeedMap.put(5.60, 223.0);
+    launchFlywheelSpeedMap.put(5.70, 225.0);
 
     timeOfFlightMap.put(5.68, 1.16);
     timeOfFlightMap.put(4.55, 1.12);

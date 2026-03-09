@@ -1,0 +1,59 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 3.0517912218268095,
+        "y": 5.535907473309607
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 6.49473309608541,
+        "y": 5.353001186239621
+      },
+      "isLocked": false,
+      "linkedName": "BDS - 2"
+    },
+    {
+      "anchor": {
+        "x": 7.635207591933572,
+        "y": 3.534697508896797
+      },
+      "prevControl": {
+        "x": 7.764317912218269,
+        "y": 6.138422301304863
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "BDS - 3"
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.08591674047830185,
+      "rotationDegrees": -45.0
+    }
+  ],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": -70.01689347810004
+  },
+  "reversed": false,
+  "folder": "Bump double swipe",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 0.0
+  },
+  "useDefaultConstraints": true
+}

@@ -114,6 +114,8 @@ public class ControlSubsystem {
 
 		SuperSystem s = SuperSystem.mInstance;
 
+		operator.b().onTrue(s.enableStow());
+
 		// Turret offset correction
 		operator.leftTrigger().onTrue(s.offsetTurretLeft());
 		operator.rightTrigger().onTrue(s.offsetTurretRight());

@@ -182,7 +182,10 @@ public class SuperSystem extends SubsystemBase {
 			turret.passAutoCommand(),
 			shooter.runPassingCommand(),
 			hood.runPassingCommand()
-		);
+		).beforeStarting(disableStow()).finallyDo(()->{
+			turret.setStowed(false);
+			hood.setStowed(false);
+		});
 	}
 
 

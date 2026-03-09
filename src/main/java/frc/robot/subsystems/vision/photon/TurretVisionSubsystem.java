@@ -33,7 +33,7 @@ public class TurretVisionSubsystem extends SubsystemBase {
         new LoggedTunableNumber("TurretVision/IntegralStepDeg", 0.05);
     // Deadband: ignore raw yaw below this (degrees). Prevents hunting near center.
     private static final LoggedTunableNumber deadbandDeg =
-        new LoggedTunableNumber("TurretVision/DeadbandDeg", 2.5);
+        new LoggedTunableNumber("TurretVision/DeadbandDeg", 5.0);
     // Minimum consecutive frames with a valid target before allowing accumulation.
     // Prevents flickering tags from pumping the integrator.
     private static final LoggedTunableNumber minStableFrames =
