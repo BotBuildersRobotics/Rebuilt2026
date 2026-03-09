@@ -160,6 +160,26 @@ public class RobotContainer {
 
 		);
 
+		NamedCommands.registerCommand("agitateChassisCommand",
+			SuperSystem.mInstance.agitateChassisCommand()
+		);
+
+		NamedCommands.registerCommand("setFlywheelSlow",
+			SuperSystem.mInstance.setFlywheelPreset(180.0)
+		);
+
+		NamedCommands.registerCommand("setFlywheelWall",
+			SuperSystem.mInstance.setFlywheelPreset(205.0)
+		);
+
+		NamedCommands.registerCommand("setFlywheelFast",
+			SuperSystem.mInstance.setFlywheelPreset(230.0)
+		);
+
+		NamedCommands.registerCommand("clearFlywheelPreset",
+			SuperSystem.mInstance.clearFlywheelPreset()
+		);
+
 		NamedCommands.registerCommand("extendClimb",
 
 			SuperSystem.mInstance.climbUp()

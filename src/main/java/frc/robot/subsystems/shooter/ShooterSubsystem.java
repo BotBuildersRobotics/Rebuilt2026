@@ -31,6 +31,7 @@ public class ShooterSubsystem  extends MotorSubsystem<MotorIOTalonFX> {
 
     private boolean manualTune = false;
     private double flywheelSpeedOffset = 0.0;
+    private Double flywheelSpeedPreset = null; // null = use shot calculator
     
     //RPM = radians / second * 9.5493
     // 10 rads / sec = 95.493 RPM
@@ -120,21 +121,35 @@ public class ShooterSubsystem  extends MotorSubsystem<MotorIOTalonFX> {
         return run(
             () -> {
                 if(!this.manualTune){
-                    var params = shotCalc.getParameters();
-                    setpointVal = params.flywheelSpeed() + flywheelSpeedOffset;
+                    if (flywheelSpeedPreset != null) {
+                        setpointVal = flywheelSpeedPreset + flywheelSpeedOffset;
+                    } else {
+                        setpointVal = shotCalc.getParameters().flywheelSpeed() + flywheelSpeedOffset;
+                    }
                     runVelocity(setpointVal);
                 }
-
             });
     }
 
     public Command runFixedCommand(DoubleSupplier velocity) {
         return run(
             () -> {
-            
+
                 runVelocity(velocity.getAsDouble());
-            
+
             });
+    }
+
+    public Command runAtVelocityCommand(double rps) {
+        return run(() -> runVelocity(rps));
+    }
+
+    public Command setFlywheelPresetCommand(double rps) {
+        return runOnce(() -> flywheelSpeedPreset = rps);
+    }
+
+    public Command clearFlywheelPresetCommand() {
+        return runOnce(() -> flywheelSpeedPreset = null);
     }
 
     public Command runPassingCommand() {

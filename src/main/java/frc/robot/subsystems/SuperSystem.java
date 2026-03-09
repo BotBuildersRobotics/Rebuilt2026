@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.util.sendable.SendableBuilder;
+import com.ctre.phoenix6.swerve.SwerveRequest;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.RobotController;
@@ -8,6 +9,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.ShiftHelpers;
 import frc.robot.lib.AllianceFlipUtil;
 import frc.robot.subsystems.chute.ChuteSubsystem;
@@ -202,6 +204,18 @@ public class SuperSystem extends SubsystemBase {
 		return turret.testAimAtHub();
 	}
 
+	public Command shootAtVelocity(double rps) {
+		return shooter.runAtVelocityCommand(rps);
+	}
+
+	public Command setFlywheelPreset(double rps) {
+		return shooter.setFlywheelPresetCommand(rps);
+	}
+
+	public Command clearFlywheelPreset() {
+		return shooter.clearFlywheelPresetCommand();
+	}
+
 	public Command setManualShooterVelocity(){
 		//use the tunable value;
 
@@ -270,6 +284,25 @@ public class SuperSystem extends SubsystemBase {
 
 	public Command zeroClimb(){
 		return ClimbSubsystem.mInstance.zeroCommand();
+	}
+
+	public Command agitateChassisCommand() {
+		final double kRotationRateRadPerSec = Math.toRadians(12.5); // 12.5 deg/s → 10° in 0.8s
+		final double kDurationSecs = 0.8;
+		SwerveRequest.FieldCentric rotateRequest = new SwerveRequest.FieldCentric();
+
+		return Commands.sequence(
+			DriveSubsystem.mInstance.run(() ->
+				DriveSubsystem.mInstance.setSwerveRequest(
+					rotateRequest.withVelocityX(0).withVelocityY(0).withRotationalRate(kRotationRateRadPerSec)
+				)
+			).withTimeout(kDurationSecs),
+			DriveSubsystem.mInstance.run(() ->
+				DriveSubsystem.mInstance.setSwerveRequest(
+					rotateRequest.withVelocityX(0).withVelocityY(0).withRotationalRate(-kRotationRateRadPerSec)
+				)
+			).withTimeout(kDurationSecs)
+		);
 	}
 
 	public Command agitateCommand(){

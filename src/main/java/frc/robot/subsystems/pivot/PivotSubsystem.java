@@ -66,7 +66,7 @@ public class PivotSubsystem extends ServoMotorSubsystem<MotorIOTalonFX> {
 	 */
 	public Command findDeployLimitCommand() {
 		// Slow downward voltage (negative = toward deploy/down)
-		final double homingVolts = 6.0;
+		final double homingVolts = 3.0;
 		// Current threshold indicating the mechanism has hit the hard stop
 		final double currentThresholdAmps = 6.0;
 		// Ignore current for this long to get past inrush spike
