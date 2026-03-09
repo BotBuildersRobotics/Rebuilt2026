@@ -161,7 +161,7 @@ public class RobotContainer {
 		);
 
 		NamedCommands.registerCommand("agitateChassisCommand",
-			SuperSystem.mInstance.agitateChassisCommand()
+			SuperSystem.mInstance.agitateChassisCommand().repeatedly().withTimeout(3.0)
 		);
 
 		NamedCommands.registerCommand("setFlywheelSlow",
