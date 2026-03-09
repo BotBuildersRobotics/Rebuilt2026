@@ -3,6 +3,7 @@ package frc.robot.subsystems.vision;
 
 
 import com.ctre.phoenix6.Utils;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -95,6 +96,20 @@ public class VisionIOLimelight extends VisionIO {
 	public void update() {
 		updateGyro();
 		setLatestEstimate(LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(config.name), 1);
+
+		// When MegaTag1 sees 2+ tags, use its rotation to correct gyro drift.
+		// High translation std devs so only the heading is trusted.
+		if (!disabled) {
+			PoseEstimate mt1 = LimelightHelpers.getBotPoseEstimate_wpiBlue(config.name);
+			if (mt1 != null && mt1.tagCount >= 2 && isInsideField(mt1.pose)) {
+				DriveSubsystem.mInstance.addVisionUpdate(
+					mt1.pose,
+					Units.Seconds.of(mt1.timestampSeconds),
+					VecBuilder.fill(9999.0, 9999.0, 0.1)
+				);
+				SmartDashboard.putNumber(config.name + "/MT1HeadingDeg", mt1.pose.getRotation().getDegrees());
+			}
+		}
 
 		SmartDashboard.putBoolean(config.name + "/Disabled", disabled);
 	}
