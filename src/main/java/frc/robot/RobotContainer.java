@@ -169,7 +169,7 @@ public class RobotContainer {
 		);
 
 		NamedCommands.registerCommand("setFlywheelWall",
-			SuperSystem.mInstance.setFlywheelPreset(205.0)
+			SuperSystem.mInstance.setFlywheelPreset(210.0)
 		);
 
 		NamedCommands.registerCommand("setFlywheelFast",

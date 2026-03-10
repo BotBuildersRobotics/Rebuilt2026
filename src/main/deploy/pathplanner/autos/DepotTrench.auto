@@ -51,6 +51,12 @@
                     }
                   ]
                 }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "setFlywheelWall"
+                }
               }
             ]
           }
@@ -125,6 +131,12 @@
                 "type": "named",
                 "data": {
                   "name": "Intake"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "agitateChassisCommand"
                 }
               },
               {
@@ -219,6 +231,12 @@
                 "type": "named",
                 "data": {
                   "name": "Shoot"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "agitateChassisCommand"
                 }
               },
               {
