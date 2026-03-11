@@ -25,9 +25,9 @@ public class ClimbSubsystem extends MotorSubsystem<MotorIOTalonFX> {
 
 	// Tunable climb distance for field testing
 	private static final LoggedTunableNumber climbExtendRotations =
-		new LoggedTunableNumber("Climb/ClimbRotations", -130.0);
+		new LoggedTunableNumber("Climb/ExtendRotations", -130.0);
 
-		private static final LoggedTunableNumber climbRotations =
+	private static final LoggedTunableNumber climbRotations =
 		new LoggedTunableNumber("Climb/ClimbRotations", -100.0);
 
 	public static final ClimbSubsystem mInstance = new ClimbSubsystem();
@@ -67,10 +67,12 @@ public class ClimbSubsystem extends MotorSubsystem<MotorIOTalonFX> {
 	}
 
 	public Command extendAutoCommand(){
-		return Commands.runOnce(() -> Setpoint.withMotionMagicSetpoint(Units.Rotations.of(climbExtendRotations.get())));
+		return Commands.runOnce(() -> applySetpoint(
+			Setpoint.withMotionMagicSetpoint(Units.Rotations.of(climbExtendRotations.get()))));
 	}
 
 	public Command climeAutoCommand(){
-		return Commands.runOnce(() -> Setpoint.withMotionMagicSetpoint(Units.Rotations.of(climbRotations.get())));
+		return Commands.runOnce(() -> applySetpoint(
+			Setpoint.withMotionMagicSetpoint(Units.Rotations.of(climbRotations.get()))));
 	}
 }
