@@ -20,11 +20,11 @@ public class ChuteConstants {
 		TalonFXConfiguration config = new TalonFXConfiguration();
 
 		config.CurrentLimits.StatorCurrentLimitEnable = Robot.isReal();
-		config.CurrentLimits.StatorCurrentLimit = 120.0;
+		config.CurrentLimits.StatorCurrentLimit = 100.0;
 
 		config.CurrentLimits.SupplyCurrentLimitEnable = Robot.isReal();
-		config.CurrentLimits.SupplyCurrentLimit = 60.0;
-		config.CurrentLimits.SupplyCurrentLowerLimit = 60.0;
+		config.CurrentLimits.SupplyCurrentLimit = 40.0;
+		config.CurrentLimits.SupplyCurrentLowerLimit = 40.0;
 		config.CurrentLimits.SupplyCurrentLowerTime = 0.1;
 
 		config.Voltage.PeakForwardVoltage = 12.0;

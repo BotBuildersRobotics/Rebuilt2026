@@ -30,7 +30,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Bump 1"
+                  "pathName": "IntoTrenchPass1"
                 }
               },
               {
@@ -60,15 +60,47 @@
           "data": {
             "commands": [
               {
+                "type": "parallel",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "sequential",
+                      "data": {
+                        "commands": [
+                          {
+                            "type": "named",
+                            "data": {
+                              "name": "idleIntake"
+                            }
+                          },
+                          {
+                            "type": "wait",
+                            "data": {
+                              "waitTime": 2.0
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "TrenchReturn"
+                      }
+                    }
+                  ]
+                }
+              },
+              {
                 "type": "named",
                 "data": {
-                  "name": "setFlywheelSlow"
+                  "name": "setFlywheelWall"
                 }
               },
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Bump Return 1"
+                  "pathName": "ReturnForShot"
                 }
               },
               {
@@ -92,61 +124,29 @@
               {
                 "type": "wait",
                 "data": {
-                  "waitTime": 4.0
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "sequential",
-          "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "idleIntake"
+                  "waitTime": 1.0
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "idleShooter"
+                  "name": "Intake"
                 }
               },
               {
-                "type": "named",
-                "data": {
-                  "name": "stowTurret"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "parallel",
-          "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "Bump 2"
-                }
-              },
-              {
-                "type": "sequential",
+                "type": "parallel",
                 "data": {
                   "commands": [
                     {
                       "type": "named",
                       "data": {
-                        "name": "Intake"
+                        "name": "Shoot"
                       }
                     },
                     {
-                      "type": "wait",
+                      "type": "named",
                       "data": {
-                        "waitTime": 3.0
+                        "name": "agitateChassisCommand"
                       }
                     }
                   ]
@@ -160,27 +160,46 @@
           "data": {
             "commands": [
               {
+                "type": "named",
+                "data": {
+                  "name": "idleShooter"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "stowTurret"
+                }
+              },
+              {
+                "type": "parallel",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "deployHook"
+                      }
+                    },
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "ReturnToClimber"
+                      }
+                    }
+                  ]
+                }
+              },
+              {
                 "type": "path",
                 "data": {
-                  "pathName": "Bump Return 2"
+                  "pathName": "AlignToClimb"
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "aimTurret"
-                }
-              },
-              {
-                "type": "wait",
-                "data": {
-                  "waitTime": 0.25
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Shoot"
+                  "name": "climb"
                 }
               }
             ]

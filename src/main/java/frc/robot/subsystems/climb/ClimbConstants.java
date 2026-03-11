@@ -21,7 +21,7 @@ public class ClimbConstants {
 
 	// Position setpoints (in rotations)
 	public static final Angle kStowedPosition = Units.Rotations.of(0.0);
-	public static final Angle kClimbedPosition = Units.Rotations.of(-180.0); 
+	public static final Angle kClimbedPosition = Units.Rotations.of(-130.0); 
 
 	public static TalonFXConfiguration getFXConfig() {
 		TalonFXConfiguration config = new TalonFXConfiguration();
@@ -43,8 +43,8 @@ public class ClimbConstants {
 		config.Slot0.kS = 0.0;
 
 		// Motion Magic — conservative speeds for climbing
-		config.MotionMagic.MotionMagicCruiseVelocity = 5.0;
-		config.MotionMagic.MotionMagicAcceleration = 10.0;
+		config.MotionMagic.MotionMagicCruiseVelocity = 500.0;
+		config.MotionMagic.MotionMagicAcceleration = 100.0;
 
 		config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 

@@ -6,6 +6,7 @@ import frc.robot.lib.io.MotorIO.Setpoint;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.lib.io.MotorIOTalonFX;
 import org.littletonrobotics.junction.Logger;
 
@@ -23,8 +24,11 @@ public class ClimbSubsystem extends MotorSubsystem<MotorIOTalonFX> {
 	public static final Setpoint CLIMBED = Setpoint.withMotionMagicSetpoint(ClimbConstants.kClimbedPosition);
 
 	// Tunable climb distance for field testing
-	private static final LoggedTunableNumber climbRotations =
-		new LoggedTunableNumber("Climb/ClimbRotations", 180.0);
+	private static final LoggedTunableNumber climbExtendRotations =
+		new LoggedTunableNumber("Climb/ClimbRotations", -130.0);
+
+		private static final LoggedTunableNumber climbRotations =
+		new LoggedTunableNumber("Climb/ClimbRotations", -100.0);
 
 	public static final ClimbSubsystem mInstance = new ClimbSubsystem();
 
@@ -55,5 +59,18 @@ public class ClimbSubsystem extends MotorSubsystem<MotorIOTalonFX> {
 	public Command climbCommand() {
 		return run(() -> applySetpoint(
 			Setpoint.withMotionMagicSetpoint(Units.Rotations.of(climbRotations.get()))));
+	}
+
+	public Command extendCommand() {
+		return run(() -> applySetpoint(
+			Setpoint.withMotionMagicSetpoint(Units.Rotations.of(climbExtendRotations.get()))));
+	}
+
+	public Command extendAutoCommand(){
+		return Commands.runOnce(() -> Setpoint.withMotionMagicSetpoint(Units.Rotations.of(climbExtendRotations.get())));
+	}
+
+	public Command climeAutoCommand(){
+		return Commands.runOnce(() -> Setpoint.withMotionMagicSetpoint(Units.Rotations.of(climbRotations.get())));
 	}
 }

@@ -283,6 +283,14 @@ public class SuperSystem extends SubsystemBase {
 		return ClimbSubsystem.mInstance.stowCommand();
 	}
 
+	public Command climbAutoCommand(){
+		return ClimbSubsystem.mInstance.climeAutoCommand();
+	}
+
+	public Command extendAutoCommand(){
+		return ClimbSubsystem.mInstance.extendAutoCommand();
+	}
+
 	public Command zeroClimb(){
 		return ClimbSubsystem.mInstance.zeroCommand();
 	}

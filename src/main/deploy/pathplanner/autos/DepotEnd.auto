@@ -13,6 +13,12 @@
                 "data": {
                   "name": "DeployIntake"
                 }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "stowTurret"
+                }
               }
             ]
           }
@@ -44,6 +50,12 @@
                       }
                     }
                   ]
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "setFlywheelWall"
                 }
               }
             ]
@@ -94,8 +106,27 @@
                 "data": {
                   "waitTime": 1.0
                 }
+              },
+              {
+                "type": "parallel",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 2.0
+                      }
+                    }
+                  ]
+                }
               }
             ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Intake"
           }
         },
         {
@@ -105,28 +136,15 @@
           }
         },
         {
+          "type": "wait",
+          "data": {
+            "waitTime": 2.0
+          }
+        },
+        {
           "type": "sequential",
           "data": {
-            "commands": [
-              {
-                "type": "wait",
-                "data": {
-                  "waitTime": 4.0
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "idleIntake"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "idleShooter"
-                }
-              }
-            ]
+            "commands": []
           }
         }
       ]

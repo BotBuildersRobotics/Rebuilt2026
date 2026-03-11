@@ -51,12 +51,6 @@
                     }
                   ]
                 }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "setFlywheelWall"
-                }
               }
             ]
           }
@@ -98,6 +92,12 @@
                 }
               },
               {
+                "type": "named",
+                "data": {
+                  "name": "setFlywheelWall"
+                }
+              },
+              {
                 "type": "path",
                 "data": {
                   "pathName": "ReturnForShot"
@@ -134,15 +134,22 @@
                 }
               },
               {
-                "type": "named",
+                "type": "parallel",
                 "data": {
-                  "name": "agitateChassisCommand"
-                }
-              },
-              {
-                "type": "wait",
-                "data": {
-                  "waitTime": 3.0
+                  "commands": [
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "Shoot"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "agitateChassisCommand"
+                      }
+                    }
+                  ]
                 }
               }
             ]
@@ -174,7 +181,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Trench2"
+                  "pathName": "IntoTrenchPass2"
                 }
               },
               {
@@ -190,7 +197,7 @@
                     {
                       "type": "wait",
                       "data": {
-                        "waitTime": 3.0
+                        "waitTime": 1.0
                       }
                     }
                   ]
@@ -206,13 +213,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "TrenchReturn"
-                }
-              },
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "ReturnForShot"
+                  "pathName": "ReturnForShot2"
                 }
               },
               {
@@ -228,21 +229,28 @@
                 }
               },
               {
-                "type": "named",
+                "type": "parallel",
                 "data": {
-                  "name": "Shoot"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "agitateChassisCommand"
+                  "commands": [
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "agitateChassisCommand"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "Shoot"
+                      }
+                    }
+                  ]
                 }
               },
               {
                 "type": "wait",
                 "data": {
-                  "waitTime": 5.0
+                  "waitTime": 1.0
                 }
               },
               {

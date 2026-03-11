@@ -160,6 +160,16 @@ public class RobotContainer {
 
 		);
 
+		NamedCommands.registerCommand("deployHook",
+			SuperSystem.mInstance.extendAutoCommand()
+		);
+
+		NamedCommands.registerCommand("climb",
+			SuperSystem.mInstance.climbAutoCommand()
+		);
+
+		
+
 		NamedCommands.registerCommand("agitateChassisCommand",
 			SuperSystem.mInstance.agitateChassisCommand().repeatedly().withTimeout(3.0)
 		);
