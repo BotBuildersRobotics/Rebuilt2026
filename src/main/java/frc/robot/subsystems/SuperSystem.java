@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.util.sendable.SendableBuilder;
 import com.ctre.phoenix6.swerve.SwerveRequest;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.RobotController;
@@ -206,6 +207,14 @@ public class SuperSystem extends SubsystemBase {
 
 	public Command shootAtVelocity(double rps) {
 		return shooter.runAtVelocityCommand(rps);
+	}
+
+	public Command setTurretAnglePreset(double fieldRelativeDeg) {
+		return Commands.runOnce(() -> turret.setTurretAnglePreset(Rotation2d.fromDegrees(fieldRelativeDeg)));
+	}
+
+	public Command clearTurretAnglePreset() {
+		return Commands.runOnce(() -> turret.clearTurretAnglePreset());
 	}
 
 	public Command setFlywheelPreset(double rps) {

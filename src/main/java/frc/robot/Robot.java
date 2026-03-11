@@ -95,6 +95,7 @@ public class Robot extends LoggedRobot {
       m_autonomousCommand.cancel();
     }
     SuperSystem.mInstance.clearFlywheelPreset().schedule();
+    SuperSystem.mInstance.clearTurretAnglePreset().schedule();
   }
 
   /** This function is called periodically during operator control. */

@@ -54,6 +54,7 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
 
   private ShootState shootState = ShootState.ACTIVE_SHOOTING;
   private boolean stowed = true;
+  private Rotation2d turretAnglePreset = null; // null = use shot calculator
 
   private Mechanism2d turretMech;
   private MechanismLigament2d turretLigament;
@@ -257,6 +258,14 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
         });
   }
 
+  public void setTurretAnglePreset(Rotation2d angle) {
+    this.turretAnglePreset = angle;
+  }
+
+  public void clearTurretAnglePreset() {
+    this.turretAnglePreset = null;
+  }
+
   public Command runTrackTargetActiveShootingCommand() {
     return run(
         () -> {
@@ -264,6 +273,10 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
             // Hold 0° robot-relative (straight ahead)
             Rotation2d robotAngle = DriveSubsystem.mInstance.getState().Pose.getRotation();
             setFieldRelativeTarget(robotAngle);
+            setShootState(ShootState.ACTIVE_SHOOTING);
+          } else if (turretAnglePreset != null) {
+            double totalOffset = turretOffset - getVisionCorrectionDeg();
+            setFieldRelativeTarget(turretAnglePreset.plus(Rotation2d.fromDegrees(totalOffset)));
             setShootState(ShootState.ACTIVE_SHOOTING);
           } else {
             var params = shotCalc.getParameters();
