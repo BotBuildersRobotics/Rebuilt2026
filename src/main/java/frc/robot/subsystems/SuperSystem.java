@@ -275,8 +275,11 @@ public class SuperSystem extends SubsystemBase {
 		return PivotSubsystem.mInstance.setpointCommand(PivotSubsystem.STOW_FULL);
 	}
 
-	public Command climbUp(){
+	public Command climb(){
 		return ClimbSubsystem.mInstance.climbCommand();
+	}
+	public Command climbExtend(){
+		return ClimbSubsystem.mInstance.extendCommand();
 	}
 
 	public Command climbStow(){

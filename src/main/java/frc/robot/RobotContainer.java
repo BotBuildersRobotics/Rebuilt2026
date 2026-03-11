@@ -192,7 +192,7 @@ public class RobotContainer {
 
 		NamedCommands.registerCommand("extendClimb",
 
-			SuperSystem.mInstance.climbUp()
+			SuperSystem.mInstance.extendAutoCommand()
 
 		);
 

@@ -111,8 +111,10 @@ public class ControlSubsystem {
 		operator.rightTrigger().onTrue(s.offsetTurretRight());
 
 		// Climb: left bumper = climb to position, right bumper = stow back to zero
-		operator.leftBumper().onTrue(s.climbUp());
+		operator.leftBumper().onTrue(s.climbExtend());
 		operator.rightBumper().onTrue(s.climbStow());
+
+		operator.b().onTrue(s.climb());
 		
 		operator.povDown().onTrue(ClimbSubsystem.mInstance.setpointCommand(ClimbSubsystem.CLIMB)).onFalse(
 			ClimbSubsystem.mInstance.setpointCommand(ClimbSubsystem.STOP)
