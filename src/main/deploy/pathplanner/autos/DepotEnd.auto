@@ -92,7 +92,13 @@
               {
                 "type": "wait",
                 "data": {
-                  "waitTime": 0.5
+                  "waitTime": 0.3
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Intake"
                 }
               },
               {
@@ -119,6 +125,18 @@
                     }
                   ]
                 }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "idleShooter"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "idleIntake"
+                }
               }
             ]
           }
@@ -126,7 +144,7 @@
         {
           "type": "named",
           "data": {
-            "name": "Intake"
+            "name": "idleIntake"
           }
         },
         {
@@ -136,15 +154,21 @@
           }
         },
         {
-          "type": "wait",
+          "type": "named",
           "data": {
-            "waitTime": 2.0
+            "name": "Intake"
           }
         },
         {
-          "type": "sequential",
+          "type": "wait",
           "data": {
-            "commands": []
+            "waitTime": 1.0
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot"
           }
         }
       ]

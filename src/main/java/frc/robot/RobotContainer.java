@@ -179,7 +179,7 @@ public class RobotContainer {
 		);
 
 		NamedCommands.registerCommand("setFlywheelWall",
-			SuperSystem.mInstance.setFlywheelPreset(210.0)
+			SuperSystem.mInstance.setFlywheelPreset(205.0)
 		);
 
 		NamedCommands.registerCommand("setFlywheelFast",
@@ -194,12 +194,12 @@ public class RobotContainer {
 			SuperSystem.mInstance.setTurretAnglePreset(0.0)
 		);
 
-		NamedCommands.registerCommand("setTurretAngle2",
-			SuperSystem.mInstance.setTurretAnglePreset(45.0)
+		NamedCommands.registerCommand("setTurretAngleLeftWall",
+			SuperSystem.mInstance.setTurretAnglePreset(-73.0)
 		);
 
-		NamedCommands.registerCommand("setTurretAngle3",
-			SuperSystem.mInstance.setTurretAnglePreset(90.0)
+		NamedCommands.registerCommand("setTurretAngleDepot",
+			SuperSystem.mInstance.setTurretAnglePreset(-25.0)
 		);
 
 		NamedCommands.registerCommand("clearTurretAnglePreset",

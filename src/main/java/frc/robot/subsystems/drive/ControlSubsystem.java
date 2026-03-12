@@ -104,7 +104,7 @@ public class ControlSubsystem {
 
 		SuperSystem s = SuperSystem.mInstance;
 
-		operator.b().onTrue(s.enableStow());
+	//	operator.b().onTrue(s.enableStow());
 
 		// Turret offset correction
 		operator.leftTrigger().onTrue(s.offsetTurretLeft());
@@ -129,9 +129,9 @@ public class ControlSubsystem {
 		operator.x().onTrue(s.zeroTurretCommand());
 
 		// Reverse all systems (intake, shuffla, chute) — hold to reverse
-		operator.y()
-			.onTrue(s.reverseAllSystems())
-			.onFalse(s.idleAllSystems());
+		//operator.y()
+		//	.onTrue(s.reverseAllSystems())
+		//	.onFalse(s.idleAllSystems());
 
 		// Stow intake
 		operator.a().onTrue(s.stowIntake());

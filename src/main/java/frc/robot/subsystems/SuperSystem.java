@@ -281,7 +281,7 @@ public class SuperSystem extends SubsystemBase {
 	}
 
 	public Command stowIntake(){
-		return PivotSubsystem.mInstance.setpointCommand(PivotSubsystem.STOW_FULL);
+		return PivotSubsystem.mInstance.setpointCommand(PivotSubsystem.AGITATE);
 	}
 
 	public Command climb(){
