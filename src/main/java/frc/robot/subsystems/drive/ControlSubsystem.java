@@ -58,6 +58,13 @@ public class ControlSubsystem {
 				() -> driver.getHID().setRumble(RumbleType.kBothRumble, 1.0),
 				() -> driver.getHID().setRumble(RumbleType.kBothRumble, 0.0)
 			).withTimeout(1.0));
+		
+		ShiftHelpers.hubAboutToActivate(10.0)
+			.onTrue(Commands.startEnd(
+				() -> operator.getHID().setRumble(RumbleType.kBothRumble, 1.0),
+				() -> operator.getHID().setRumble(RumbleType.kBothRumble, 0.0)
+			).withTimeout(1.0));
+	
 	}
 
     public void driverControls() {
@@ -73,16 +80,22 @@ public class ControlSubsystem {
 		driver.rightTrigger().onTrue(
 			Commands.parallel(
 				s.Shoot(),
-				Commands.runOnce(() -> DriveConstants.setShootingSpeedLimited(true))
+				Commands.runOnce(() -> DriveConstants.setShootingSpeedLimited(true)),
+				s.activeTurretHood()
 			)
 		).onFalse(
 			Commands.parallel(
 				s.idleShooter(),
-				Commands.runOnce(() -> DriveConstants.setShootingSpeedLimited(false))
+				Commands.runOnce(() -> DriveConstants.setShootingSpeedLimited(false)),
+				s.stowTurretHood()
 			)
 		);
 
-		driver.a().onTrue(s.toggleStow());
+		driver.a().onTrue(
+			s.activeTurretHood()
+		).onFalse(
+			s.stowTurretHood()
+		);	
 
 		driver.b().whileTrue(s.passAuto());
 
@@ -115,6 +128,8 @@ public class ControlSubsystem {
 		operator.rightBumper().onTrue(s.climbStow());
 
 		operator.b().onTrue(s.climb());
+
+		operator.y().onTrue(s.stowTurretHood());
 		
 		operator.povDown().onTrue(ClimbSubsystem.mInstance.setpointCommand(ClimbSubsystem.CLIMB)).onFalse(
 			ClimbSubsystem.mInstance.setpointCommand(ClimbSubsystem.STOP)

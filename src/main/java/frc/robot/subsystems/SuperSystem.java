@@ -150,6 +150,20 @@ public class SuperSystem extends SubsystemBase {
 		});
 	}
 
+	public Command stowTurretHood(){
+		return Commands.runOnce(() -> {
+			turret.setStowed(true);
+			hood.setStowed(true);
+		});
+	}
+
+	public Command activeTurretHood(){
+		return Commands.runOnce(() -> {
+			turret.setStowed(false);
+			hood.setStowed(false);
+		});
+	}
+
 	public Command enableStow(){
 		return Commands.runOnce(() -> {
 			turret.setStowed(true);

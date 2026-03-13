@@ -1,0 +1,54 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 5.8404729729729725,
+        "y": 0.6178603603603618
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 6.8404729729729725,
+        "y": 0.6178603603603616
+      },
+      "isLocked": false,
+      "linkedName": "SwipeEnd1-Depot"
+    },
+    {
+      "anchor": {
+        "x": 2.383828828828829,
+        "y": 2.2770495495495506
+      },
+      "prevControl": {
+        "x": -0.32222972972972963,
+        "y": 0.10430180180180137
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 71.86191784440261
+  },
+  "reversed": false,
+  "folder": "Split",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 178.02506598911813
+  },
+  "useDefaultConstraints": true
+}

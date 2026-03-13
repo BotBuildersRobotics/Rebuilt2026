@@ -47,7 +47,7 @@ public class HoodSubsystem extends ServoMotorSubsystem<MotorIOTalonFX> {
 		setCurrentPosition(HoodConstants.converter.toAngle(HoodConstants.kStowPosition));
 
         manualHood.initDefault(0);
-        passingAngle.initDefault(25);
+        passingAngle.initDefault(30);
 
 	}
 
@@ -112,7 +112,7 @@ public class HoodSubsystem extends ServoMotorSubsystem<MotorIOTalonFX> {
     }
 
     public Command runPassingCommand() {
-        return run(() -> setGoalParamsDeg(passingAngle.get(), 0.0));
+        return run(() -> setGoalParamsDeg(passingAngle.get() * HoodConstants.fudgeFactor, 0.0));
     }
 
     public Command runFixedCommand(DoubleSupplier angleDeg, DoubleSupplier velocity) {

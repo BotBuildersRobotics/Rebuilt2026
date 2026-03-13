@@ -1,0 +1,75 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 3.628220720720721,
+        "y": 7.5706531531531525
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 8.684797297297298,
+        "y": 7.7089189189189185
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 6.2552702702702705,
+        "y": 6.346013513513514
+      },
+      "prevControl": {
+        "x": 6.373783783783783,
+        "y": 6.573164414414415
+      },
+      "nextControl": {
+        "x": 6.059096562787675,
+        "y": 5.970013907505202
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 6.304650900900901,
+        "y": 3.3732995495495492
+      },
+      "prevControl": {
+        "x": 6.334279279279279,
+        "y": 4.953479729729729
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "BarkerIC Counter"
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.95,
+      "rotationDegrees": -110.0
+    }
+  ],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": -110.0
+  },
+  "reversed": false,
+  "folder": null,
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 180.0
+  },
+  "useDefaultConstraints": true
+}
