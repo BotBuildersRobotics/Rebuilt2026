@@ -157,6 +157,30 @@ public class SuperSystem extends SubsystemBase {
 		});
 	}
 
+	public Command activeHood(){
+		return Commands.runOnce(() -> {
+			hood.setStowed(false);
+		});
+	}
+
+	public Command stowHood(){
+		return Commands.runOnce(() -> {
+			hood.setStowed(true);
+		});
+	}
+
+	public Command activeTurret(){
+		return Commands.runOnce(() -> {
+			turret.setStowed(false);
+		});
+	}
+
+	public Command stowTurrets(){
+		return Commands.runOnce(() -> {
+			turret.setStowed(true);
+		});
+	}
+
 	public Command activeTurretHood(){
 		return Commands.runOnce(() -> {
 			turret.setStowed(false);
@@ -192,6 +216,28 @@ public class SuperSystem extends SubsystemBase {
 			shooter.runPassingCommand(),
 			hood.runPassingCommand()
 		);
+	}
+
+	public Command ShooterRunPassingCommand() {
+		return shooter.runPassingCommand();
+	}
+
+	public Command PassSCR() {
+		return Commands.parallel(
+			ShooterRunPassingCommand(),
+			stowTurrets()
+		);
+	}
+
+	public Command passAutoSCR() {
+		return Commands.parallel(
+			turret.passAutoCommand(),
+			shooter.runPassingCommand(),
+			hood.runPassingCommand()
+		).beforeStarting(disableStow()).finallyDo(()->{
+			turret.setStowed(true);
+			hood.setStowed(true);
+		});
 	}
 
 	public Command passAuto(){

@@ -47,7 +47,7 @@ public class HoodSubsystem extends ServoMotorSubsystem<MotorIOTalonFX> {
 		setCurrentPosition(HoodConstants.converter.toAngle(HoodConstants.kStowPosition));
 
         manualHood.initDefault(0);
-        passingAngle.initDefault(30);
+        passingAngle.initDefault(45);
 
 	}
 

@@ -56,12 +56,6 @@
           }
         },
         {
-          "type": "path",
-          "data": {
-            "pathName": "SwipeHome"
-          }
-        },
-        {
           "type": "sequential",
           "data": {
             "commands": [
@@ -87,6 +81,12 @@
                 "type": "named",
                 "data": {
                   "name": "Intake"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "clearFlywheelPreset"
                 }
               },
               {

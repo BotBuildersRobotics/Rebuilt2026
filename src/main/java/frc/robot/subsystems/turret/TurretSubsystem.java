@@ -369,8 +369,10 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
    * Alliance-flipped so it works for both blue and red.
    */
   public Command passLeftCommand() {
-    return pointAtFieldPosition(
-        AllianceFlipUtil.apply(FieldConstants.PassingTargets.leftPassTarget));
+     return pointAtFieldPosition(
+        AllianceFlipUtil.apply(FieldConstants.Depot.depotCenter.toTranslation2d()));
+    //return pointAtFieldPosition(
+    //    AllianceFlipUtil.apply(FieldConstants.PassingTargets.leftPassTarget));
   }
 
   /**
@@ -379,7 +381,9 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
    */
   public Command passRightCommand() {
     return pointAtFieldPosition(
-        AllianceFlipUtil.apply(FieldConstants.PassingTargets.rightPassTarget));
+        AllianceFlipUtil.apply(FieldConstants.Outpost.centerPoint));
+  //  return pointAtFieldPosition(
+   //     AllianceFlipUtil.apply(FieldConstants.PassingTargets.rightPassTarget));
   }
 
   /**

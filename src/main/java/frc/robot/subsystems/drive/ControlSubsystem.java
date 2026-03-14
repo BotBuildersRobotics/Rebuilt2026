@@ -81,24 +81,23 @@ public class ControlSubsystem {
 			Commands.parallel(
 				s.Shoot(),
 				Commands.runOnce(() -> DriveConstants.setShootingSpeedLimited(true)),
-				s.activeTurretHood()
+				s.activeHood()
 			)
 		).onFalse(
 			Commands.parallel(
 				s.idleShooter(),
 				Commands.runOnce(() -> DriveConstants.setShootingSpeedLimited(false)),
-				s.stowTurretHood()
+				s.stowHood()
 			)
 		);
 
 		driver.a().onTrue(
-			s.activeTurretHood()
+			s.activeTurret()
 		).onFalse(
-			s.stowTurretHood()
+			s.stowTurrets()
 		);	
 
-		driver.b().whileTrue(s.passAuto());
-
+		driver.b().whileTrue(s.PassSCR());
 
 		driver.povUp().onTrue(s.incrementFlywheelSpeed());
 		driver.povDown().onTrue(s.decrementFlywheelSpeed());

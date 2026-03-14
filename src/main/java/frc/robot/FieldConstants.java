@@ -302,13 +302,15 @@ public class FieldConstants {
     public static final Translation2d leftPassTarget =
         new Translation2d(
             LinesVertical.allianceZone,
-            (LinesHorizontal.leftBumpStart + LinesHorizontal.leftTrenchOpenEnd) / 2.0);
+            (LinesHorizontal.leftBumpStart) / 3.0);
+            //(LinesHorizontal.leftBumpStart + LinesHorizontal.leftTrenchOpenEnd) / 2.0);
 
     // Land fuel in the right trench (alliance side, past the right bump)
     public static final Translation2d rightPassTarget =
         new Translation2d(
             LinesVertical.allianceZone,
-            (LinesHorizontal.rightBumpEnd + LinesHorizontal.rightTrenchOpenStart) / 2.0);
+            (LinesHorizontal.rightBumpEnd) / 3.0);
+            //(LinesHorizontal.rightBumpEnd + LinesHorizontal.rightTrenchOpenStart) / 2.0);
   }
 
   public static class Outpost {
