@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import frc.robot.ShiftHelpers;
 import frc.robot.lib.io.MotorIO.Setpoint;
 import frc.robot.subsystems.SuperSystem;
@@ -84,7 +85,11 @@ public class ControlSubsystem {
 
 		driver.a().onTrue(s.toggleStow());
 
-		driver.b().whileTrue(s.passAuto());
+		driver.b().whileTrue(new ConditionalCommand(
+			s.passLobAuto(),
+			s.passAuto(),
+			() -> ShiftHelpers.isOnOpponentSide()
+		));
 
 
 		driver.povUp().onTrue(s.incrementFlywheelSpeed());

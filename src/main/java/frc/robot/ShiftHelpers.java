@@ -5,6 +5,8 @@ import edu.wpi.first.networktables.StringEntry;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.lib.AllianceFlipUtil;
+import frc.robot.subsystems.drive.DriveSubsystem;
 
 public final class ShiftHelpers {
     private ShiftHelpers() {}
@@ -249,5 +251,32 @@ public final class ShiftHelpers {
 
     public static boolean isBlueHubActive() {
         return isHubActiveForAlliance(DriverStation.Alliance.Blue);
+    }
+
+    /**
+     * Returns true when the robot has crossed into the opponent's bump zone or beyond.
+     *
+     * The boundary is the near face of the opponent hub (Hub.oppNearLeftCorner.getX()),
+     * which is where the opponent's bump starts facing the neutral zone. The neutral zone
+     * itself sits between the two bumps and does NOT trigger this.
+     *
+     * AllianceFlipUtil mirrors the boundary automatically for Red.
+     * Returns false if the alliance is unknown.
+     */
+    public static boolean isOnOpponentSide() {
+        var allianceOpt = DriverStation.getAlliance();
+        if (allianceOpt.isEmpty()) return false;
+
+        double robotX = DriveSubsystem.mInstance.getDrivetrain().getState().Pose.getX();
+        double boundary = AllianceFlipUtil.applyX(FieldConstants.Hub.oppNearLeftCorner.getX());
+
+        return allianceOpt.get() == DriverStation.Alliance.Blue
+            ? robotX > boundary
+            : robotX < boundary;
+    }
+
+    /** Trigger that is active while the robot is in the opponent's bump zone or beyond. */
+    public static Trigger onOpponentSide() {
+        return new Trigger(ShiftHelpers::isOnOpponentSide);
     }
 }

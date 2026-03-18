@@ -28,6 +28,7 @@ public class ShooterSubsystem  extends MotorSubsystem<MotorIOTalonFX> {
 
     private static final LoggedTunableNumber manualShooter = new LoggedTunableNumber("Shooter/Manual");
     private static final LoggedTunableNumber passingSpeed = new LoggedTunableNumber("Shooter/PassingSpeed");
+    private static final LoggedTunableNumber lobPassingSpeed = new LoggedTunableNumber("Shooter/LobPassingSpeed");
 
     private boolean manualTune = false;
     private double flywheelSpeedOffset = 0.0;
@@ -49,6 +50,7 @@ public class ShooterSubsystem  extends MotorSubsystem<MotorIOTalonFX> {
 		super(ShooterConstants.getMotorIO(), "Shooter Rollers");
         manualShooter.initDefault(200);
         passingSpeed.initDefault(222);
+        lobPassingSpeed.initDefault(240);
 	}
 
 
@@ -154,6 +156,10 @@ public class ShooterSubsystem  extends MotorSubsystem<MotorIOTalonFX> {
 
     public Command runPassingCommand() {
         return run(() -> runVelocity(passingSpeed.get()));
+    }
+
+    public Command runLobPassingCommand() {
+        return run(() -> runVelocity(lobPassingSpeed.get()));
     }
 
     public Command stopCommand()

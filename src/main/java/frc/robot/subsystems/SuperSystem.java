@@ -191,6 +191,22 @@ public class SuperSystem extends SubsystemBase {
 		});
 	}
 
+	/**
+	 * Long lob pass from the opponent side back into our alliance zone.
+	 * Uses higher flywheel speed and steeper hood angle than the normal pass.
+	 * Turret still auto-selects left/right target based on robot Y position.
+	 */
+	public Command passLobAuto(){
+		return Commands.parallel(
+			turret.passAutoCommand(),
+			shooter.runLobPassingCommand(),
+			hood.runLobPassingCommand()
+		).beforeStarting(disableStow()).finallyDo(()->{
+			turret.setStowed(true);
+			hood.setStowed(true);
+		});
+	}
+
 
 	// --- Turret calibration test commands ---
 	public Command testTurretStraightAhead(){

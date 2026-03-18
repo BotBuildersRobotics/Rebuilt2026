@@ -35,6 +35,7 @@ public class HoodSubsystem extends ServoMotorSubsystem<MotorIOTalonFX> {
     private boolean stowed = true;
     private static final LoggedTunableNumber manualHood = new LoggedTunableNumber("Hood/Manual");
     private static final LoggedTunableNumber passingAngle = new LoggedTunableNumber("Hood/PassingAngle");
+    private static final LoggedTunableNumber lobPassingAngle = new LoggedTunableNumber("Hood/LobPassingAngle");
 
     private ShotCalculator shotCalc;
 
@@ -48,6 +49,7 @@ public class HoodSubsystem extends ServoMotorSubsystem<MotorIOTalonFX> {
 
         manualHood.initDefault(0);
         passingAngle.initDefault(25);
+        lobPassingAngle.initDefault(50);
 
 	}
 
@@ -113,6 +115,10 @@ public class HoodSubsystem extends ServoMotorSubsystem<MotorIOTalonFX> {
 
     public Command runPassingCommand() {
         return run(() -> setGoalParamsDeg(passingAngle.get() * HoodConstants.fudgeFactor, 0.0));
+    }
+
+    public Command runLobPassingCommand() {
+        return run(() -> setGoalParamsDeg(lobPassingAngle.get() * HoodConstants.fudgeFactor, 0.0));
     }
 
     public Command runFixedCommand(DoubleSupplier angleDeg, DoubleSupplier velocity) {
