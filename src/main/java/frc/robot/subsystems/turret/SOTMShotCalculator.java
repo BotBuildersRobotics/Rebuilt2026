@@ -27,6 +27,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import org.littletonrobotics.junction.Logger;
 
 /**
  * Shoot-on-the-move fire control solver. Figures out what RPM and heading your robot needs
@@ -248,6 +249,10 @@ public class SOTMShotCalculator {
       return LaunchParameters.INVALID;
     }
 
+    if (inputs.hubCenter() == null || inputs.hubForward() == null) {
+      return LaunchParameters.INVALID;
+    }
+
     // Second-order pose prediction. Instead of just v*dt, we use v*dt + 0.5*a*dt^2
     // where acceleration is estimated from the velocity delta between this cycle and last.
     // This tracks better through turns and speed changes because it catches the curvature.
@@ -408,10 +413,11 @@ public class SOTMShotCalculator {
     // Save for next cycle's warm start
     previousTOF = solvedTOF;
 
-    double effectiveTOF = solvedTOF + config.mechLatencyMs / 1000.0;
+    double adjustedTOF = solvedTOF + config.mechLatencyMs / 1000.0;
 
     // RPM from LUT at solved distance
     double effectiveRPMValue = effectiveRPM(projDist);
+
 
     // Drive angle: aim at velocity-compensated target position
     double compTargetX;
@@ -435,7 +441,7 @@ public class SOTMShotCalculator {
     double driveAngularVelocity = 0;
     if (!velocityFiltered && distance > 0.1) {
       // tangential velocity / distance gives angular rate
-      double tangentialVel = (ry * vx - rx * vy) / distance;
+      double tangentialVel = (rx * vy - ry * vx) / distance;
       driveAngularVelocity = tangentialVel / distance;
     }
 
@@ -460,13 +466,24 @@ public class SOTMShotCalculator {
 
     previousSpeed = robotSpeed;
 
+    Logger.recordOutput("SOTMShotCalc/Confidence", confidence);
+    Logger.recordOutput("SOTMShotCalc/Iterations", iterationsUsed);
+    Logger.recordOutput("SOTMShotCalc/WarmStartUsed", warmStartUsed);
+    Logger.recordOutput("SOTMShotCalc/SolvedDistanceM", distance);
+    Logger.recordOutput("SOTMShotCalc/ProjDistM", projDist);
+    Logger.recordOutput("SOTMShotCalc/DriveAngleDeg", driveAngle.getDegrees());
+    Logger.recordOutput("SOTMShotCalc/RPM", effectiveRPMValue);
+    Logger.recordOutput("SOTMShotCalc/TOFSec", adjustedTOF);
+
     return new LaunchParameters(
         effectiveRPMValue,
-        effectiveTOF,
+        adjustedTOF,
         driveAngle,
         driveAngularVelocity,
         true,
         confidence,
+        // solvedDistanceM is the current launcher-to-hub distance, NOT the SOTM-projected distance.
+        // Use ProjDistM log output above to see the velocity-compensated projected distance.
         distance,
         iterationsUsed,
         warmStartUsed);

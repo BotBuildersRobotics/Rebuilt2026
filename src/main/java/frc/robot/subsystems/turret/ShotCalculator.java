@@ -25,8 +25,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 import frc.robot.FieldConstants;
 import frc.robot.lib.AllianceFlipUtil;
+import frc.robot.lib.LoggedTunableNumber;
 import frc.robot.subsystems.drive.DriveSubsystem;
-
 
 import org.littletonrobotics.junction.Logger;
 
@@ -119,6 +119,66 @@ public class ShotCalculator {
     timeOfFlightMap.put(3.15, 1.11);
     timeOfFlightMap.put(1.88, 1.09);
     timeOfFlightMap.put(1.38, 0.90);
+  }
+
+  // --- SOTM (Shoot-On-The-Move) Newton-method solver ---
+  // Toggle on SmartDashboard: LaunchCalculator/EnableSOTM = 1 to use SOTM, 0 for legacy
+  private static final LoggedTunableNumber enableSOTM =
+      new LoggedTunableNumber("LaunchCalculator/EnableSOTM");
+
+  private final SOTMShotCalculator sotmCalc;
+
+  public ShotCalculator() {
+    enableSOTM.initDefault(0);
+
+    // Build SOTM config from existing LUT constants so there's one source of truth
+    SOTMShotCalculator.Config sotmConfig = new SOTMShotCalculator.Config();
+    sotmConfig.launcherOffsetX = robotToTurret.getTranslation().getX();
+    sotmConfig.launcherOffsetY = robotToTurret.getTranslation().getY();
+    sotmConfig.minScoringDistance = minDistance;
+    sotmConfig.maxScoringDistance = maxDistance;
+    sotmConfig.phaseDelayMs = phaseDelay * 1000.0;
+
+    sotmCalc = new SOTMShotCalculator(sotmConfig);
+
+    // Sample the existing LUT at 0.25 m intervals — the interpolating maps fill the gaps
+    for (double d = minDistance; d <= maxDistance + 0.01; d += 0.25) {
+      sotmCalc.loadLUTEntry(d, launchFlywheelSpeedMap.get(d), timeOfFlightMap.get(d));
+    }
+  }
+
+  /**
+   * Attempt a SOTM firing solution. Returns null if SOTM is disabled or the solver
+   * returned INVALID, so the caller can fall back to the legacy fixed-iteration loop.
+   */
+  private LaunchingParameters trySOTMCalculation() {
+    Translation2d hub =
+        AllianceFlipUtil.apply(FieldConstants.Hub.topCenterPoint.toTranslation2d());
+    Pose2d pose = DriveSubsystem.mInstance.getDrivetrain().getState().Pose;
+    ChassisSpeeds fieldVel = DriveSubsystem.mInstance.getDrivetrain().getFieldVelocity();
+    ChassisSpeeds robotVel = DriveSubsystem.mInstance.getGeneratedDrive().getState().Speeds;
+
+    // hubForward = zero disables the behind-hub check (valid from anywhere on field)
+    SOTMShotCalculator.ShotInputs inputs = new SOTMShotCalculator.ShotInputs(
+        pose, fieldVel, robotVel, hub, new Translation2d(0, 0), 1.0);
+
+    SOTMShotCalculator.LaunchParameters result = sotmCalc.calculate(inputs);
+    if (!result.isValid()) return null;
+
+    double solvedDist = result.solvedDistanceM();
+    Rotation2d hoodAngleRot = launchHoodAngleMap.get(solvedDist);
+
+    Logger.recordOutput("LaunchCalculator/SOTM/DriveAngleDeg", result.driveAngle().getDegrees());
+    Logger.recordOutput("LaunchCalculator/SOTM/SolvedDistanceM", solvedDist);
+    Logger.recordOutput("LaunchCalculator/SOTM/Confidence", result.confidence());
+
+    return new LaunchingParameters(
+        solvedDist >= minDistance && solvedDist <= maxDistance,
+        result.driveAngle(),
+        result.driveAngularVelocityRadPerSec(),
+        hoodAngleRot.getRadians(),
+        0.0,
+        result.rpm());
   }
 
   private Double lastContinuousTurretAngleDeg = null;
@@ -228,6 +288,15 @@ public class ShotCalculator {
   public LaunchingParameters getParameters() {
     if (latestParameters != null) {
       return latestParameters;
+    }
+
+    // === SOTM path (optional, toggle via SmartDashboard) ===
+    if (enableSOTM.get() > 0.5) {
+      LaunchingParameters sotmResult = trySOTMCalculation();
+      if (sotmResult != null) {
+        latestParameters = sotmResult;
+        return latestParameters;
+      }
     }
 
     // Calculate distance from turret to target
