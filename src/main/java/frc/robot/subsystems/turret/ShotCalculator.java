@@ -80,7 +80,7 @@ public class ShotCalculator {
     maxDistance = 5.70;
     phaseDelay = 0.03;
 
-   launchHoodAngleMap.put(1.34, Rotation2d.fromDegrees(0.0));
+    launchHoodAngleMap.put(1.34, Rotation2d.fromDegrees(0.0));
     launchHoodAngleMap.put(1.78, Rotation2d.fromDegrees(0.0));
     launchHoodAngleMap.put(2.17, Rotation2d.fromDegrees(15.0));
     launchHoodAngleMap.put(2.81, Rotation2d.fromDegrees(20.0)); // in front of climb
@@ -95,18 +95,19 @@ public class ShotCalculator {
     launchHoodAngleMap.put(5.60, Rotation2d.fromDegrees(42.0));
     launchHoodAngleMap.put(5.70, Rotation2d.fromDegrees(45.0));
 
-    launchFlywheelSpeedMap.put(1.68, 155.0); //
-    launchFlywheelSpeedMap.put(2.13, 170.0); //
-    launchFlywheelSpeedMap.put(2.81, 175.0); //in front of climb
-    launchFlywheelSpeedMap.put(3.08, 178.0); //AUTO 
-    launchFlywheelSpeedMap.put(3.35, 183.0);  
-    launchFlywheelSpeedMap.put(3.42, 184.0); //
-    launchFlywheelSpeedMap.put(3.6, 195.0); //
-    launchFlywheelSpeedMap.put(3.82, 200.0);
-    launchFlywheelSpeedMap.put(4.09, 204.0);
-    launchFlywheelSpeedMap.put(4.20, 205.0);
-     launchFlywheelSpeedMap.put(4.30, 206.0); // near depot
-     launchFlywheelSpeedMap.put(4.40, 208.0); // near depot
+    launchFlywheelSpeedMap.put(1.0, 187.0);
+    launchFlywheelSpeedMap.put(1.68, 187.0); //
+    launchFlywheelSpeedMap.put(2.13, 187.0); //
+    launchFlywheelSpeedMap.put(2.81, 187.0); //in front of climb
+    launchFlywheelSpeedMap.put(3.08, 193.0); //AUTO 
+    launchFlywheelSpeedMap.put(3.35, 195.0);  
+    launchFlywheelSpeedMap.put(3.42, 198.0); //
+    launchFlywheelSpeedMap.put(3.6, 200.0); //
+    launchFlywheelSpeedMap.put(3.82, 203.0);
+    launchFlywheelSpeedMap.put(4.09, 206.0);
+    launchFlywheelSpeedMap.put(4.20, 208.0);
+     launchFlywheelSpeedMap.put(4.30, 209.0); // near depot
+     launchFlywheelSpeedMap.put(4.40, 210.0); // near depot
      launchFlywheelSpeedMap.put(4.60, 212.0); // near depot
     launchFlywheelSpeedMap.put(4.77, 215.0);
     launchFlywheelSpeedMap.put(5.17, 218.0);

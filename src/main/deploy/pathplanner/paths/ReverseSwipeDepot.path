@@ -1,0 +1,131 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 3.2726801801801804,
+        "y": 7.511396396396396
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 4.272680180180181,
+        "y": 7.511396396396396
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 7.91445945945946,
+        "y": 7.234864864864864
+      },
+      "prevControl": {
+        "x": 7.302139639639639,
+        "y": 7.481768018018019
+      },
+      "nextControl": {
+        "x": 8.841900931491866,
+        "y": 6.860896529367924
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 8.279876126126126,
+        "y": 2.5733333333333337
+      },
+      "prevControl": {
+        "x": 8.4971509009009,
+        "y": 4.7460810810810825
+      },
+      "nextControl": {
+        "x": 8.062601351351352,
+        "y": 0.4005855855855862
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 5.8404729729729725,
+        "y": 0.6178603603603618
+      },
+      "prevControl": {
+        "x": 6.551554054054053,
+        "y": 0.5388513513513544
+      },
+      "nextControl": {
+        "x": 5.189815777181636,
+        "y": 0.6901556043371755
+      },
+      "isLocked": false,
+      "linkedName": "SwipeEnd1-Depot"
+    },
+    {
+      "anchor": {
+        "x": 2.6998648648648653,
+        "y": 0.8647635135135123
+      },
+      "prevControl": {
+        "x": 3.2430518018018013,
+        "y": 0.4005855855855851
+      },
+      "nextControl": {
+        "x": 2.1566779279279293,
+        "y": 1.3289414414414398
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 2.5714752252252255,
+        "y": 2.3955630630630638
+      },
+      "prevControl": {
+        "x": 2.3640765765765774,
+        "y": 1.8622522522522518
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.8792650918635193,
+      "rotationDegrees": 121.36361805228994
+    },
+    {
+      "waypointRelativePos": 2.6727909011373603,
+      "rotationDegrees": -177.94008210803008
+    },
+    {
+      "waypointRelativePos": 3.871391076115497,
+      "rotationDegrees": 161.5463866197832
+    }
+  ],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 67.47943439710312
+  },
+  "reversed": false,
+  "folder": "Split",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": -178.88760038370222
+  },
+  "useDefaultConstraints": true
+}

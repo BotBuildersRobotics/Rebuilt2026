@@ -182,6 +182,10 @@ public class RobotContainer {
 			SuperSystem.mInstance.setFlywheelPreset(205.0)
 		);
 
+		NamedCommands.registerCommand("setFlywheelOCS",
+			SuperSystem.mInstance.setFlywheelPreset(170)
+		);
+
 		NamedCommands.registerCommand("setFlywheelFast",
 			SuperSystem.mInstance.setFlywheelPreset(230.0)
 		);

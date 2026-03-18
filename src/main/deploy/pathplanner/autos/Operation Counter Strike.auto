@@ -1,0 +1,133 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "sequential",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "DeployIntake"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "stowTurret"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 2.0
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "BarkerIC Counter - Start"
+                }
+              },
+              {
+                "type": "sequential",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "Intake"
+                      }
+                    },
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 1.0
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "sequential",
+          "data": {
+            "commands": [
+              {
+                "type": "parallel",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "sequential",
+                      "data": {
+                        "commands": [
+                          {
+                            "type": "named",
+                            "data": {
+                              "name": "idleIntake"
+                            }
+                          },
+                          {
+                            "type": "wait",
+                            "data": {
+                              "waitTime": 2.0
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "BarkerIC Counter - End"
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "clearFlywheelPreset"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "aimTurret"
+                }
+              },
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 0.25
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Shoot"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}
