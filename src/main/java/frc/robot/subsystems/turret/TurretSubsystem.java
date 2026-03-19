@@ -8,7 +8,6 @@ import frc.robot.lib.io.MotorIO;
 import frc.robot.lib.io.MotorIO.Setpoint;
 import frc.robot.lib.io.MotorSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem;
-import frc.robot.subsystems.vision.photon.TurretVisionSubsystem;
 
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
@@ -45,9 +44,6 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
   private double turretOffset;
   private boolean turretZeroed = true;
 
-  private TurretVisionSubsystem turretVision;
-  private static final LoggedTunableNumber visionCorrectionEnabled =
-      new LoggedTunableNumber("Turret/VisionCorrectionEnabled", 1.0);
   // 1.0 = use position+velocity feedforward, 0.0 = use Motion Magic
   private static final LoggedTunableNumber useVelocityFeedforward =
       new LoggedTunableNumber("Turret/UseVelocityFeedforward", 0.0);
@@ -91,21 +87,6 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
 
   public void setShotCalculator(ShotCalculator shotCalc){
     this.shotCalc = shotCalc;
-  }
-
-  public void setTurretVision(TurretVisionSubsystem turretVision) {
-    this.turretVision = turretVision;
-  }
-
-  private double getVisionCorrectionDeg() {
-   if (turretVision == null || visionCorrectionEnabled.get() < 0.5) {
-      return 0.0;
-    }
-    if (!turretVision.hasTarget()) {
-      return 0.0;
-    }
-    return turretVision.getAimCorrectionDeg();
-    
   }
 
    public void periodic() {
@@ -250,7 +231,7 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
     return run(
         () -> {
           var params = shotCalc.getParameters();
-          double totalOffset = turretOffset - getVisionCorrectionDeg();
+          double totalOffset = turretOffset;
           setFieldRelativeTarget(
               params.turretAngle().plus(Rotation2d.fromDegrees(totalOffset)),
               params.turretVelocity());
@@ -275,12 +256,12 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
             setFieldRelativeTarget(robotAngle);
             setShootState(ShootState.ACTIVE_SHOOTING);
           } else if (turretAnglePreset != null) {
-            double totalOffset = turretOffset - getVisionCorrectionDeg();
+            double totalOffset = turretOffset;
             setFieldRelativeTarget(turretAnglePreset.plus(Rotation2d.fromDegrees(totalOffset)));
             setShootState(ShootState.ACTIVE_SHOOTING);
           } else {
             var params = shotCalc.getParameters();
-            double totalOffset = turretOffset - getVisionCorrectionDeg();
+            double totalOffset = turretOffset;
             setFieldRelativeTarget(
                 params.turretAngle().plus(Rotation2d.fromDegrees(totalOffset)),
                 params.turretVelocity());
@@ -293,9 +274,6 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
     this.stowed = stowed;
     if (stowed) {
       turretOffset = 0.0;
-      if (turretVision != null) {
-        turretVision.resetCorrection();
-      }
     }
   }
 

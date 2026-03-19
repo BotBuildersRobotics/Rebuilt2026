@@ -7,12 +7,14 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import java.util.Set;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.ShiftHelpers;
 import frc.robot.lib.AllianceFlipUtil;
+import frc.robot.lib.LoggedTunableNumber;
 import frc.robot.subsystems.chute.ChuteSubsystem;
 import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.hood.HoodSubsystem;
@@ -22,13 +24,17 @@ import frc.robot.subsystems.shooter.ShooterSubsystem;
 import frc.robot.subsystems.shuffla.ShufflaSubsystem;
 import frc.robot.subsystems.turret.ShotCalculator;
 import frc.robot.subsystems.turret.TurretSubsystem;
-import frc.robot.subsystems.vision.photon.TurretVisionSubsystem;
 
 
 
 public class SuperSystem extends SubsystemBase {
-    
+
     public static SuperSystem mInstance;
+
+    private static final LoggedTunableNumber intakePulseOnTime =
+        new LoggedTunableNumber("SuperSystem/IntakePulseOnTimeSec");
+    private static final LoggedTunableNumber intakePulseOffTime =
+        new LoggedTunableNumber("SuperSystem/IntakePulseOffTimeSec");
 
 	private TurretSubsystem turret;
 
@@ -52,6 +58,9 @@ public class SuperSystem extends SubsystemBase {
 
 	public SuperSystem(){
 
+		intakePulseOnTime.initDefault(0.5);
+		intakePulseOffTime.initDefault(0.5);
+
 		shooter = new ShooterSubsystem();
 		turret = new TurretSubsystem();
 		hood = new HoodSubsystem();
@@ -61,7 +70,6 @@ public class SuperSystem extends SubsystemBase {
 		hood.setShotCalculator(shotCalc);
 		turret.setShotCalculator(shotCalc);
 		shooter.setShotCalculator(shotCalc);
-		turret.setTurretVision(TurretVisionSubsystem.mInstance);
 		
 		shooter.setDefaultCommand(shooter.runTrackTargetActiveShootingCommand());
 		turret.setDefaultCommand(turret.runTrackTargetActiveShootingCommand());
@@ -249,6 +257,19 @@ public class SuperSystem extends SubsystemBase {
 			turret.setStowed(true);
 			hood.setStowed(true);
 		});
+	}
+
+	/**
+	 * Pulses the intake on and off to agitate balls in the hopper while shooting.
+	 * Runs indefinitely until interrupted.
+	 */
+	public Command intakePulseCommand() {
+		return Commands.sequence(
+			Intake(),
+			Commands.defer(() -> Commands.waitSeconds(intakePulseOnTime.get()), Set.of()),
+			idleIntakes(),
+			Commands.defer(() -> Commands.waitSeconds(intakePulseOffTime.get()), Set.of())
+		).repeatedly();
 	}
 
 	/**

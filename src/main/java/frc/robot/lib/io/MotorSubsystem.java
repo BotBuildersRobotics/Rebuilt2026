@@ -1,5 +1,9 @@
 package frc.robot.lib.io;
 
+import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Celsius;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.Volts;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
@@ -43,6 +47,11 @@ public class MotorSubsystem<IO extends MotorIO> extends SubsystemBase {
 	 */
 	public void outputTelemetry() {
 		Logger.recordOutput(name + "/isOK", io.isOK());
+		Logger.recordOutput(name + "/TemperatureCelsius", io.getMotorTemperature().in(Celsius));
+		Logger.recordOutput(name + "/StatorCurrentAmps", io.getStatorCurrent().in(Amps));
+		Logger.recordOutput(name + "/SupplyCurrentAmps", io.getSupplyCurrent().in(Amps));
+		Logger.recordOutput(name + "/VelocityRPS", io.getVelocity().in(RotationsPerSecond));
+		Logger.recordOutput(name + "/VoltageV", io.getMotorVoltage().in(Volts));
 		LoggedTracer.record(name);
 	}
 

@@ -130,7 +130,7 @@ public class ShotCalculator {
   private final SOTMShotCalculator sotmCalc;
 
   public ShotCalculator() {
-    enableSOTM.initDefault(0);
+    enableSOTM.initDefault(1);
 
     // Build SOTM config from existing LUT constants so there's one source of truth
     SOTMShotCalculator.Config sotmConfig = new SOTMShotCalculator.Config();

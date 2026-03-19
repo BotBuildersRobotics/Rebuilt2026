@@ -60,7 +60,6 @@ import frc.robot.subsystems.vision.LimelightSubsystem;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
 import frc.robot.subsystems.vision.photon.FuelDetectionSubsystem;
-import frc.robot.subsystems.vision.photon.TurretVisionSubsystem;
 
 
 /**
@@ -97,8 +96,7 @@ public class RobotContainer {
 			ChuteSubsystem.mInstance,
 			ShufflaSubsystem.mInstance,
 			SuperSystem.mInstance,
-			FuelDetectionSubsystem.mInstance,
-			TurretVisionSubsystem.mInstance
+			FuelDetectionSubsystem.mInstance
 
 		}) {
 			SmartDashboard.putData(s);

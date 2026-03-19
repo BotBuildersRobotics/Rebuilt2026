@@ -229,6 +229,10 @@ public abstract class MotorIO implements Sendable {
 		return inputs.isOK;
 	}
 
+	public Temperature getMotorTemperature() {
+		return inputs.motorTemperature;
+	}
+
 	/**
 	 * Gets the last applied setpoint of the MotorIO.
 	 *

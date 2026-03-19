@@ -5,13 +5,13 @@ import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import edu.wpi.first.units.measure.AngularVelocity;
+import java.util.Set;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import frc.robot.ShiftHelpers;
+import frc.robot.lib.LoggedTunableNumber;
 import frc.robot.lib.io.MotorIO.Setpoint;
 import frc.robot.subsystems.SuperSystem;
 import frc.robot.subsystems.climb.ClimbConstants;
@@ -38,6 +38,11 @@ public class ControlSubsystem {
 
 	private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
 	private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
+
+	// How long after pressing the trigger before the chute/shuffla start feeding.
+	// Gives the turret and hood time to reach their target before the ball enters the shooter.
+	private static final LoggedTunableNumber shootDelay =
+		new LoggedTunableNumber("Driver/ShootDelaySec");
 
 
     public void configureBindings() {
@@ -78,25 +83,31 @@ public class ControlSubsystem {
 			s.idleIntakes()
 		);
 
-		driver.rightTrigger().onTrue(
-			Commands.parallel(
-				s.Shoot(),
-				Commands.runOnce(() -> DriveConstants.setShootingSpeedLimited(true)),
-				s.activeHood()
+		shootDelay.initDefault(0.3);
+
+		// Trigger pull: immediately unstow turret+hood so they start tracking,
+		// then wait for them to move before feeding the ball into the shooter.
+		driver.rightTrigger().whileTrue(
+			Commands.sequence(
+				Commands.parallel(
+					s.activeTurretHood(),
+					Commands.runOnce(() -> DriveConstants.setShootingSpeedLimited(true))
+				),
+				// Re-evaluate the tunable delay each time the trigger is pressed
+				Commands.defer(() -> Commands.waitSeconds(shootDelay.get()), Set.of()),
+				Commands.parallel(
+					s.Shoot(),
+					s.intakePulseCommand()
+				)
 			)
 		).onFalse(
 			Commands.parallel(
+				s.stowTurretHood(),
 				s.idleShooter(),
-				Commands.runOnce(() -> DriveConstants.setShootingSpeedLimited(false)),
-				s.stowHood()
+				s.idleIntakes(),
+				Commands.runOnce(() -> DriveConstants.setShootingSpeedLimited(false))
 			)
 		);
-
-		driver.a().onTrue(
-			s.activeTurret()
-		).onFalse(
-			s.stowTurrets()
-		);	
 
 		driver.b().whileTrue(new ConditionalCommand(
 			s.passLobAuto(),
