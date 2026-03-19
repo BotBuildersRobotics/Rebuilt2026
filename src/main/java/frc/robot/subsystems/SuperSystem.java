@@ -104,7 +104,7 @@ public class SuperSystem extends SubsystemBase {
 		return 
 		Commands.parallel(
 			ShufflaSubsystem.mInstance.setpointCommand(ShufflaSubsystem.SHOOT),
-			ChuteSubsystem.mInstance.setpointCommand(ChuteSubsystem.SHOOT)
+			ChuteSubsystem.mInstance.runShootCommand()
 		
 		);
 	}

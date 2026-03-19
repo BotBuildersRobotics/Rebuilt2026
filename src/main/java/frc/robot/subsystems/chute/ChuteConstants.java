@@ -12,8 +12,7 @@ import frc.robot.Robot;
 
 
 public class ChuteConstants {
-	
-	public static final Voltage kShootVoltage = Units.Volts.of( 5);
+
 	public static final Voltage kReverseVoltage = Units.Volts.of(-2);
 
 	public static TalonFXConfiguration getFXConfig() {
@@ -29,7 +28,11 @@ public class ChuteConstants {
 
 		config.Voltage.PeakForwardVoltage = 12.0;
 		config.Voltage.PeakReverseVoltage = -12.0;
-		
+
+		// Slot 0: VelocityVoltage — tune kS/kV on the robot, then add kP if needed
+		config.Slot0.kS = 0.25;   // V, static friction
+		config.Slot0.kV = 0.12;   // V per RPS — start here, tune up if it lags
+		config.Slot0.kP = 0.1;    // V per RPS of error
 
 		config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
