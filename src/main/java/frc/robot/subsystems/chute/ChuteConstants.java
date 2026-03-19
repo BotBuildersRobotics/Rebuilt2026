@@ -30,9 +30,9 @@ public class ChuteConstants {
 		config.Voltage.PeakReverseVoltage = -12.0;
 
 		// Slot 0: VelocityVoltage — tune kS/kV on the robot, then add kP if needed
-		config.Slot0.kS = 0.25;   // V, static friction
-		config.Slot0.kV = 0.12;   // V per RPS — start here, tune up if it lags
-		config.Slot0.kP = 0.1;    // V per RPS of error
+		config.Slot1.kS = 0.25;   // V, static friction
+		config.Slot1.kV = 0.12;   // V per RPS — start here, tune up if it lags
+		config.Slot1.kP = 0.1;    // V per RPS of error
 
 		config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
