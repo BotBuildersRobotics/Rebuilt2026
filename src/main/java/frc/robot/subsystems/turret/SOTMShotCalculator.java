@@ -441,7 +441,7 @@ public class SOTMShotCalculator {
     double driveAngularVelocity = 0;
     if (!velocityFiltered && distance > 0.1) {
       // tangential velocity / distance gives angular rate
-      double tangentialVel = (rx * vy - ry * vx) / distance;
+      double tangentialVel = (ry * vy - rx * vx) / distance;
       driveAngularVelocity = tangentialVel / distance;
     }
 

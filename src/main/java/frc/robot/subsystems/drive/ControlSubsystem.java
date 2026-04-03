@@ -111,7 +111,7 @@ public class ControlSubsystem {
 
 		driver.b().whileTrue(new ConditionalCommand(
 			s.passLobAuto(),
-			s.passAuto(),
+			s.passAutoSCR(),
 			() -> ShiftHelpers.isOnOpponentSide()
 		));
 
