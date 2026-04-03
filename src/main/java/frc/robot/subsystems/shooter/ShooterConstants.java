@@ -55,6 +55,14 @@ public class ShooterConstants {
 		return config;
 	}
 
+	public static TalonFXConfiguration getFollowerFXConfig() {
+		TalonFXConfiguration config = getFXConfig();
+		// Opposed alignment in follower control already handles direction —
+		// do NOT set Clockwise_Positive here or it double-inverts and fights the main motor.
+		config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+		return config;
+	}
+
 	public static frc.robot.lib.io.MotorIOTalonFX.MotorIOTalonFXConfig getIOConfig() {
 		frc.robot.lib.io.MotorIOTalonFX.MotorIOTalonFXConfig config = new frc.robot.lib.io.MotorIOTalonFX.MotorIOTalonFXConfig();
 		config.mainConfig = getFXConfig();
@@ -63,7 +71,7 @@ public class ShooterConstants {
 		config.mainID = Ports.SHOOTER.getDeviceNumber();
 		config.mainBus = Ports.SHOOTER.getBus();
 		config.velocityUpdateHz = 200;
-		config.followerConfig = getFXConfig();
+		config.followerConfig = getFollowerFXConfig();
 		config.followerOpposeMain = new boolean[] {true};
 		config.followerBuses = new String[] {Ports.SHOOTER_2.getBus()};
 		config.followerIDs = new int[] {Ports.SHOOTER_2.getDeviceNumber()};

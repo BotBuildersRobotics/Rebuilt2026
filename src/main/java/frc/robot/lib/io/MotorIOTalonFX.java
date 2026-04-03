@@ -249,7 +249,7 @@ public class MotorIOTalonFX extends MotorIO {
 			}
 		}
 
-		setFollowerConfig(followerConfig);
+		setFollowerConfig(config.followerConfig);
 	}
 
 	/**

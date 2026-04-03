@@ -58,7 +58,10 @@ public class ShooterSubsystem  extends MotorSubsystem<MotorIOTalonFX> {
     /** Returns true when the flywheel is within tolerance of its current target velocity. */
     public boolean isAtSpeed() {
         if (setpointVal <= 0) return false;
-        return Math.abs(getVelocity().in(RotationsPerSecond) - setpointVal) < atSpeedToleranceRPS.get();
+        double actualRPS = getVelocity().in(RotationsPerSecond);
+        Logger.recordOutput("Shooter/AtSpeedActualRPS", actualRPS);
+        Logger.recordOutput("Shooter/AtSpeedSetpointRPS", setpointVal);
+        return Math.abs(actualRPS - setpointVal) < atSpeedToleranceRPS.get();
     }
 
 
@@ -71,12 +74,12 @@ public class ShooterSubsystem  extends MotorSubsystem<MotorIOTalonFX> {
     FOC - adjust kV first, then kP for
     response. */
 
-    private void runVelocity(double velocityRadsPerSec) {
+    private void runVelocity(double rps) {
         this.applySetpoint(Setpoint.withVelocitySetpoint(
-            AngularVelocity.ofBaseUnits(velocityRadsPerSec, RotationsPerSecond)));
+            RotationsPerSecond.of(rps)));
 
         // this.applySetpoint(Setpoint.withVelocityFOCSetpoint(
-        //    AngularVelocity.ofBaseUnits(velocityRadsPerSec, RotationsPerSecond)));
+        //    RotationsPerSecond.of(rps)));
     }
 
     public Command setManualShooterVelocity(){
@@ -85,10 +88,10 @@ public class ShooterSubsystem  extends MotorSubsystem<MotorIOTalonFX> {
             this.manualTune = true;
             
             this.applySetpoint(Setpoint.withVelocitySetpoint(
-            AngularVelocity.ofBaseUnits(manualShooter.get(), RotationsPerSecond)));
+            RotationsPerSecond.of(manualShooter.get())));
 
            //   this.applySetpoint(Setpoint.withVelocityFOCSetpoint(
-            //AngularVelocity.ofBaseUnits(manualShooter.get(), RotationsPerSecond)));
+            //RotationsPerSecond.of(manualShooter.get())));
 
         });
 
@@ -96,16 +99,17 @@ public class ShooterSubsystem  extends MotorSubsystem<MotorIOTalonFX> {
 
      public void periodic() {
         super.periodic();
-         SmartDashboard.putNumber("Shooter/Speed",this.getVelocity().baseUnitMagnitude());
-         SmartDashboard.putBoolean("Shooter/Manual", manualTune);
-        SmartDashboard.putNumber("Shooter/VelocitySetPoint",setpointVal );
+        double velocityRPS = this.getVelocity().in(RotationsPerSecond);
+        SmartDashboard.putNumber("Shooter/SpeedRPS", velocityRPS);
+        SmartDashboard.putNumber("Shooter/SetpointRPS", setpointVal);
+        SmartDashboard.putBoolean("Shooter/AtSpeed", isAtSpeed());
+        SmartDashboard.putBoolean("Shooter/Manual", manualTune);
 
-         // AdvantageKit structured logging for replay
-         Logger.recordOutput("Shooter/VelocityRPS", this.getVelocity().baseUnitMagnitude());
-         Logger.recordOutput("Shooter/VelocitySetPoint", setpointVal);
-         Logger.recordOutput("Shooter/ManualTune", manualTune);
-         Logger.recordOutput("Shooter/SpeedOffset", flywheelSpeedOffset);
-         Logger.recordOutput("Shooter/AtSpeed", isAtSpeed());
+        Logger.recordOutput("Shooter/VelocityRPS", velocityRPS);
+        Logger.recordOutput("Shooter/VelocitySetPoint", setpointVal);
+        Logger.recordOutput("Shooter/ManualTune", manualTune);
+        Logger.recordOutput("Shooter/SpeedOffset", flywheelSpeedOffset);
+        Logger.recordOutput("Shooter/AtSpeed", isAtSpeed());
      }
 
     public Command resetAutoMap(){
