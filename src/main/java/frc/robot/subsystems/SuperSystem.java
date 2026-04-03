@@ -109,11 +109,10 @@ public class SuperSystem extends SubsystemBase {
 	}
 
 	public Command Shoot(){
-		return 
+		return
 		Commands.parallel(
-			ShufflaSubsystem.mInstance.setpointCommand(ShufflaSubsystem.SHOOT),
-			ChuteSubsystem.mInstance.runShootCommand()
-		
+			ShufflaSubsystem.mInstance.runShootCommandGated(shooter::isAtSpeed),
+			ChuteSubsystem.mInstance.runShootCommandGated(shooter::isAtSpeed)
 		);
 	}
 

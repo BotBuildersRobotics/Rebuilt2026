@@ -2,6 +2,8 @@ package frc.robot.subsystems.chute;
 
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
+import java.util.function.BooleanSupplier;
+
 import frc.robot.lib.LoggedTunableNumber;
 import frc.robot.lib.io.MotorSubsystem;
 import frc.robot.lib.io.MotorIO.Setpoint;
@@ -26,6 +28,20 @@ public class ChuteSubsystem extends MotorSubsystem<MotorIOTalonFX> {
 		return run(() -> applySetpoint(
 			Setpoint.withVelocitySetpoint(RotationsPerSecond.of(shootSpeed.get()))
 		));
+	}
+
+	/**
+	 * Runs the chute at shoot speed when {@code ready} is true, idles otherwise.
+	 * Automatically pauses feeding if the shooter bogs down and resumes when it recovers.
+	 */
+	public Command runShootCommandGated(BooleanSupplier ready) {
+		return run(() -> {
+			if (ready.getAsBoolean()) {
+				applySetpoint(Setpoint.withVelocitySetpoint(RotationsPerSecond.of(shootSpeed.get())));
+			} else {
+				applySetpoint(IDLE);
+			}
+		});
 	}
 
 }

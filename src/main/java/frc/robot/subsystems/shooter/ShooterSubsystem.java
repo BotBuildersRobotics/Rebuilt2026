@@ -29,6 +29,7 @@ public class ShooterSubsystem  extends MotorSubsystem<MotorIOTalonFX> {
     private static final LoggedTunableNumber manualShooter = new LoggedTunableNumber("Shooter/Manual");
     private static final LoggedTunableNumber passingSpeed = new LoggedTunableNumber("Shooter/PassingSpeed");
     private static final LoggedTunableNumber lobPassingSpeed = new LoggedTunableNumber("Shooter/LobPassingSpeed");
+    private static final LoggedTunableNumber atSpeedToleranceRPS = new LoggedTunableNumber("Shooter/AtSpeedToleranceRPS");
 
     private boolean manualTune = false;
     private double flywheelSpeedOffset = 0.0;
@@ -51,7 +52,14 @@ public class ShooterSubsystem  extends MotorSubsystem<MotorIOTalonFX> {
         manualShooter.initDefault(200);
         passingSpeed.initDefault(222);
         lobPassingSpeed.initDefault(240);
+        atSpeedToleranceRPS.initDefault(10.0);
 	}
+
+    /** Returns true when the flywheel is within tolerance of its current target velocity. */
+    public boolean isAtSpeed() {
+        if (setpointVal <= 0) return false;
+        return Math.abs(getVelocity().in(RotationsPerSecond) - setpointVal) < atSpeedToleranceRPS.get();
+    }
 
 
     public void setShotCalculator(ShotCalculator shotCalc){
@@ -97,6 +105,7 @@ public class ShooterSubsystem  extends MotorSubsystem<MotorIOTalonFX> {
          Logger.recordOutput("Shooter/VelocitySetPoint", setpointVal);
          Logger.recordOutput("Shooter/ManualTune", manualTune);
          Logger.recordOutput("Shooter/SpeedOffset", flywheelSpeedOffset);
+         Logger.recordOutput("Shooter/AtSpeed", isAtSpeed());
      }
 
     public Command resetAutoMap(){
