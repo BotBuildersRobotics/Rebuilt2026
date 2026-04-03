@@ -53,7 +53,7 @@ Z = 481.82229676
 					new Rotation3d(
 							Units.Degree.of(0),
 							Units.Degree.of(5),
-							Units.Degree.of(170)
+							Units.Degree.of(90)
 						)
 						);
 

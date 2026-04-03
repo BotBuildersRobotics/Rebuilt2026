@@ -35,12 +35,15 @@ public class ShooterConstants {
 		config.MotionMagic.MotionMagicExpo_kV = 0.12034;
 		
 		// Slot 1: Voltage-based velocity control (VelocityVoltage)
-		config.Slot1.kS = 0.30532;
-		config.Slot1.kP = 0.453558;
+		config.Slot1.kS = 0.15532;
+		config.Slot1.kP = 0.583558;
 		config.Slot1.kV = 0.12034;//0.12034;
+		config.Slot1.kA = 0.0106;
+
 
 		// Slot 0: Torque current FOC velocity control (VelocityTorqueCurrentFOC)
 		// Units are in Amps instead of Volts
+		//NOT ENABLED BY DEFAULT
 		config.Slot0.kS = 0.085;   // static friction compensation in amps
 		config.Slot0.kP = 3.35;   // amps per RPS of error
 		config.Slot0.kV = 0.25;   // amps per RPS of target velocity
@@ -59,6 +62,13 @@ public class ShooterConstants {
 		config.unit = Units.Rotations;
 		config.mainID = Ports.SHOOTER.getDeviceNumber();
 		config.mainBus = Ports.SHOOTER.getBus();
+		config.velocityUpdateHz = 200;
+		config.followerConfig = getFXConfig();
+		config.followerOpposeMain = new boolean[] {true};
+		config.followerBuses = new String[] {Ports.SHOOTER_2.getBus()};
+		config.followerIDs = new int[] {Ports.SHOOTER_2.getDeviceNumber()};
+		
+
 		return config;
 	}
 

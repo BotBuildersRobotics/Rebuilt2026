@@ -265,9 +265,9 @@ public class SuperSystem extends SubsystemBase {
 	 */
 	public Command intakePulseCommand() {
 		return Commands.sequence(
-			Intake(),
+			Commands.runOnce(() -> IntakeSubsystem.mInstance.applySetpoint(IntakeSubsystem.INTAKE)),
 			Commands.defer(() -> Commands.waitSeconds(intakePulseOnTime.get()), Set.of()),
-			idleIntakes(),
+			Commands.runOnce(() -> IntakeSubsystem.mInstance.applySetpoint(IntakeSubsystem.IDLE)),
 			Commands.defer(() -> Commands.waitSeconds(intakePulseOffTime.get()), Set.of())
 		).repeatedly();
 	}

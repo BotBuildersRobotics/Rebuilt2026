@@ -18,7 +18,7 @@ public class ChuteSubsystem extends MotorSubsystem<MotorIOTalonFX> {
 
 	public ChuteSubsystem() {
 		super(ChuteConstants.getMotorIO(), "Chute Rollers");
-		shootSpeed.initDefault(20); // RPS 
+		shootSpeed.initDefault(30); // RPS 
 	}
 
 	/** Runs the chute at a closed-loop velocity setpoint. Re-evaluates the tunable each cycle. */

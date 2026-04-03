@@ -47,11 +47,11 @@ public class TurretConstants {
 		config.Voltage.PeakForwardVoltage = 12.0;
 		config.Voltage.PeakReverseVoltage = -12.0;
 		
-		config.Feedback.SensorToMechanismRatio = 40;
+		config.Feedback.SensorToMechanismRatio = 41.666667;
 		config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
 
-		config.Slot0.kP = 25.88; 
+		config.Slot0.kP = 50;//25.88; 
 		config.Slot0.kI = 0.002;
 		config.Slot0.kD = 0.005;
 		config.Slot0.kS = 1.90;

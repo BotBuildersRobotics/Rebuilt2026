@@ -11,6 +11,7 @@ public class Ports {
     public static final CanDeviceId TURRET = new CanDeviceId(30, "canivore");
    
     public static final CanDeviceId SHOOTER = new CanDeviceId(21, "canivore");
+    public static final CanDeviceId SHOOTER_2 = new CanDeviceId(22, "canivore");
     public static final CanDeviceId HOOD = new CanDeviceId(33, "canivore");
 
     public static final CanDeviceId SHUFFLA = new CanDeviceId(16, "canivore");

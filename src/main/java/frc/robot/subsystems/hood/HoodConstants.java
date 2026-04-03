@@ -18,7 +18,7 @@ public class HoodConstants {
 
     public static final Util.DistanceAngleConverter converter = new Util.DistanceAngleConverter(Units.Centimeters.of(2.0));
 	
-	public static final double fudgeFactor = 6.5;
+	public static final double fudgeFactor = 2.5;
 
 	public static TalonFXConfiguration getFXConfig() {
 		TalonFXConfiguration config = new TalonFXConfiguration();
@@ -35,7 +35,7 @@ public class HoodConstants {
 		config.Voltage.PeakReverseVoltage = -12.0;
 		
 		config.Feedback.SensorToMechanismRatio = 6.43;
-		config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+		config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
 		// PID gains for position control 
 		config.Slot0.kP = 10;
