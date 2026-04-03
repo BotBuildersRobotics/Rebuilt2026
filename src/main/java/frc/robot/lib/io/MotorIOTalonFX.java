@@ -244,6 +244,9 @@ public class MotorIOTalonFX extends MotorIO {
 				? MotorAlignmentValue.Opposed
 				: MotorAlignmentValue.Aligned;
 			followers[i].setControl(new Follower(config.mainID, alignment));
+			if (config.velocityUpdateHz > 0) {
+				followers[i].getVelocity().setUpdateFrequency(config.velocityUpdateHz);
+			}
 		}
 
 		setFollowerConfig(followerConfig);
