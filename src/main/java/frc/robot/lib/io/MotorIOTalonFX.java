@@ -232,6 +232,10 @@ public class MotorIOTalonFX extends MotorIO {
 		
 		setMainConfig(config.mainConfig);
 
+		if (config.velocityUpdateHz > 0) {
+			main.getVelocity().setUpdateFrequency(config.velocityUpdateHz);
+		}
+
 		followers = new TalonFX[config.followerIDs.length];
 		for (int i = 0; i < config.followerIDs.length; i++) {
 			followers[i] = new TalonFX(config.followerIDs[i], new CANBus(config.followerBuses[i]));
@@ -259,6 +263,8 @@ public class MotorIOTalonFX extends MotorIO {
 		public TalonFXConfiguration followerConfig = new TalonFXConfiguration();
 		public boolean[] followerOpposeMain = new boolean[0];
 		public ControlRequestGetter requestGetter = new ControlRequestGetter();
+		/** Override the velocity signal update frequency in Hz. 0 = use Phoenix default (50 Hz). */
+		public double velocityUpdateHz = 0;
 	}
 
 

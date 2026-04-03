@@ -199,6 +199,7 @@ public class ShotCalculator {
 
         double turretToTargetDistance = target.getDistance(turretPoseField.getTranslation());
 
+
         // Field-relative velocity of the robot
         ChassisSpeeds v = DriveSubsystem.mInstance.getDrivetrain().getFieldVelocity();
 
@@ -318,6 +319,7 @@ public class ShotCalculator {
         AllianceFlipUtil.apply(FieldConstants.Hub.topCenterPoint.toTranslation2d());
     Pose2d turretPosition = estimatedPose.transformBy(toTransform2d(robotToTurret));
     double turretToTargetDistance = target.getDistance(turretPosition.getTranslation());
+
 
     // Calculate field relative turret velocity
     ChassisSpeeds robotVelocity = DriveSubsystem.mInstance.getDrivetrain().getFieldVelocity();

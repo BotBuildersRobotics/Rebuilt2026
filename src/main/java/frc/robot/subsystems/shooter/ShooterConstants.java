@@ -59,6 +59,7 @@ public class ShooterConstants {
 		config.unit = Units.Rotations;
 		config.mainID = Ports.SHOOTER.getDeviceNumber();
 		config.mainBus = Ports.SHOOTER.getBus();
+		config.velocityUpdateHz = 200;
 		return config;
 	}
 

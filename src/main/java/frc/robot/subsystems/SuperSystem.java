@@ -261,13 +261,15 @@ public class SuperSystem extends SubsystemBase {
 
 	/**
 	 * Pulses the intake on and off to agitate balls in the hopper while shooting.
+	 * Intentionally does NOT require IntakeSubsystem so the driver can also manually
+	 * run the intake simultaneously without cancelling the shoot command.
 	 * Runs indefinitely until interrupted.
 	 */
 	public Command intakePulseCommand() {
 		return Commands.sequence(
-			Intake(),
+			Commands.runOnce(() -> IntakeSubsystem.mInstance.applySetpoint(IntakeSubsystem.INTAKE)),
 			Commands.defer(() -> Commands.waitSeconds(intakePulseOnTime.get()), Set.of()),
-			idleIntakes(),
+			Commands.runOnce(() -> IntakeSubsystem.mInstance.applySetpoint(IntakeSubsystem.IDLE)),
 			Commands.defer(() -> Commands.waitSeconds(intakePulseOffTime.get()), Set.of())
 		).repeatedly();
 	}
