@@ -307,6 +307,14 @@ public class SuperSystem extends SubsystemBase {
 		return shooter.runAtVelocityCommand(rps);
 	}
 
+	public Command shooterSysIdQuasistatic(edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction direction) {
+		return shooter.sysIdQuasistatic(direction);
+	}
+
+	public Command shooterSysIdDynamic(edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction direction) {
+		return shooter.sysIdDynamic(direction);
+	}
+
 	public Command setTurretAnglePreset(double fieldRelativeDeg) {
 		return Commands.runOnce(() -> turret.setTurretAnglePreset(Rotation2d.fromDegrees(fieldRelativeDeg)));
 	}
