@@ -289,7 +289,7 @@ public class MotorIOTalonFX extends MotorIO {
 		}
 
 		public ControlRequest getVelocityRequest(AngularVelocity mechanismVelocity) {
-			return new VelocityVoltage(mechanismVelocity).withSlot(1);
+			return new VelocityVoltage(mechanismVelocity).withSlot(1).withEnableFOC(true).withUpdateFreqHz(200);
 		}
 
 		public ControlRequest getVelocityFOCRequest(AngularVelocity mechanismVelocity) {

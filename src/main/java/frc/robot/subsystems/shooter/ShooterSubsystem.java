@@ -58,9 +58,10 @@ public class ShooterSubsystem  extends MotorSubsystem<MotorIOTalonFX> {
     /** Returns true when the flywheel is within tolerance of its current target velocity. */
     public boolean isAtSpeed() {
         if (setpointVal <= 0) return false;
-        double actualRPS = getVelocity().in(RotationsPerSecond);
+        double actualRPS = getVelocity().baseUnitMagnitude();
         Logger.recordOutput("Shooter/AtSpeedActualRPS", actualRPS);
         Logger.recordOutput("Shooter/AtSpeedSetpointRPS", setpointVal);
+        
         return Math.abs(actualRPS - setpointVal) < atSpeedToleranceRPS.get();
     }
 
