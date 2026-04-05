@@ -76,8 +76,8 @@ public class ControlSubsystem {
 
 		SuperSystem s = SuperSystem.mInstance;
 
-		driver.leftTrigger().onTrue(
-			s.Intake()
+		driver.leftTrigger().whileTrue(
+			s.intakeContinuousCommand()
 		).onFalse(
 			s.idleIntakes()
 		);
@@ -104,6 +104,30 @@ public class ControlSubsystem {
 				s.stowTurretHood(),
 				s.idleShooter(),
 				s.idleIntakes(),
+				Commands.runOnce(() -> DriveConstants.setShootingSpeedLimited(false))
+			)
+		);
+
+		// Right bumper: shoot + agitate intake pivot simultaneously
+		driver.rightBumper().whileTrue(
+			Commands.sequence(
+				Commands.parallel(
+					s.activeTurretHood(),
+					Commands.runOnce(() -> DriveConstants.setShootingSpeedLimited(true))
+				),
+				Commands.defer(() -> Commands.waitSeconds(shootDelay.get()), Set.of()),
+				Commands.parallel(
+					s.Shoot(),
+					s.intakePulseCommand(),
+					s.pivotAgitateLoopCommand()
+				)
+			)
+		).onFalse(
+			Commands.parallel(
+				s.stowTurretHood(),
+				s.idleShooter(),
+				s.idleIntakes(),
+				PivotSubsystem.mInstance.setpointCommand(PivotSubsystem.DEPLOY),
 				Commands.runOnce(() -> DriveConstants.setShootingSpeedLimited(false))
 			)
 		);
