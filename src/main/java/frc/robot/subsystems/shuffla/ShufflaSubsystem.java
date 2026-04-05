@@ -27,4 +27,8 @@ public class ShufflaSubsystem extends MotorSubsystem<MotorIOTalonFX> {
 		return run(() -> applySetpoint(ready.getAsBoolean() ? SHOOT : IDLE));
 	}
 
+	public Command runShootCommand() {
+		return runOnce(() -> applySetpoint( SHOOT));
+	}
+
 }

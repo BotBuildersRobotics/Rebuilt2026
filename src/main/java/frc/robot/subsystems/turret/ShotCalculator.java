@@ -99,16 +99,16 @@ public class ShotCalculator {
     launchFlywheelSpeedMap.put(1.68, 187.0); //
     launchFlywheelSpeedMap.put(2.13, 187.0); //
     launchFlywheelSpeedMap.put(2.81, 187.0); //in front of climb
-    launchFlywheelSpeedMap.put(3.08, 193.0); //AUTO 
-    launchFlywheelSpeedMap.put(3.35, 195.0);  
-    launchFlywheelSpeedMap.put(3.42, 198.0); //
-    launchFlywheelSpeedMap.put(3.6, 200.0); //
-    launchFlywheelSpeedMap.put(3.82, 203.0);
-    launchFlywheelSpeedMap.put(4.09, 206.0);
-    launchFlywheelSpeedMap.put(4.20, 208.0);
-     launchFlywheelSpeedMap.put(4.30, 209.0); // near depot
-     launchFlywheelSpeedMap.put(4.40, 210.0); // near depot
-     launchFlywheelSpeedMap.put(4.60, 212.0); // near depot
+    launchFlywheelSpeedMap.put(3.08, 198.0); //AUTO 
+    launchFlywheelSpeedMap.put(3.35, 200.0);  
+    launchFlywheelSpeedMap.put(3.42,205.0); //
+    launchFlywheelSpeedMap.put(3.6, 208.0); //
+    launchFlywheelSpeedMap.put(3.82, 210.0);
+    launchFlywheelSpeedMap.put(4.09, 212.0);
+    launchFlywheelSpeedMap.put(4.20, 215.0);
+     launchFlywheelSpeedMap.put(4.30, 216.0); // near depot
+     launchFlywheelSpeedMap.put(4.40, 217.0); // near depot
+     launchFlywheelSpeedMap.put(4.60, 218.0); // near depot
     launchFlywheelSpeedMap.put(4.77, 215.0);
     launchFlywheelSpeedMap.put(5.17, 218.0);
     launchFlywheelSpeedMap.put(5.57, 220.0);
@@ -172,6 +172,7 @@ public class ShotCalculator {
     Logger.recordOutput("LaunchCalculator/SOTM/DriveAngleDeg", result.driveAngle().getDegrees());
     Logger.recordOutput("LaunchCalculator/SOTM/SolvedDistanceM", solvedDist);
     Logger.recordOutput("LaunchCalculator/SOTM/Confidence", result.confidence());
+    Logger.recordOutput("LaunchCalculator/Alt/TurretToTargetDistance", solvedDist);
 
     return new LaunchingParameters(
         solvedDist >= minDistance && solvedDist <= maxDistance,

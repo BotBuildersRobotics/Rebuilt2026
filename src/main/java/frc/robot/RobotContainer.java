@@ -113,10 +113,10 @@ public class RobotContainer {
 		SmartDashboard.putData("SysId/Signal Logger Stop",  Commands.runOnce(SignalLogger::stop).ignoringDisable(true).withName("Signal Logger Stop"));
 
 		// Shooter SysId — run these in test mode only, one at a time
-		SmartDashboard.putData("SysId/Shooter Quasistatic Fwd", SuperSystem.mInstance.shooterSysIdQuasistatic(edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction.kForward));
-		SmartDashboard.putData("SysId/Shooter Quasistatic Rev", SuperSystem.mInstance.shooterSysIdQuasistatic(edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction.kReverse));
-		SmartDashboard.putData("SysId/Shooter Dynamic Fwd",     SuperSystem.mInstance.shooterSysIdDynamic(edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction.kForward));
-		SmartDashboard.putData("SysId/Shooter Dynamic Rev",     SuperSystem.mInstance.shooterSysIdDynamic(edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction.kReverse));
+		//SmartDashboard.putData("SysId/Shooter Quasistatic Fwd", SuperSystem.mInstance.shooterSysIdQuasistatic(edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction.kForward));
+		//SmartDashboard.putData("SysId/Shooter Quasistatic Rev", SuperSystem.mInstance.shooterSysIdQuasistatic(edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction.kReverse));
+		//SmartDashboard.putData("SysId/Shooter Dynamic Fwd",     SuperSystem.mInstance.shooterSysIdDynamic(edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction.kForward));
+		//SmartDashboard.putData("SysId/Shooter Dynamic Rev",     SuperSystem.mInstance.shooterSysIdDynamic(edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction.kReverse));
 
 		CommandScheduler.getInstance().setPeriod(0.02);
 
@@ -140,7 +140,7 @@ public class RobotContainer {
 
 		NamedCommands.registerCommand("Shoot",
 		
-			SuperSystem.mInstance.Shoot()
+			SuperSystem.mInstance.ShootAuto()
 		
 		);
 

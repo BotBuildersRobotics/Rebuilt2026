@@ -94,7 +94,7 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "setFlywheelWall"
+                  "name": "clearFlywheelPreset"
                 }
               },
               {
@@ -348,7 +348,7 @@
       ]
     }
   },
-  "resetOdom": true,
+  "resetOdom": false,
   "folder": null,
   "choreoAuto": false
 }

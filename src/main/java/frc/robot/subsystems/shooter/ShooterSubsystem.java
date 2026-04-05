@@ -75,9 +75,9 @@ public class ShooterSubsystem  extends MotorSubsystem<MotorIOTalonFX> {
     FOC - adjust kV first, then kP for
     response. */
 
-    private void runVelocity(double rps) {
+    private void runVelocity(double velocityRadPerSec) {
         this.applySetpoint(Setpoint.withVelocitySetpoint(
-            RotationsPerSecond.of(rps)));
+            AngularVelocity.ofBaseUnits(velocityRadPerSec, RotationsPerSecond)));
 
         // this.applySetpoint(Setpoint.withVelocityFOCSetpoint(
         //    RotationsPerSecond.of(rps)));

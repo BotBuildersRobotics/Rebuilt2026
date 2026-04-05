@@ -116,6 +116,15 @@ public class SuperSystem extends SubsystemBase {
 		);
 	}
 
+	public Command ShootAuto(){
+		return
+		
+		Commands.parallel(
+			ShufflaSubsystem.mInstance.runShootCommand(),
+			ChuteSubsystem.mInstance.runShootCommand()
+		);
+	}
+
 	public Command idleShooter(){
 
 		return 
@@ -308,11 +317,23 @@ public class SuperSystem extends SubsystemBase {
 	}
 
 	public Command shooterSysIdQuasistatic(edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction direction) {
-		return shooter.sysIdQuasistatic(direction);
+		return shooter.sysIdQuasistatic(direction).beforeStarting(
+			Commands.runOnce(() -> {
+				edu.wpi.first.wpilibj2.command.CommandScheduler.getInstance().removeDefaultCommand(shooter);
+			})
+		).finallyDo(() ->{
+			shooter.setDefaultCommand(shooter.runTrackTargetActiveShootingCommand());
+		});
 	}
 
 	public Command shooterSysIdDynamic(edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction direction) {
-		return shooter.sysIdDynamic(direction);
+		return shooter.sysIdDynamic(direction).beforeStarting(
+			Commands.runOnce(() -> {
+				edu.wpi.first.wpilibj2.command.CommandScheduler.getInstance().removeDefaultCommand(shooter);
+			})
+		).finallyDo(() ->{
+			shooter.setDefaultCommand(shooter.runTrackTargetActiveShootingCommand());
+		});
 	}
 
 	public Command setTurretAnglePreset(double fieldRelativeDeg) {
