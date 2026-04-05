@@ -103,10 +103,14 @@ public class SuperSystem extends SubsystemBase {
 	}
 
 	public Command Intake() {
-		
 		return IntakeSubsystem.mInstance.setpointCommand(IntakeSubsystem.INTAKE);
-					
 	}
+
+	/** Continuously holds the intake running. Use for driver trigger bindings so it overrides pulse idle phases. */
+	public Command intakeContinuousCommand() {
+		return IntakeSubsystem.mInstance.followSetpointCommand(() -> IntakeSubsystem.INTAKE);
+	}
+
 
 	public Command Shoot(){
 		return
@@ -308,11 +312,31 @@ public class SuperSystem extends SubsystemBase {
 	}
 
 	public Command shooterSysIdQuasistatic(edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction direction) {
-		return shooter.sysIdQuasistatic(direction);
+		return shooter.sysIdQuasistatic(direction)
+			.beforeStarting(Commands.runOnce(() -> {
+				edu.wpi.first.wpilibj2.command.CommandScheduler.getInstance().removeDefaultCommand(shooter);
+				turret.setStowed(true);
+				hood.setStowed(true);
+			}))
+			.finallyDo(() -> {
+				shooter.setDefaultCommand(shooter.runTrackTargetActiveShootingCommand());
+				turret.setStowed(false);
+				hood.setStowed(false);
+			});
 	}
 
 	public Command shooterSysIdDynamic(edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction direction) {
-		return shooter.sysIdDynamic(direction);
+		return shooter.sysIdDynamic(direction)
+			.beforeStarting(Commands.runOnce(() -> {
+				edu.wpi.first.wpilibj2.command.CommandScheduler.getInstance().removeDefaultCommand(shooter);
+				turret.setStowed(true);
+				hood.setStowed(true);
+			}))
+			.finallyDo(() -> {
+				shooter.setDefaultCommand(shooter.runTrackTargetActiveShootingCommand());
+				turret.setStowed(false);
+				hood.setStowed(false);
+			});
 	}
 
 	public Command setTurretAnglePreset(double fieldRelativeDeg) {
@@ -430,6 +454,16 @@ public class SuperSystem extends SubsystemBase {
 				)
 			).withTimeout(kDurationSecs)
 		);
+	}
+
+	/** Repeatedly cycles the intake pivot between AGITATE and DEPLOY while shooting. */
+	public Command pivotAgitateLoopCommand() {
+		return Commands.sequence(
+			PivotSubsystem.mInstance.setpointCommand(PivotSubsystem.AGITATE),
+			Commands.waitSeconds(0.15),
+			PivotSubsystem.mInstance.setpointCommand(PivotSubsystem.DEPLOY),
+			Commands.waitSeconds(0.15)
+		).repeatedly();
 	}
 
 	public Command agitateCommand(){
