@@ -90,16 +90,19 @@ public class ControlSubsystem {
 
 		shootDelay.initDefault(0.3);
 
-		// Trigger pull: pass if enabled and on opponent side, otherwise shoot.
-		driver.rightTrigger().whileTrue(
-			new ConditionalCommand(
-				// Pass branch
-				new ConditionalCommand(
-					s.passLobAuto(),
-					s.passAutoSCR(),
-					() -> ShiftHelpers.isOnOpponentSide()
-				),
-				// Shoot branch: unstow, wait for turret/hood, then fire
+		// Trigger pull (opponent side + passing enabled): pass over the bump.
+		// Separate binding so the pass commands' turret requirement doesn't bleed into
+		// the shoot binding and cancel the turret's tracking default command.
+		driver.rightTrigger()
+			.and(() -> passingEnabled && ShiftHelpers.isOnOpponentSide())
+			.whileTrue(new ConditionalCommand(s.passLobAuto(), s.passAutoSCR(), ShiftHelpers::isOnOpponentSide))
+			.onFalse(Commands.parallel(s.stowTurretHood(), s.idleShooter(), s.idleIntakes()));
+
+		// Trigger pull (alliance side, or passing disabled): normal shoot.
+		// No turret requirement here — turret default command provides field-relative tracking.
+		driver.rightTrigger()
+			.and(() -> !passingEnabled || !ShiftHelpers.isOnOpponentSide())
+			.whileTrue(
 				Commands.sequence(
 					Commands.parallel(
 						s.activeTurretHood(),
@@ -110,17 +113,15 @@ public class ControlSubsystem {
 						s.Shoot(),
 						s.intakePulseCommand()
 					)
-				),
-				() -> passingEnabled && ShiftHelpers.isOnOpponentSide()
-			)
-		).onFalse(
-			Commands.parallel(
-				s.stowTurretHood(),
-				s.idleShooter(),
-				s.idleIntakes(),
-				Commands.runOnce(() -> DriveConstants.setShootingSpeedLimited(false))
-			)
-		);
+				)
+			).onFalse(
+				Commands.parallel(
+					s.stowTurretHood(),
+					s.idleShooter(),
+					s.idleIntakes(),
+					Commands.runOnce(() -> DriveConstants.setShootingSpeedLimited(false))
+				)
+			);
 
 		// Right bumper: shoot + agitate intake pivot simultaneously
 		driver.rightBumper().whileTrue(
