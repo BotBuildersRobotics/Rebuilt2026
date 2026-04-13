@@ -114,8 +114,8 @@ public class SOTMShotCalculator {
   /** Tuning parameters. Set these to match your robot, or wire them to SmartDashboard/TunableNumber. */
   public static class Config {
     // Launcher geometry (measure from CAD)
-    public double launcherOffsetX = 0.20; // meters forward of robot center
-    public double launcherOffsetY = 0.0;  // meters left of robot center
+    public double launcherOffsetX = -0.20; // meters forward of robot center (negative = back)
+    public double launcherOffsetY = -0.20; // meters left of robot center (negative = right)
 
     // How close/far you can score from (meters)
     public double minScoringDistance = 0.5;
@@ -430,8 +430,8 @@ public class SOTMShotCalculator {
       compTargetX = hubX - vx * headingDriftTOF;
       compTargetY = hubY - vy * headingDriftTOF;
     }
-    double aimX = compTargetX - robotX;
-    double aimY = compTargetY - robotY;
+    double aimX = compTargetX - launcherX;
+    double aimY = compTargetY - launcherY;
     Rotation2d driveAngle = new Rotation2d(aimX, aimY);
 
     // Heading error for confidence calculation
@@ -474,6 +474,14 @@ public class SOTMShotCalculator {
     Logger.recordOutput("SOTMShotCalc/DriveAngleDeg", driveAngle.getDegrees());
     Logger.recordOutput("SOTMShotCalc/RPM", effectiveRPMValue);
     Logger.recordOutput("SOTMShotCalc/TOFSec", adjustedTOF);
+
+    // Field poses for AdvantageScope playback
+    // LauncherPose: where the shot originates, facing the compensated target
+    Logger.recordOutput("SOTMShotCalc/LauncherPose",
+        new Pose2d(launcherX, launcherY, driveAngle));
+    // CompensatedTarget: the velocity-adjusted point we're aiming at
+    Logger.recordOutput("SOTMShotCalc/CompensatedTarget",
+        new Translation2d(compTargetX, compTargetY));
 
     return new LaunchParameters(
         effectiveRPMValue,

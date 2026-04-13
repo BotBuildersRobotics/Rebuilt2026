@@ -7,6 +7,7 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 import edu.wpi.first.units.measure.AngularVelocity;
 import java.util.Set;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
@@ -38,6 +39,10 @@ public class ControlSubsystem {
 	private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
 	private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
 
+	// When false, right trigger always shoots regardless of field position.
+	// Toggle with driver B button when localisation is unreliable.
+	private boolean passingEnabled = true;
+
 	// How long after pressing the trigger before the chute/shuffla start feeding.
 	// Gives the turret and hood time to reach their target before the ball enters the shooter.
 	private static final LoggedTunableNumber shootDelay =
@@ -54,6 +59,7 @@ public class ControlSubsystem {
 								() -> DriveSubsystem.mInstance.getGeneratedDrive().seedFieldCentric(), DriveSubsystem.mInstance)
 						.ignoringDisable(true));
 
+		SmartDashboard.putBoolean("Passing Enabled", passingEnabled);
 		driverControls();
 		operatorControls();
 
@@ -84,20 +90,28 @@ public class ControlSubsystem {
 
 		shootDelay.initDefault(0.3);
 
-		// Trigger pull: immediately unstow turret+hood so they start tracking,
-		// then wait for them to move before feeding the ball into the shooter.
+		// Trigger pull: pass if enabled and on opponent side, otherwise shoot.
 		driver.rightTrigger().whileTrue(
-			Commands.sequence(
-				Commands.parallel(
-					s.activeTurretHood(),
-					Commands.runOnce(() -> DriveConstants.setShootingSpeedLimited(true))
+			new ConditionalCommand(
+				// Pass branch
+				new ConditionalCommand(
+					s.passLobAuto(),
+					s.passAutoSCR(),
+					() -> ShiftHelpers.isOnOpponentSide()
 				),
-				// Re-evaluate the tunable delay each time the trigger is pressed
-				Commands.defer(() -> Commands.waitSeconds(shootDelay.get()), Set.of()),
-				Commands.parallel(
-					s.Shoot(),
-					s.intakePulseCommand()
-				)
+				// Shoot branch: unstow, wait for turret/hood, then fire
+				Commands.sequence(
+					Commands.parallel(
+						s.activeTurretHood(),
+						Commands.runOnce(() -> DriveConstants.setShootingSpeedLimited(true))
+					),
+					Commands.defer(() -> Commands.waitSeconds(shootDelay.get()), Set.of()),
+					Commands.parallel(
+						s.Shoot(),
+						s.intakePulseCommand()
+					)
+				),
+				() -> passingEnabled && ShiftHelpers.isOnOpponentSide()
 			)
 		).onFalse(
 			Commands.parallel(
@@ -132,11 +146,11 @@ public class ControlSubsystem {
 			)
 		);
 
-		driver.b().whileTrue(new ConditionalCommand(
-			s.passLobAuto(),
-			s.passAutoSCR(),
-			() -> ShiftHelpers.isOnOpponentSide()
-		));
+		// B button: toggle passing on/off (disable when localisation is unreliable)
+		driver.b().onTrue(Commands.runOnce(() -> {
+			passingEnabled = !passingEnabled;
+			SmartDashboard.putBoolean("Passing Enabled", passingEnabled);
+		}).ignoringDisable(true));
 
 
 		driver.povUp().onTrue(s.incrementFlywheelSpeed());
@@ -168,7 +182,9 @@ public class ControlSubsystem {
 
 		operator.b().onTrue(s.climb());
 
-		operator.y().onTrue(s.stowTurretHood());
+		operator.y()
+			.onTrue(Commands.runOnce(() -> IntakeSubsystem.mInstance.applySetpoint(IntakeSubsystem.REVERSE)))
+			.onFalse(Commands.runOnce(() -> IntakeSubsystem.mInstance.applySetpoint(IntakeSubsystem.IDLE)));
 		
 		operator.povDown().onTrue(ClimbSubsystem.mInstance.setpointCommand(ClimbSubsystem.CLIMB)).onFalse(
 			ClimbSubsystem.mInstance.setpointCommand(ClimbSubsystem.STOP)
