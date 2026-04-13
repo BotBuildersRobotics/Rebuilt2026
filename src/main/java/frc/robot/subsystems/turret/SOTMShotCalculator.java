@@ -319,12 +319,17 @@ public class SOTMShotCalculator {
 
     double robotSpeed = Math.hypot(vx, vy);
 
+    Logger.recordOutput("SOTMShotCalc/Input/FieldVelX", fieldVel.vxMetersPerSecond);
+    Logger.recordOutput("SOTMShotCalc/Input/FieldVelY", fieldVel.vyMetersPerSecond);
+    Logger.recordOutput("SOTMShotCalc/Input/RobotSpeed", robotSpeed);
+
     // Speed cap: shots above this speed are out of calibration range
     if (robotSpeed > config.maxSOTMSpeed) {
       return LaunchParameters.INVALID;
     }
 
     boolean velocityFiltered = robotSpeed < config.minSOTMSpeed;
+    Logger.recordOutput("SOTMShotCalc/Input/VelocityFiltered", velocityFiltered);
 
     double solvedTOF;
     double projDist;
