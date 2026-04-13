@@ -182,7 +182,9 @@ public class ControlSubsystem {
 
 		operator.b().onTrue(s.climb());
 
-		operator.y().onTrue(s.stowTurretHood());
+		operator.y()
+			.onTrue(Commands.runOnce(() -> IntakeSubsystem.mInstance.applySetpoint(IntakeSubsystem.REVERSE)))
+			.onFalse(Commands.runOnce(() -> IntakeSubsystem.mInstance.applySetpoint(IntakeSubsystem.IDLE)));
 		
 		operator.povDown().onTrue(ClimbSubsystem.mInstance.setpointCommand(ClimbSubsystem.CLIMB)).onFalse(
 			ClimbSubsystem.mInstance.setpointCommand(ClimbSubsystem.STOP)
