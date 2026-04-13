@@ -296,21 +296,19 @@ public class FieldConstants {
         new Translation3d(depth, (fieldWidth / 2) + distanceFromCenterY - (width / 2), height);
   }
 
-  /** Passing target landing zones — alliance side of each bump, in the open trench area */
+  /** Passing targets — center of each bump (X = hub center, Y = midpoint of bump width) */
   public static class PassingTargets {
-    // Land fuel in the left trench (alliance side, past the left bump)
+    // Center of the left bump
     public static final Translation2d leftPassTarget =
         new Translation2d(
-            LinesVertical.allianceZone,
-            (LinesHorizontal.leftBumpStart) / 3.0);
-            //(LinesHorizontal.leftBumpStart + LinesHorizontal.leftTrenchOpenEnd) / 2.0);
+            LinesVertical.hubCenter,
+            (LinesHorizontal.leftBumpEnd + LinesHorizontal.leftBumpStart) / 2.0);
 
-    // Land fuel in the right trench (alliance side, past the right bump)
+    // Center of the right bump
     public static final Translation2d rightPassTarget =
         new Translation2d(
-            LinesVertical.allianceZone,
-            (LinesHorizontal.rightBumpEnd) / 3.0);
-            //(LinesHorizontal.rightBumpEnd + LinesHorizontal.rightTrenchOpenStart) / 2.0);
+            LinesVertical.hubCenter,
+            (LinesHorizontal.rightBumpStart + LinesHorizontal.rightBumpEnd) / 2.0);
   }
 
   public static class Outpost {
