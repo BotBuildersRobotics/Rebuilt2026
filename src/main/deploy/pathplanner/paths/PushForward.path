@@ -1,0 +1,54 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 0.8676749703440101,
+        "y": 7.149786476868328
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 1.8676749703440103,
+        "y": 7.149786476868328
+      },
+      "isLocked": false,
+      "linkedName": "Hub2Depot-PickupEnd"
+    },
+    {
+      "anchor": {
+        "x": 0.6847686832740218,
+        "y": 7.354211150652431
+      },
+      "prevControl": {
+        "x": 0.383511269276394,
+        "y": 7.784578884934757
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 123.99645914825051
+  },
+  "reversed": false,
+  "folder": "HubToDepot",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 90.0
+  },
+  "useDefaultConstraints": true
+}

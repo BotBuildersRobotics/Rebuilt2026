@@ -4,10 +4,14 @@
   "holonomicMode": true,
   "pathFolders": [
     "Bump double swipe",
+    "HubToDepot",
+    "New New Folder",
     "Split",
     "SwipeClimb"
   ],
-  "autoFolders": [],
+  "autoFolders": [
+    "HubStart"
+  ],
   "defaultMaxVel": 3.0,
   "defaultMaxAccel": 3.0,
   "defaultMaxAngVel": 540.0,
