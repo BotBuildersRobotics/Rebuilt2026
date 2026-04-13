@@ -268,7 +268,7 @@ public final class ShiftHelpers {
         if (allianceOpt.isEmpty()) return false;
 
         double robotX = DriveSubsystem.mInstance.getDrivetrain().getState().Pose.getX();
-        double boundary = AllianceFlipUtil.applyX(FieldConstants.Hub.oppNearLeftCorner.getX());
+        double boundary = AllianceFlipUtil.applyX(FieldConstants.LinesVertical.neutralZoneNear);
 
         return allianceOpt.get() == DriverStation.Alliance.Blue
             ? robotX > boundary
