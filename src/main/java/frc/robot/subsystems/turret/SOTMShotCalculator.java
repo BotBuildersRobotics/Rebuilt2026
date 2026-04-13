@@ -475,6 +475,14 @@ public class SOTMShotCalculator {
     Logger.recordOutput("SOTMShotCalc/RPM", effectiveRPMValue);
     Logger.recordOutput("SOTMShotCalc/TOFSec", adjustedTOF);
 
+    // Field poses for AdvantageScope playback
+    // LauncherPose: where the shot originates, facing the compensated target
+    Logger.recordOutput("SOTMShotCalc/LauncherPose",
+        new Pose2d(launcherX, launcherY, driveAngle));
+    // CompensatedTarget: the velocity-adjusted point we're aiming at
+    Logger.recordOutput("SOTMShotCalc/CompensatedTarget",
+        new Translation2d(compTargetX, compTargetY));
+
     return new LaunchParameters(
         effectiveRPMValue,
         adjustedTOF,
