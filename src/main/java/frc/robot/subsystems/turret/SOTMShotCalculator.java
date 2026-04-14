@@ -97,7 +97,8 @@ public class SOTMShotCalculator {
       Translation2d hubForward,
       double visionConfidence,
       double pitchDeg,
-      double rollDeg) {
+      double rollDeg,
+      double turretFieldAngleRad) {
 
     /** Convenience constructor for callers that don't have pitch/roll data. */
     public ShotInputs(
@@ -107,7 +108,8 @@ public class SOTMShotCalculator {
         Translation2d hubCenter,
         Translation2d hubForward,
         double visionConfidence) {
-      this(robotPose, fieldVelocity, robotVelocity, hubCenter, hubForward, visionConfidence, 0.0, 0.0);
+      this(robotPose, fieldVelocity, robotVelocity, hubCenter, hubForward, visionConfidence, 0.0, 0.0,
+          robotPose.getRotation().getRadians());
     }
   }
 
@@ -119,13 +121,13 @@ public class SOTMShotCalculator {
 
     // How close/far you can score from (meters)
     public double minScoringDistance = 0.5;
-    public double maxScoringDistance = 5.0;
+    public double maxScoringDistance = 5.7;
 
     // Newton solver tuning
     public int maxIterations = 25;
     public double convergenceTolerance = 0.001; // seconds
     public double tofMin = 0.05;
-    public double tofMax = 5.0;
+    public double tofMax = 5.7;
 
     // Below this speed (m/s), don't bother with SOTM, just aim straight
     public double minSOTMSpeed = 0.1;
@@ -439,8 +441,10 @@ public class SOTMShotCalculator {
     double aimY = compTargetY - launcherY;
     Rotation2d driveAngle = new Rotation2d(aimX, aimY);
 
-    // Heading error for confidence calculation
-    double headingErrorRad = MathUtil.angleModulus(driveAngle.getRadians() - heading);
+    // Heading error: how far the turret is from pointing at the compensated target.
+    // Uses turret field angle (robot heading + turret offset) rather than robot chassis
+    // heading, since the turret compensates for chassis misalignment independently.
+    double headingErrorRad = MathUtil.angleModulus(driveAngle.getRadians() - inputs.turretFieldAngleRad());
 
     // Angular velocity feedforward: rate of change of aim angle
     double driveAngularVelocity = 0;
