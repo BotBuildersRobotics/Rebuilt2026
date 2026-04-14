@@ -70,6 +70,9 @@ public class SuperSystem extends SubsystemBase {
 		hood.setShotCalculator(shotCalc);
 		turret.setShotCalculator(shotCalc);
 		shooter.setShotCalculator(shotCalc);
+		shotCalc.setTurretFieldAngleSupplier(() ->
+			frc.robot.subsystems.drive.DriveSubsystem.mInstance.getDrivetrain().getState().Pose.getRotation().getRadians()
+			+ turret.getTurretAngle());
 		
 		shooter.setDefaultCommand(shooter.runTrackTargetActiveShootingCommand());
 		turret.setDefaultCommand(turret.runTrackTargetActiveShootingCommand());

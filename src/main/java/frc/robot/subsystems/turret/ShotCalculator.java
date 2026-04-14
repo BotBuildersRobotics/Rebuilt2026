@@ -23,6 +23,7 @@ import edu.wpi.first.math.interpolation.InverseInterpolator;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
+import java.util.function.DoubleSupplier;
 import frc.robot.FieldConstants;
 import frc.robot.lib.AllianceFlipUtil;
 import frc.robot.lib.LoggedTunableNumber;
@@ -128,6 +129,9 @@ public class ShotCalculator {
   private static final LoggedTunableNumber enableSOTM =
       new LoggedTunableNumber("LaunchCalculator/EnableSOTM");
 
+  /** Supplier of the turret's field-relative angle in radians. Set via {@link #setTurretFieldAngleSupplier}. */
+  private DoubleSupplier turretFieldAngleSupplier = () -> DriveSubsystem.mInstance.getDrivetrain().getState().Pose.getRotation().getRadians();
+
   private final SOTMShotCalculator sotmCalc;
 
   public ShotCalculator() {
@@ -160,9 +164,12 @@ public class ShotCalculator {
     ChassisSpeeds fieldVel = DriveSubsystem.mInstance.getDrivetrain().getFieldVelocity();
     ChassisSpeeds robotVel = DriveSubsystem.mInstance.getGeneratedDrive().getState().Speeds;
 
+    double turretFieldAngleRad = turretFieldAngleSupplier.getAsDouble();
+
     // hubForward = zero disables the behind-hub check (valid from anywhere on field)
     SOTMShotCalculator.ShotInputs inputs = new SOTMShotCalculator.ShotInputs(
-        pose, fieldVel, robotVel, hub, new Translation2d(0, 0), 1.0);
+        pose, fieldVel, robotVel, hub, new Translation2d(0, 0), 1.0,
+        0.0, 0.0, turretFieldAngleRad);
 
     SOTMShotCalculator.LaunchParameters result = sotmCalc.calculate(inputs);
     if (!result.isValid()) return null;
@@ -391,5 +398,13 @@ public class ShotCalculator {
 
   public void clearShootingParameters() {
     latestParameters = null;
+  }
+
+  /**
+   * Injects a supplier that returns the turret's field-relative heading in radians.
+   * Call this once from SuperSystem after both the turret and shot calculator are constructed.
+   */
+  public void setTurretFieldAngleSupplier(DoubleSupplier supplier) {
+    this.turretFieldAngleSupplier = supplier;
   }
 }
