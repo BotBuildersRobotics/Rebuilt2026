@@ -116,11 +116,11 @@ public class ShotCalculator {
     launchFlywheelSpeedMap.put(5.60, 249.0);
     launchFlywheelSpeedMap.put(5.70, 253.0);
 
-    timeOfFlightMap.put(5.68, 1.16);
-    timeOfFlightMap.put(4.55, 1.12);
-    timeOfFlightMap.put(3.15, 1.11);
-    timeOfFlightMap.put(1.88, 1.09);
-    timeOfFlightMap.put(1.38, 0.90);
+    timeOfFlightMap.put(5.68, 1.01);
+    timeOfFlightMap.put(4.55, 0.08);
+    timeOfFlightMap.put(3.15, 0.6);
+    timeOfFlightMap.put(1.88, 0.4);
+    timeOfFlightMap.put(1.38, 0.30);
   }
 
   // --- SOTM (Shoot-On-The-Move) Newton-method solver ---

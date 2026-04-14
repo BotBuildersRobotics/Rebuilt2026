@@ -253,7 +253,9 @@ public class SuperSystem extends SubsystemBase {
 		return Commands.parallel(
 			turret.passAutoCommand(),
 			shooter.runPassingCommand(),
-			hood.runPassingCommand()
+			hood.runPassingCommand(),
+			ShufflaSubsystem.mInstance.runShootCommandGated(shooter::isAtSpeed),
+			ChuteSubsystem.mInstance.runShootCommandGated(shooter::isAtSpeed)
 		).beforeStarting(disableStow()).finallyDo(()->{
 			turret.setStowed(true);
 			hood.setStowed(true);
@@ -295,7 +297,9 @@ public class SuperSystem extends SubsystemBase {
 		return Commands.parallel(
 			turret.passAutoCommand(),
 			shooter.runLobPassingCommand(),
-			hood.runLobPassingCommand()
+			hood.runLobPassingCommand(),
+			ShufflaSubsystem.mInstance.runShootCommandGated(shooter::isAtSpeed),
+			ChuteSubsystem.mInstance.runShootCommandGated(shooter::isAtSpeed)
 		).beforeStarting(disableStow()).finallyDo(()->{
 			turret.setStowed(true);
 			hood.setStowed(true);
