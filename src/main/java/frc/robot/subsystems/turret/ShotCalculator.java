@@ -96,9 +96,9 @@ public class ShotCalculator {
     launchHoodAngleMap.put(5.60, Rotation2d.fromDegrees(41.0));
     launchHoodAngleMap.put(5.70, Rotation2d.fromDegrees(41.0));
 
-    launchFlywheelSpeedMap.put(1.0, 189.0);
-    launchFlywheelSpeedMap.put(1.68, 194.0); //
-    launchFlywheelSpeedMap.put(2.13, 198.0); //
+    launchFlywheelSpeedMap.put(1.0, 175.0);
+    launchFlywheelSpeedMap.put(1.68, 180.0); //
+    launchFlywheelSpeedMap.put(2.13, 184.0); //
     launchFlywheelSpeedMap.put(2.81, 203.0); //in front of climb
     launchFlywheelSpeedMap.put(3.08, 208.0); //AUTO 
     launchFlywheelSpeedMap.put(3.35, 212.0);  
@@ -106,16 +106,16 @@ public class ShotCalculator {
     launchFlywheelSpeedMap.put(3.6, 219.0); //
     launchFlywheelSpeedMap.put(3.82, 223.0);
     launchFlywheelSpeedMap.put(4.09, 227.0);
-    launchFlywheelSpeedMap.put(4.20, 231.0);
-    launchFlywheelSpeedMap.put(4.30, 234.0); // near depot
-    launchFlywheelSpeedMap.put(4.40, 236.0); // near depot
-    launchFlywheelSpeedMap.put(4.60, 237.0); // near depot
-    launchFlywheelSpeedMap.put(4.77, 238.0);
-    launchFlywheelSpeedMap.put(4.97, 239.0);
+    launchFlywheelSpeedMap.put(4.20, 229.0);
+    launchFlywheelSpeedMap.put(4.30, 231.0); // near depot
+    launchFlywheelSpeedMap.put(4.40, 233.0); // near depot
+    launchFlywheelSpeedMap.put(4.60, 234.0); // near depot
+    launchFlywheelSpeedMap.put(4.77, 236.0);
+    launchFlywheelSpeedMap.put(4.97, 238.0);
     launchFlywheelSpeedMap.put(5.17, 240.0);
     launchFlywheelSpeedMap.put(5.57, 244.0);
-    launchFlywheelSpeedMap.put(5.60, 249.0);
-    launchFlywheelSpeedMap.put(5.70, 253.0);
+    launchFlywheelSpeedMap.put(5.60, 247.0);
+    launchFlywheelSpeedMap.put(5.70, 252.0);
 
     timeOfFlightMap.put(5.68, 1.0);
     timeOfFlightMap.put(4.55, 0.9);
