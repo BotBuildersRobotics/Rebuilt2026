@@ -95,7 +95,7 @@ public class ControlSubsystem {
 		// the shoot binding and cancel the turret's tracking default command.
 		driver.rightTrigger()
 			.and(() -> passingEnabled && ShiftHelpers.isOnOpponentSide())
-			.whileTrue(new ConditionalCommand(s.passLobAuto(), s.passAutoSCR(), ShiftHelpers::isOnOpponentSide))
+			.whileTrue(new ConditionalCommand(s.passLobAuto(), s.passAutoSCR(), ShiftHelpers::isInOpponentZone))
 			.onFalse(Commands.parallel(s.stowTurretHood(), s.idleShooter(), s.idleIntakes()));
 
 		// Trigger pull (alliance side, or passing disabled): normal shoot.
