@@ -96,32 +96,32 @@ public class ShotCalculator {
     launchHoodAngleMap.put(5.60, Rotation2d.fromDegrees(41.0));
     launchHoodAngleMap.put(5.70, Rotation2d.fromDegrees(41.0));
 
-    launchFlywheelSpeedMap.put(1.0, 187.0);
-    launchFlywheelSpeedMap.put(1.68, 187.0); //
-    launchFlywheelSpeedMap.put(2.13, 187.0); //
-    launchFlywheelSpeedMap.put(2.81, 187.0); //in front of climb
-    launchFlywheelSpeedMap.put(3.08, 198.0); //AUTO 
-    launchFlywheelSpeedMap.put(3.35, 200.0);  
-    launchFlywheelSpeedMap.put(3.42,205.0); //
-    launchFlywheelSpeedMap.put(3.6, 208.0); //
-    launchFlywheelSpeedMap.put(3.82, 210.0);
-    launchFlywheelSpeedMap.put(4.09, 212.0);
-    launchFlywheelSpeedMap.put(4.20, 215.0);
-     launchFlywheelSpeedMap.put(4.30, 218.0); // near depot
-     launchFlywheelSpeedMap.put(4.40, 220.0); // near depot
-     launchFlywheelSpeedMap.put(4.60, 225.0); // near depot
-    launchFlywheelSpeedMap.put(4.77, 229.0);
-    launchFlywheelSpeedMap.put(4.97, 235.0);
+    launchFlywheelSpeedMap.put(1.0, 189.0);
+    launchFlywheelSpeedMap.put(1.68, 194.0); //
+    launchFlywheelSpeedMap.put(2.13, 198.0); //
+    launchFlywheelSpeedMap.put(2.81, 203.0); //in front of climb
+    launchFlywheelSpeedMap.put(3.08, 208.0); //AUTO 
+    launchFlywheelSpeedMap.put(3.35, 212.0);  
+    launchFlywheelSpeedMap.put(3.42,216.0); //
+    launchFlywheelSpeedMap.put(3.6, 219.0); //
+    launchFlywheelSpeedMap.put(3.82, 223.0);
+    launchFlywheelSpeedMap.put(4.09, 227.0);
+    launchFlywheelSpeedMap.put(4.20, 231.0);
+    launchFlywheelSpeedMap.put(4.30, 234.0); // near depot
+    launchFlywheelSpeedMap.put(4.40, 236.0); // near depot
+    launchFlywheelSpeedMap.put(4.60, 237.0); // near depot
+    launchFlywheelSpeedMap.put(4.77, 238.0);
+    launchFlywheelSpeedMap.put(4.97, 239.0);
     launchFlywheelSpeedMap.put(5.17, 240.0);
     launchFlywheelSpeedMap.put(5.57, 244.0);
     launchFlywheelSpeedMap.put(5.60, 249.0);
     launchFlywheelSpeedMap.put(5.70, 253.0);
 
-    timeOfFlightMap.put(5.68, 1.01);
-    timeOfFlightMap.put(4.55, 0.08);
-    timeOfFlightMap.put(3.15, 0.6);
-    timeOfFlightMap.put(1.88, 0.4);
-    timeOfFlightMap.put(1.38, 0.30);
+    timeOfFlightMap.put(5.68, 1.0);
+    timeOfFlightMap.put(4.55, 0.9);
+    timeOfFlightMap.put(3.15, 0.8);
+    timeOfFlightMap.put(1.88, 0.6);
+    timeOfFlightMap.put(1.38, 0.5);
   }
 
   // --- SOTM (Shoot-On-The-Move) Newton-method solver ---
