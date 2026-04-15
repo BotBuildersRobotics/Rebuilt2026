@@ -275,8 +275,29 @@ public final class ShiftHelpers {
             : robotX < boundary;
     }
 
-    /** Trigger that is active while the robot is in the opponent's bump zone or beyond. */
+    /** Trigger that is active while the robot is in the neutral zone or opponent zone. */
     public static Trigger onOpponentSide() {
         return new Trigger(ShiftHelpers::isOnOpponentSide);
+    }
+
+    /**
+     * Returns true only when the robot has crossed past the neutral zone into the
+     * opponent's alliance zone (beyond neutralZoneFar toward the opponent wall).
+     */
+    public static boolean isInOpponentZone() {
+        var allianceOpt = DriverStation.getAlliance();
+        if (allianceOpt.isEmpty()) return false;
+
+        double robotX = DriveSubsystem.mInstance.getDrivetrain().getState().Pose.getX();
+        double boundary = AllianceFlipUtil.applyX(FieldConstants.LinesVertical.neutralZoneFar);
+
+        return allianceOpt.get() == DriverStation.Alliance.Blue
+            ? robotX > boundary
+            : robotX < boundary;
+    }
+
+    /** Trigger that is active only while the robot is inside the opponent's alliance zone. */
+    public static Trigger inOpponentZone() {
+        return new Trigger(ShiftHelpers::isInOpponentZone);
     }
 }
