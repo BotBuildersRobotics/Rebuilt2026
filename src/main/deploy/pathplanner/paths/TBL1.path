@@ -1,0 +1,93 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 4.224543297746146,
+        "y": 7.53711743772242
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 6.193475682087783,
+        "y": 7.601672597864768
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 7.6244483985765115,
+        "y": 5.837164887307236
+      },
+      "prevControl": {
+        "x": 7.44298397659491,
+        "y": 6.74448699721523
+      },
+      "nextControl": {
+        "x": 7.710521945432978,
+        "y": 5.406797153024911
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 2.685978647686834,
+        "y": 5.492870699881376
+      },
+      "prevControl": {
+        "x": 3.3422894424673792,
+        "y": 5.428315539739027
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "TBL - 1"
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.1753764393268399,
+      "rotationDegrees": 180.0
+    },
+    {
+      "waypointRelativePos": 0.643046944198408,
+      "rotationDegrees": -75.0
+    }
+  ],
+  "constraintZones": [
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 0.7466367713004528,
+      "maxWaypointRelativePos": 0.9932735426008992,
+      "constraints": {
+        "maxVelocity": 2.0,
+        "maxAcceleration": 3.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": -46.00508600525422
+  },
+  "reversed": false,
+  "folder": "TrenchBump",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 180.0
+  },
+  "useDefaultConstraints": true
+}

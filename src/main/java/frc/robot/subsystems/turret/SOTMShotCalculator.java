@@ -117,7 +117,7 @@ public class SOTMShotCalculator {
   public static class Config {
     // Launcher geometry (measure from CAD)
     public double launcherOffsetX = -0.20; // meters forward of robot center (negative = back)
-    public double launcherOffsetY = -0.20; // meters left of robot center (negative = right)
+    public double launcherOffsetY = 0.20; // meters left of robot center (negative = right)
 
     // How close/far you can score from (meters)
     public double minScoringDistance = 0.5;

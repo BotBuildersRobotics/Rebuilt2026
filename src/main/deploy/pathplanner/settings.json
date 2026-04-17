@@ -5,12 +5,13 @@
   "pathFolders": [
     "Bump double swipe",
     "HubToDepot",
-    "New New Folder",
     "Split",
-    "SwipeClimb"
+    "SwipeClimb",
+    "TrenchBump"
   ],
   "autoFolders": [
-    "HubStart"
+    "HubStart",
+    "TrenchBump"
   ],
   "defaultMaxVel": 3.0,
   "defaultMaxAccel": 3.0,
