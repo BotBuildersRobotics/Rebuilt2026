@@ -18,7 +18,6 @@ import frc.robot.subsystems.SuperSystem;
 import frc.robot.subsystems.climb.ClimbConstants;
 import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.intake.IntakeConstants;
-import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.pivot.PivotSubsystem;
 import frc.robot.subsystems.shooter.ShooterConstants;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
@@ -184,8 +183,8 @@ public class ControlSubsystem {
 		operator.b().onTrue(s.climb());
 
 		operator.y()
-			.onTrue(Commands.runOnce(() -> IntakeSubsystem.mInstance.applySetpoint(IntakeSubsystem.REVERSE)))
-			.onFalse(Commands.runOnce(() -> IntakeSubsystem.mInstance.applySetpoint(IntakeSubsystem.IDLE)));
+			.onTrue(s.reverseAllSystems())
+			.onFalse(s.idleAllSystems());
 		
 		operator.povDown().onTrue(ClimbSubsystem.mInstance.setpointCommand(ClimbSubsystem.CLIMB)).onFalse(
 			ClimbSubsystem.mInstance.setpointCommand(ClimbSubsystem.STOP)

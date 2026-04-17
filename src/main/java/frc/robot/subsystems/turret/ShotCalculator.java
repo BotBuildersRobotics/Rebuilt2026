@@ -161,6 +161,7 @@ public class ShotCalculator {
     Translation2d hub =
         AllianceFlipUtil.apply(FieldConstants.Hub.topCenterPoint.toTranslation2d());
     Pose2d pose = DriveSubsystem.mInstance.getDrivetrain().getState().Pose;
+
     ChassisSpeeds fieldVel = DriveSubsystem.mInstance.getDrivetrain().getFieldVelocity();
     ChassisSpeeds robotVel = DriveSubsystem.mInstance.getGeneratedDrive().getState().Speeds;
 
