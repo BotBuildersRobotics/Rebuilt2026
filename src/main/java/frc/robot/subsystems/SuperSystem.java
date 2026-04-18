@@ -93,6 +93,8 @@ public class SuperSystem extends SubsystemBase {
 
 		 // Clear shooting parameters so they are recalculated each tick
     	shotCalc.clearShootingParameters();
+		SmartDashboard.putBoolean("Drive/OnOpponentSide", ShiftHelpers.isOnOpponentSide());
+		SmartDashboard.putBoolean("Drive/InOpponentZone", ShiftHelpers.isInOpponentZone());
 		SmartDashboard.putBoolean("Hub/BlueActive", ShiftHelpers.isBlueHubActive());
 		SmartDashboard.putBoolean("Hub/RedActive", ShiftHelpers.isRedHubActive());
 		SmartDashboard.putBoolean("Hub/AreWeRedActive", ShiftHelpers.isRedHubActive() && DriverStation.getAlliance().get() == DriverStation.Alliance.Red);

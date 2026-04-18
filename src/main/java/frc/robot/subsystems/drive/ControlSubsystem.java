@@ -19,6 +19,7 @@ import frc.robot.subsystems.chute.ChuteSubsystem;
 import frc.robot.subsystems.climb.ClimbConstants;
 import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.intake.IntakeConstants;
+import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.pivot.PivotSubsystem;
 import frc.robot.subsystems.shooter.ShooterConstants;
 import frc.robot.subsystems.shooter.ShooterSubsystem;

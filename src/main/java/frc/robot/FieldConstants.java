@@ -296,19 +296,24 @@ public class FieldConstants {
         new Translation3d(depth, (fieldWidth / 2) + distanceFromCenterY - (width / 2), height);
   }
 
-  /** Passing targets — center of each bump (X = hub center, Y = midpoint of bump width) */
+  /**
+   * Passing targets — center of each trench opening (the open gap past the bump).
+   * Using the trench opening center gives a larger angular offset from the hub direction
+   * (~15°) compared to the bump center (~8°), making the pass aim clearly distinct
+   * from normal hub-tracking when viewed from the opponent zone.
+   */
   public static class PassingTargets {
-    // Center of the left bump
+    // Center of the left trench opening (past the left bump, toward the left field wall)
     public static final Translation2d leftPassTarget =
         new Translation2d(
             LinesVertical.hubCenter,
-            (LinesHorizontal.leftBumpEnd + LinesHorizontal.leftBumpStart) / 2.0);
+            (LinesHorizontal.leftTrenchOpenEnd + LinesHorizontal.leftTrenchOpenStart) / 2.0);
 
-    // Center of the right bump
+    // Center of the right trench opening (past the right bump, toward the right field wall)
     public static final Translation2d rightPassTarget =
         new Translation2d(
             LinesVertical.hubCenter,
-            (LinesHorizontal.rightBumpStart + LinesHorizontal.rightBumpEnd) / 2.0);
+            (LinesHorizontal.rightTrenchOpenStart + LinesHorizontal.rightTrenchOpenEnd) / 2.0);
   }
 
   public static class Outpost {
