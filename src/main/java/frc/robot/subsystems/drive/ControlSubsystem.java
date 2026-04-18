@@ -15,6 +15,7 @@ import frc.robot.ShiftHelpers;
 import frc.robot.lib.LoggedTunableNumber;
 import frc.robot.lib.io.MotorIO.Setpoint;
 import frc.robot.subsystems.SuperSystem;
+import frc.robot.subsystems.chute.ChuteSubsystem;
 import frc.robot.subsystems.climb.ClimbConstants;
 import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.intake.IntakeConstants;
@@ -22,6 +23,7 @@ import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.pivot.PivotSubsystem;
 import frc.robot.subsystems.shooter.ShooterConstants;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
+import frc.robot.subsystems.shuffla.ShufflaSubsystem;
 import frc.robot.subsystems.turret.TurretSubsystem;
 import frc.robot.subsystems.vision.Limelight;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
@@ -184,8 +186,20 @@ public class ControlSubsystem {
 		operator.b().onTrue(s.climb());
 
 		operator.y()
-			.onTrue(Commands.runOnce(() -> IntakeSubsystem.mInstance.applySetpoint(IntakeSubsystem.REVERSE)))
-			.onFalse(Commands.runOnce(() -> IntakeSubsystem.mInstance.applySetpoint(IntakeSubsystem.IDLE)));
+			.onTrue(Commands.runOnce(() -> {
+			
+					IntakeSubsystem.mInstance.applySetpoint(IntakeSubsystem.REVERSE);
+					ChuteSubsystem.mInstance.applySetpoint(ChuteSubsystem.REVERSE);
+					ShufflaSubsystem.mInstance.applySetpoint(ShufflaSubsystem.REVERSE);
+			
+			}))
+			.onFalse(Commands.runOnce(() -> {
+
+					IntakeSubsystem.mInstance.applySetpoint(IntakeSubsystem.IDLE);
+					ChuteSubsystem.mInstance.applySetpoint(ChuteSubsystem.IDLE);
+					ShufflaSubsystem.mInstance.applySetpoint(ShufflaSubsystem.IDLE);
+			}
+			));
 		
 		operator.povDown().onTrue(ClimbSubsystem.mInstance.setpointCommand(ClimbSubsystem.CLIMB)).onFalse(
 			ClimbSubsystem.mInstance.setpointCommand(ClimbSubsystem.STOP)

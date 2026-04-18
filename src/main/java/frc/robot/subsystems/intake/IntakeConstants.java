@@ -16,7 +16,7 @@ import frc.robot.Robot;
 public class IntakeConstants {
 	
 	public static final Voltage kIntakeVoltage = Units.Volts.of( 12);
-	public static final Voltage kReverseVoltage = Units.Volts.of(-1);
+	public static final Voltage kReverseVoltage = Units.Volts.of(-5);
 
 	public static TalonFXConfiguration getFXConfig() {
 		TalonFXConfiguration config = new TalonFXConfiguration();
