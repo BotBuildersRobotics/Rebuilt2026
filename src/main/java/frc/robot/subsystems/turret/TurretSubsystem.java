@@ -65,7 +65,12 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
   //public static final TurretSubsystem mInstance = new TurretSubsystem();
 
   private ShotCalculator shotCalc;
-  
+  private double lastPassDistanceM = 0.0;
+
+  /** Returns the most recent turret-to-passing-target distance (metres). Updated by passAutoCommand(). */
+  public double getPassDistance() { return lastPassDistanceM; }
+
+
 	public TurretSubsystem() {
 		super(TurretConstants.getMotorIO(), "Turret Motor");
     initMechanism();
@@ -312,6 +317,8 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
       // Calculate angle to target (in field coordinates)
       Rotation2d angleToTarget = toTarget.getAngle();
 
+      lastPassDistanceM = toTarget.getNorm();
+
       // Set the turret goal
       setFieldRelativeTarget(angleToTarget);
       setShootState(ShootState.ACTIVE_SHOOTING);
@@ -475,12 +482,14 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
           ShotCalculator.getInstance().toTransform2d(ShotCalculator.robotToTurret));
       Translation2d toTarget = target.minus(turretPose.getTranslation());
 
+      lastPassDistanceM = toTarget.getNorm();
+
       setFieldRelativeTarget(toTarget.getAngle());
       setShootState(ShootState.ACTIVE_SHOOTING);
 
       SmartDashboard.putNumber("Turret/PassTargetX", target.getX());
       SmartDashboard.putNumber("Turret/PassTargetY", target.getY());
-      SmartDashboard.putNumber("Turret/PassDistance", toTarget.getNorm());
+      SmartDashboard.putNumber("Turret/PassDistance", lastPassDistanceM);
     });
   }
 

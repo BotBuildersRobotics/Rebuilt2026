@@ -230,7 +230,7 @@ public class SuperSystem extends SubsystemBase {
 	public Command passLeft(){
 		return Commands.parallel(
 			turret.passLeftCommand(),
-			shooter.runPassingCommand(),
+			shooter.runPassingCommand(turret::getPassDistance),
 			hood.runPassingCommand()
 		);
 	}
@@ -238,13 +238,13 @@ public class SuperSystem extends SubsystemBase {
 	public Command passRight(){
 		return Commands.parallel(
 			turret.passRightCommand(),
-			shooter.runPassingCommand(),
+			shooter.runPassingCommand(turret::getPassDistance),
 			hood.runPassingCommand()
 		);
 	}
 
 	public Command ShooterRunPassingCommand() {
-		return shooter.runPassingCommand();
+		return shooter.runPassingCommand(turret::getPassDistance);
 	}
 
 	public Command PassSCR() {
@@ -257,7 +257,7 @@ public class SuperSystem extends SubsystemBase {
 	public Command passAutoSCR() {
 		return Commands.parallel(
 			turret.passAutoCommand(),
-			shooter.runPassingCommand(),
+			shooter.runPassingCommand(turret::getPassDistance),
 			hood.runPassingCommand(),
 			ShufflaSubsystem.mInstance.runShootCommand(),
 			ChuteSubsystem.mInstance.runShootCommand()
@@ -270,7 +270,7 @@ public class SuperSystem extends SubsystemBase {
 	public Command passAuto(){
 		return Commands.parallel(
 			turret.passAutoCommand(),
-			shooter.runPassingCommand(),
+			shooter.runPassingCommand(turret::getPassDistance),
 			hood.runPassingCommand()
 		).beforeStarting(disableStow()).finallyDo(()->{
 			turret.setStowed(true);
@@ -301,7 +301,7 @@ public class SuperSystem extends SubsystemBase {
 	public Command passLobAuto(){
 		return Commands.parallel(
 			turret.passAutoCommand(),
-			shooter.runLobPassingCommand(),
+			shooter.runLobPassingCommand(turret::getPassDistance),
 			hood.runLobPassingCommand(),
 			ShufflaSubsystem.mInstance.runShootCommand(),
 			ChuteSubsystem.mInstance.runShootCommand()

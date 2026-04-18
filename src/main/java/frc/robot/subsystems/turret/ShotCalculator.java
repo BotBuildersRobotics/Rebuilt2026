@@ -401,6 +401,16 @@ public class ShotCalculator {
         transform.getTranslation().toTranslation2d(), transform.getRotation().toRotation2d());
   }
 
+  /**
+   * Returns the flywheel speed (RPS) from the LUT for a given distance (metres).
+   * Returns {@link Double#NaN} if the distance is outside the LUT range so callers
+   * can fall back to a default speed.
+   */
+  public double getFlywheelSpeedForDistance(double distanceM) {
+    if (distanceM < minDistance || distanceM > maxDistance) return Double.NaN;
+    return launchFlywheelSpeedMap.get(distanceM);
+  }
+
   public void clearShootingParameters() {
     latestParameters = null;
   }

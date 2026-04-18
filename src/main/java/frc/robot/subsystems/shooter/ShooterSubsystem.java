@@ -168,12 +168,18 @@ public class ShooterSubsystem  extends MotorSubsystem<MotorIOTalonFX> {
         return Commands.runOnce(() -> flywheelSpeedPreset = null);
     }
 
-    public Command runPassingCommand() {
-        return run(() -> runVelocity(passingSpeed.get()));
+    public Command runPassingCommand(DoubleSupplier distanceM) {
+        return run(() -> {
+            double speed = shotCalc.getFlywheelSpeedForDistance(distanceM.getAsDouble());
+            runVelocity(Double.isNaN(speed) ? passingSpeed.get() : speed);
+        });
     }
 
-    public Command runLobPassingCommand() {
-        return run(() -> runVelocity(lobPassingSpeed.get()));
+    public Command runLobPassingCommand(DoubleSupplier distanceM) {
+        return run(() -> {
+            double speed = shotCalc.getFlywheelSpeedForDistance(distanceM.getAsDouble());
+            runVelocity(Double.isNaN(speed) ? lobPassingSpeed.get() : speed);
+        });
     }
 
     public Command stopCommand()
