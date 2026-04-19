@@ -49,7 +49,7 @@ public class HoodSubsystem extends ServoMotorSubsystem<MotorIOTalonFX> {
 
         manualHood.initDefault(0);
         passingAngle.initDefault(15);
-        lobPassingAngle.initDefault(30);
+        lobPassingAngle.initDefault(45);
 
 	}
 

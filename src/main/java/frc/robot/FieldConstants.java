@@ -307,13 +307,13 @@ public class FieldConstants {
     public static final Translation2d leftPassTarget =
         new Translation2d(
             LinesVertical.hubCenter,
-            (LinesHorizontal.leftTrenchOpenEnd + LinesHorizontal.leftTrenchOpenStart) / 2.0);
+            (LinesHorizontal.leftBumpEnd + LinesHorizontal.leftBumpStart) / 2.0);
 
     // Center of the right trench opening (past the right bump, toward the right field wall)
     public static final Translation2d rightPassTarget =
         new Translation2d(
             LinesVertical.hubCenter,
-            (LinesHorizontal.rightTrenchOpenStart + LinesHorizontal.rightTrenchOpenEnd) / 2.0);
+            (LinesHorizontal.rightBumpStart + LinesHorizontal.rightBumpEnd) / 2.0);
   }
 
   public static class Outpost {
