@@ -50,7 +50,7 @@ public class ShooterSubsystem  extends MotorSubsystem<MotorIOTalonFX> {
 	public ShooterSubsystem() {
 		super(ShooterConstants.getMotorIO(), "Shooter Rollers");
         manualShooter.initDefault(200);
-        passingSpeed.initDefault(250);
+        passingSpeed.initDefault(275);
         lobPassingSpeed.initDefault(360);
         atSpeedToleranceRPS.initDefault(10.0);
 	}

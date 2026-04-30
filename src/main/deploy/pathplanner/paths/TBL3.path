@@ -79,7 +79,7 @@
   "rotationTargets": [
     {
       "waypointRelativePos": 0.3294951284322463,
-      "rotationDegrees": 0.0
+      "rotationDegrees": 180.0
     },
     {
       "waypointRelativePos": 1.1727192205491597,
@@ -125,13 +125,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -29.29136217098434
+    "rotation": -50.0
   },
   "reversed": false,
   "folder": "TrenchBump",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 180.0
   },
   "useDefaultConstraints": true
 }

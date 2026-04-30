@@ -96,6 +96,7 @@ public class ShotCalculator {
     launchHoodAngleMap.put(5.60, Rotation2d.fromDegrees(41.0));
     launchHoodAngleMap.put(5.70, Rotation2d.fromDegrees(41.0));
 
+    launchFlywheelSpeedMap.put(0.00, 175.0);
     launchFlywheelSpeedMap.put(1.0, 175.0);
     launchFlywheelSpeedMap.put(1.68, 180.0); //
     launchFlywheelSpeedMap.put(2.13, 184.0); //

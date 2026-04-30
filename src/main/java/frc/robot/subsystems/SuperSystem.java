@@ -257,7 +257,7 @@ public class SuperSystem extends SubsystemBase {
 	public Command passAutoSCR() {
 		return Commands.parallel(
 			turret.passAutoCommand(),
-			Commands.waitSeconds(0.3),
+			Commands.waitSeconds(1),
 			shooter.runPassingCommand(turret::getPassDistance),
 			hood.runPassingCommand(),
 			ShufflaSubsystem.mInstance.runShootCommand(),
@@ -272,7 +272,7 @@ public class SuperSystem extends SubsystemBase {
 		return Commands.parallel(
 			turret.passAutoCommand(),
 			hood.runPassingCommand(),
-			Commands.waitSeconds(0.3),
+			Commands.waitSeconds(1),
 			shooter.runPassingCommand(turret::getPassDistance)
 			
 		).beforeStarting(disableStow()).finallyDo(()->{
@@ -305,7 +305,7 @@ public class SuperSystem extends SubsystemBase {
 		return Commands.parallel(
 			turret.passAutoCommand(),
 			hood.runLobPassingCommand(),
-			Commands.waitSeconds(0.3),
+			Commands.waitSeconds(1),
 			shooter.runLobPassingCommand(turret::getPassDistance),
 			
 			ShufflaSubsystem.mInstance.runShootCommand(),

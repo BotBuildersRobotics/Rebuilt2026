@@ -48,7 +48,7 @@
   "folder": "TrenchBump",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 45.0
+    "rotation": 35.0
   },
   "useDefaultConstraints": true
 }

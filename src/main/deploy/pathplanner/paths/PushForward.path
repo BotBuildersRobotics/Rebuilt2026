@@ -3,33 +3,52 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.437912218268091,
-        "y": 6.55803084223013
+        "x": 1.5024673784104396,
+        "y": 6.708659549228944
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.792965599051009,
-        "y": 5.955516014234875
+        "x": 1.4536149184784226,
+        "y": 6.388505981672139
       },
       "isLocked": false,
       "linkedName": "Hub2Depot-PickupEnd"
     },
     {
       "anchor": {
-        "x": 1.5777817319098464,
-        "y": 5.030225385527876
+        "x": 1.17,
+        "y": 5.0
       },
       "prevControl": {
-        "x": 1.5777817319098464,
-        "y": 5.57894424673784
+        "x": 1.3131869802024374,
+        "y": 6.050844359218903
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "HTD - 3"
     }
   ],
-  "rotationTargets": [],
-  "constraintZones": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.38352524357838874,
+      "rotationDegrees": -20.0
+    }
+  ],
+  "constraintZones": [
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 0,
+      "maxWaypointRelativePos": 1.0,
+      "constraints": {
+        "maxVelocity": 0.5,
+        "maxAcceleration": 3.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
@@ -48,7 +67,7 @@
   "folder": "HubToDepot",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 90.0
+    "rotation": 1.9198101301617119
   },
   "useDefaultConstraints": true
 }

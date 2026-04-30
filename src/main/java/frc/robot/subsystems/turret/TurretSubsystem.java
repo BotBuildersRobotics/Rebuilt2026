@@ -41,7 +41,8 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
   private double goalVelocityRadPerSec = 0.0;
   private double lastGoalAngle = 0.0;
 
-  private double turretOffset;
+  private double turretOffset = -15;  //1st game red - needed 3 ticks to right
+   
   private boolean turretZeroed = true;
 
   // 1.0 = use position+velocity feedforward, 0.0 = use Motion Magic

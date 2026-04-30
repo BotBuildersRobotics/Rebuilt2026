@@ -181,11 +181,11 @@ public class ControlSubsystem {
 
 		// Climb: left bumper = climb to position, right bumper = stow back to zero
 		operator.leftBumper().onTrue(s.climbExtend());
-		operator.rightBumper().onTrue(s.climbStow());
+		operator.rightBumper().onTrue(s.climb());
 
-		operator.b().onTrue(s.climb());
+		operator.b().onTrue(s.climbStow());
 
-		operator.y()
+		operator.x()
 			.onTrue(Commands.runOnce(() -> {
 			
 					IntakeSubsystem.mInstance.applySetpoint(IntakeSubsystem.REVERSE);
@@ -200,7 +200,21 @@ public class ControlSubsystem {
 					ShufflaSubsystem.mInstance.applySetpoint(ShufflaSubsystem.IDLE);
 			}
 			));
-		
+	
+		operator.y()
+			.onTrue(Commands.runOnce(() -> {
+			
+					ChuteSubsystem.mInstance.applySetpoint(ChuteSubsystem.REVERSE);
+					ShufflaSubsystem.mInstance.applySetpoint(ShufflaSubsystem.REVERSE);
+			
+			}))
+			.onFalse(Commands.runOnce(() -> {
+
+					ChuteSubsystem.mInstance.applySetpoint(ChuteSubsystem.IDLE);
+					ShufflaSubsystem.mInstance.applySetpoint(ShufflaSubsystem.IDLE);
+			}
+			));
+
 		operator.povDown().onTrue(ClimbSubsystem.mInstance.setpointCommand(ClimbSubsystem.CLIMB)).onFalse(
 			ClimbSubsystem.mInstance.setpointCommand(ClimbSubsystem.STOP)
 		);
@@ -211,7 +225,7 @@ public class ControlSubsystem {
 
 
 		// Zero turret
-		operator.x().onTrue(s.zeroTurretCommand());
+		//operator.x().onTrue(s.zeroTurretCommand());
 
 		// Reverse all systems (intake, shuffla, chute) — hold to reverse
 		//operator.y()
