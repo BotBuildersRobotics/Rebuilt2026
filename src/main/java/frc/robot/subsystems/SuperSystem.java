@@ -378,6 +378,10 @@ public class SuperSystem extends SubsystemBase {
 		return shooter.clearFlywheelPresetCommand();
 	}
 
+	public void clearflywheelPreset(){
+		shooter.clearflywheelPreset();
+	}
+
 	public Command setManualShooterVelocity(){
 		//use the tunable value;
 
@@ -415,6 +419,12 @@ public class SuperSystem extends SubsystemBase {
 		return Commands.runOnce(() ->
 			turret.offsetRight()
 		);
+	}
+
+	public Command zeroTurretOffset(){
+		return Commands.runOnce(() ->
+					turret.zeroOffset()
+				);
 	}
 
 	public Command reverseAllSystems(){

@@ -168,6 +168,10 @@ public class ShooterSubsystem  extends MotorSubsystem<MotorIOTalonFX> {
         return Commands.runOnce(() -> flywheelSpeedPreset = null);
     }
 
+    public void clearflywheelPreset(){
+        flywheelSpeedPreset = null;
+    }
+
     public Command runPassingCommand(DoubleSupplier distanceM) {
         return run(() -> {
             double speed = shotCalc.getFlywheelSpeedForDistance(distanceM.getAsDouble());

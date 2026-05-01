@@ -63,7 +63,7 @@ public class Robot extends LoggedRobot {
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
-
+    //Logger.recordOutput("Robot", power.getAllCurrents());
    
   }
 
@@ -101,6 +101,9 @@ public class Robot extends LoggedRobot {
     }
     SuperSystem.mInstance.clearFlywheelPreset().schedule();
     SuperSystem.mInstance.clearTurretAnglePreset().schedule();
+    SuperSystem.mInstance.stowTurret();
+    SuperSystem.mInstance.stowHood();
+    SuperSystem.mInstance.clearflywheelPreset();
   }
 
   /** This function is called periodically during operator control. */

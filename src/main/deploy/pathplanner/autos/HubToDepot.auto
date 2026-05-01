@@ -55,6 +55,24 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "setFlywheelHub"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "turretRightOffset"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "turretRightOffset"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "PickupDepot"
@@ -88,6 +106,24 @@
           "type": "path",
           "data": {
             "pathName": "Climb LineUp"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 2.0
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "clearTurretAngleOffset"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "stowTurret"
           }
         }
       ]

@@ -183,7 +183,7 @@ public class ControlSubsystem {
 		operator.leftBumper().onTrue(s.climbExtend());
 		operator.rightBumper().onTrue(s.climb());
 
-		operator.b().onTrue(s.climbStow());
+		operator.a().onTrue(s.climbStow());
 
 		operator.x()
 			.onTrue(Commands.runOnce(() -> {
@@ -233,7 +233,7 @@ public class ControlSubsystem {
 		//	.onFalse(s.idleAllSystems());
 
 		// Stow intake
-		operator.a().onTrue(s.stowIntake());
+		operator.b().onTrue(s.stowIntake());
 
 		// Vision calibration mode
 		operator.back().onTrue(Limelight.mInstance.toggleCalibrationMode());

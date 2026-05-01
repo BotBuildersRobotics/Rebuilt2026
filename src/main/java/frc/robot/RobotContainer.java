@@ -198,6 +198,10 @@ public class RobotContainer {
 			SuperSystem.mInstance.setFlywheelPreset(170)
 		);
 
+		NamedCommands.registerCommand("setFlywheelHub",  //used for auto
+			SuperSystem.mInstance.setFlywheelPreset(220)
+		);
+
 		NamedCommands.registerCommand("setFlywheelFast",
 			SuperSystem.mInstance.setFlywheelPreset(230.0)
 		);
@@ -220,6 +224,18 @@ public class RobotContainer {
 
 		NamedCommands.registerCommand("clearTurretAnglePreset",
 			SuperSystem.mInstance.clearTurretAnglePreset()
+		);
+
+		NamedCommands.registerCommand("turretRightOffset",
+			SuperSystem.mInstance.offsetTurretRight()
+		);
+
+		NamedCommands.registerCommand("turretLeftOffset",
+			SuperSystem.mInstance.offsetTurretLeft()
+		);
+
+		NamedCommands.registerCommand("clearTurretAngleOffset",
+			SuperSystem.mInstance.zeroTurretOffset()
 		);
 
 		NamedCommands.registerCommand("extendClimb",

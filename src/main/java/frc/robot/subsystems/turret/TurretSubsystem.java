@@ -41,7 +41,9 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
   private double goalVelocityRadPerSec = 0.0;
   private double lastGoalAngle = 0.0;
 
-  private double turretOffset = -15;  //1st game red - needed 3 ticks to right
+   //1st game red - needed 3 ticks to right - 15
+   //2nd game - we have none
+  private double turretOffset = 0; 
    
   private boolean turretZeroed = true;
 
@@ -219,6 +221,10 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
 
   public void offsetRight(){
     turretOffset -= 5.0;
+  }
+
+  public void zeroOffset(){
+    turretOffset = 0;
   }
 
   public double getTurretAngle() {

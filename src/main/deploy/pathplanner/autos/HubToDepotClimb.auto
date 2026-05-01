@@ -55,9 +55,27 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "setFlywheelHub"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "PickupDepot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "turretRightOffset"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "turretRightOffset"
           }
         },
         {
@@ -95,6 +113,12 @@
           "type": "named",
           "data": {
             "name": "idleIntake"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "clearTurretAngleOffset"
           }
         },
         {
