@@ -44,6 +44,8 @@ public class SuperSystem extends SubsystemBase {
 
 	private HoodSubsystem hood;
 
+	private boolean defenceModeActive = false;
+
 	//private AprilTagFieldLayout kAprilTagMap = AprilTagFieldLayout.loadField(AprilTagFields);
 
 
@@ -93,6 +95,7 @@ public class SuperSystem extends SubsystemBase {
 
 		 // Clear shooting parameters so they are recalculated each tick
     	shotCalc.clearShootingParameters();
+		SmartDashboard.putBoolean("SuperSystem/DefenceMode", defenceModeActive);
 		SmartDashboard.putBoolean("Drive/OnOpponentSide", ShiftHelpers.isOnOpponentSide());
 		SmartDashboard.putBoolean("Drive/InOpponentZone", ShiftHelpers.isInOpponentZone());
 		SmartDashboard.putBoolean("Hub/BlueActive", ShiftHelpers.isBlueHubActive());
@@ -445,6 +448,46 @@ public class SuperSystem extends SubsystemBase {
 
 	public Command stowIntake(){
 		return PivotSubsystem.mInstance.setpointCommand(PivotSubsystem.AGITATE);
+	}
+
+	/**
+	 * Enables persistent defence mode: stows intake pivot, stops flywheel, stows
+	 * turret/hood. State persists after command ends — call disableDefenceModeCommand() to exit.
+	 */
+	public Command enableDefenceModeCommand() {
+		return Commands.runOnce(() -> {
+			defenceModeActive = true;
+			turret.setStowed(true);
+			hood.setStowed(true);
+			PivotSubsystem.mInstance.applySetpoint(PivotSubsystem.STOW_FULL);
+			shooter.setDefaultCommand(shooter.followSetpointCommand(() -> ShooterSubsystem.IDLE));
+			SmartDashboard.putBoolean("SuperSystem/DefenceMode", true);
+		});
+	}
+
+	/**
+	 * Disables defence mode and restores normal shooter/turret/hood behaviour.
+	 */
+	public Command disableDefenceModeCommand() {
+		return Commands.runOnce(() -> {
+			defenceModeActive = false;
+			turret.setStowed(false);
+			hood.setStowed(false);
+			PivotSubsystem.mInstance.applySetpoint(PivotSubsystem.DEPLOY);
+			shooter.setDefaultCommand(shooter.runTrackTargetActiveShootingCommand());
+			SmartDashboard.putBoolean("SuperSystem/DefenceMode", false);
+		});
+	}
+
+	/** Toggles defence mode on or off. */
+	public Command toggleDefenceModeCommand() {
+		return Commands.runOnce(() -> {
+			if (defenceModeActive) {
+				disableDefenceModeCommand().schedule();
+			} else {
+				enableDefenceModeCommand().schedule();
+			}
+		});
 	}
 
 	public Command climb(){
