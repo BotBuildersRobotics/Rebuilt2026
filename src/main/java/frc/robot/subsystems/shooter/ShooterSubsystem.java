@@ -160,6 +160,10 @@ public class ShooterSubsystem  extends MotorSubsystem<MotorIOTalonFX> {
         return run(() -> runVelocity(rps));
     }
 
+    public void setFlywheelPreset(double rps) {
+        flywheelSpeedPreset = rps;
+    }
+
     public Command setFlywheelPresetCommand(double rps) {
         return Commands.runOnce(() -> flywheelSpeedPreset = rps);
     }

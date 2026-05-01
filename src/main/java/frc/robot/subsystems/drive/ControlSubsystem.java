@@ -166,7 +166,7 @@ public class ControlSubsystem {
 
 		driver.start().onTrue(DriveSubsystem.mInstance.runOnce( () ->DriveSubsystem.mInstance.getDrivetrain().seedFieldCentric()));
 
-		
+		driver.a().onTrue(s.toggleDefenceModeCommand());
     }
 
 	public void operatorControls(){

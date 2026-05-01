@@ -18,6 +18,7 @@ import static edu.wpi.first.units.Units.Volts;
 import java.util.function.BooleanSupplier;
 
 public class PivotSubsystem extends ServoMotorSubsystem<MotorIOTalonFX> {
+	public static final Setpoint STOW_DEFENCE = Setpoint.withMotionMagicSetpoint(PivotConstants.kDefenceStow);
 	public static final Setpoint STOW_FULL = Setpoint.withMotionMagicSetpoint(PivotConstants.kFullStowPosition);
 	public static final Setpoint DEPLOY = Setpoint.withMotionMagicSetpoint(PivotConstants.kDeployPosition);
 	

@@ -457,10 +457,11 @@ public class SuperSystem extends SubsystemBase {
 	public Command enableDefenceModeCommand() {
 		return Commands.runOnce(() -> {
 			defenceModeActive = true;
+			shooter.setFlywheelPreset(0);
 			turret.setStowed(true);
 			hood.setStowed(true);
-			PivotSubsystem.mInstance.applySetpoint(PivotSubsystem.STOW_FULL);
-			shooter.setDefaultCommand(shooter.followSetpointCommand(() -> ShooterSubsystem.IDLE));
+			Commands.waitSeconds(1);
+			PivotSubsystem.mInstance.applySetpoint(PivotSubsystem.STOW_DEFENCE);
 			SmartDashboard.putBoolean("SuperSystem/DefenceMode", true);
 		});
 	}
@@ -471,9 +472,8 @@ public class SuperSystem extends SubsystemBase {
 	public Command disableDefenceModeCommand() {
 		return Commands.runOnce(() -> {
 			defenceModeActive = false;
-			turret.setStowed(false);
-			hood.setStowed(false);
 			PivotSubsystem.mInstance.applySetpoint(PivotSubsystem.DEPLOY);
+			Commands.waitSeconds(0.2);
 			shooter.setDefaultCommand(shooter.runTrackTargetActiveShootingCommand());
 			SmartDashboard.putBoolean("SuperSystem/DefenceMode", false);
 		});
@@ -483,9 +483,9 @@ public class SuperSystem extends SubsystemBase {
 	public Command toggleDefenceModeCommand() {
 		return Commands.runOnce(() -> {
 			if (defenceModeActive) {
-				disableDefenceModeCommand().schedule();
+				disableDefenceModeCommand();
 			} else {
-				enableDefenceModeCommand().schedule();
+				enableDefenceModeCommand();
 			}
 		});
 	}
