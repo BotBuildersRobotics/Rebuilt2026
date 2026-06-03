@@ -181,10 +181,10 @@ public class LimelightSubsystem extends SubsystemBase {
 			PoseEstimate est = ios.get(i).getLatestPoseEstimate();
 			String prefix = "Vision/Camera" + i + "/";
 			Logger.recordOutput(prefix + "Name", ios.get(i).getName());
+			Logger.recordOutput(prefix + "TagCount", est != null ? est.tagCount : 0);
+			Logger.recordOutput(prefix + "AvgTagDist", est != null ? est.avgTagDist : 0.0);
 			if (est != null) {
 				Logger.recordOutput(prefix + "Pose", est.pose);
-				Logger.recordOutput(prefix + "TagCount", est.tagCount);
-				Logger.recordOutput(prefix + "AvgTagDist", est.avgTagDist);
 			}
 		}
 	}
