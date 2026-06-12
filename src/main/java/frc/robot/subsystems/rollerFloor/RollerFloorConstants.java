@@ -1,4 +1,4 @@
-package frc.robot.subsystems.shuffla;
+package frc.robot.subsystems.rollerFloor;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -10,9 +10,8 @@ import frc.robot.Ports;
 import frc.robot.Robot;
 
 
-public class ShufflaConstants {
-	
-	public static final Voltage kShootVoltage = Units.Volts.of( 12);
+public class RollerFloorConstants {
+
 	public static final Voltage kReverseVoltage = Units.Volts.of(-1);
 
 	public static TalonFXConfiguration getFXConfig() {
@@ -28,27 +27,28 @@ public class ShufflaConstants {
 
 		config.Voltage.PeakForwardVoltage = 12.0;
 		config.Voltage.PeakReverseVoltage = -12.0;
-		
+
+		config.Slot1.kS = 0.25;
+		config.Slot1.kV = 0.12;
+		config.Slot1.kP = 0.1;
 
 		config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
 		return config;
 	}
 
-	public static frc.robot.lib.io.MotorIOTalonFX.MotorIOTalonFXConfig getIOConfig() {
-		frc.robot.lib.io.MotorIOTalonFX.MotorIOTalonFXConfig config = new frc.robot.lib.io.MotorIOTalonFX.MotorIOTalonFXConfig();
+	public static MotorIOTalonFX.MotorIOTalonFXConfig getIOConfig() {
+		MotorIOTalonFX.MotorIOTalonFXConfig config = new MotorIOTalonFX.MotorIOTalonFXConfig();
 		config.mainConfig = getFXConfig();
 		config.time = Units.Minute;
 		config.unit = Units.Rotations;
-		config.mainID = Ports.SHUFFLA.getDeviceNumber();
-		config.mainBus = Ports.SHUFFLA.getBus();
+		config.mainID = Ports.ROLLER_FLOOR.getDeviceNumber();
+		config.mainBus = Ports.ROLLER_FLOOR.getBus();
 		return config;
 	}
 
 	public static MotorIOTalonFX getMotorIO() {
-		
 		return new MotorIOTalonFX(getIOConfig());
-		
 	}
 
 }

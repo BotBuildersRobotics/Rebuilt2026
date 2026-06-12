@@ -23,7 +23,7 @@ import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.pivot.PivotSubsystem;
 import frc.robot.subsystems.shooter.ShooterConstants;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
-import frc.robot.subsystems.shuffla.ShufflaSubsystem;
+import frc.robot.subsystems.rollerFloor.RollerFloorSubsystem;
 import frc.robot.subsystems.turret.TurretSubsystem;
 import frc.robot.subsystems.vision.Limelight;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
@@ -190,14 +190,14 @@ public class ControlSubsystem {
 			
 					IntakeSubsystem.mInstance.applySetpoint(IntakeSubsystem.REVERSE);
 					ChuteSubsystem.mInstance.applySetpoint(ChuteSubsystem.REVERSE);
-					ShufflaSubsystem.mInstance.applySetpoint(ShufflaSubsystem.REVERSE);
+					RollerFloorSubsystem.mInstance.applySetpoint(RollerFloorSubsystem.REVERSE);
 			
 			}))
 			.onFalse(Commands.runOnce(() -> {
 
 					IntakeSubsystem.mInstance.applySetpoint(IntakeSubsystem.IDLE);
 					ChuteSubsystem.mInstance.applySetpoint(ChuteSubsystem.IDLE);
-					ShufflaSubsystem.mInstance.applySetpoint(ShufflaSubsystem.IDLE);
+					RollerFloorSubsystem.mInstance.applySetpoint(RollerFloorSubsystem.IDLE);
 			}
 			));
 	
@@ -205,13 +205,13 @@ public class ControlSubsystem {
 			.onTrue(Commands.runOnce(() -> {
 			
 					ChuteSubsystem.mInstance.applySetpoint(ChuteSubsystem.REVERSE);
-					ShufflaSubsystem.mInstance.applySetpoint(ShufflaSubsystem.REVERSE);
+					RollerFloorSubsystem.mInstance.applySetpoint(RollerFloorSubsystem.REVERSE);
 			
 			}))
 			.onFalse(Commands.runOnce(() -> {
 
 					ChuteSubsystem.mInstance.applySetpoint(ChuteSubsystem.IDLE);
-					ShufflaSubsystem.mInstance.applySetpoint(ShufflaSubsystem.IDLE);
+					RollerFloorSubsystem.mInstance.applySetpoint(RollerFloorSubsystem.IDLE);
 			}
 			));
 

@@ -53,7 +53,7 @@ import frc.robot.subsystems.hood.HoodSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.pivot.PivotSubsystem;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
-import frc.robot.subsystems.shuffla.ShufflaSubsystem;
+import frc.robot.subsystems.rollerFloor.RollerFloorSubsystem;
 import frc.robot.subsystems.turret.TurretSubsystem;
 import frc.robot.subsystems.vision.Limelight;
 import frc.robot.subsystems.vision.LimelightSubsystem;
@@ -94,7 +94,7 @@ public class RobotContainer {
 			PivotSubsystem.mInstance,
 			ClimbSubsystem.mInstance,
 			ChuteSubsystem.mInstance,
-			ShufflaSubsystem.mInstance,
+			RollerFloorSubsystem.mInstance,
 			SuperSystem.mInstance,
 			//FuelDetectionSubsystem.mInstance
 

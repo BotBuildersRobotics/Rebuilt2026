@@ -21,7 +21,7 @@ import frc.robot.subsystems.hood.HoodSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.pivot.PivotSubsystem;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
-import frc.robot.subsystems.shuffla.ShufflaSubsystem;
+import frc.robot.subsystems.rollerFloor.RollerFloorSubsystem;
 import frc.robot.subsystems.turret.ShotCalculator;
 import frc.robot.subsystems.turret.TurretSubsystem;
 
@@ -123,7 +123,7 @@ public class SuperSystem extends SubsystemBase {
 	public Command Shoot(){
 		return
 		Commands.parallel(
-			ShufflaSubsystem.mInstance.runShootCommandGated(shooter::isAtSpeed),
+			RollerFloorSubsystem.mInstance.runShootCommandGated(shooter::isAtSpeed),
 			ChuteSubsystem.mInstance.runShootCommandGated(shooter::isAtSpeed)
 		);
 	}
@@ -132,7 +132,7 @@ public class SuperSystem extends SubsystemBase {
 		return
 		
 		Commands.parallel(
-			ShufflaSubsystem.mInstance.runShootCommand(),
+			RollerFloorSubsystem.mInstance.runShootCommand(),
 			ChuteSubsystem.mInstance.runShootCommand()
 		);
 	}
@@ -141,7 +141,7 @@ public class SuperSystem extends SubsystemBase {
 
 		return 
 		Commands.parallel(
-			ShufflaSubsystem.mInstance.setpointCommand(ShufflaSubsystem.IDLE),
+			RollerFloorSubsystem.mInstance.setpointCommand(RollerFloorSubsystem.IDLE),
 			ChuteSubsystem.mInstance.setpointCommand(ChuteSubsystem.IDLE)
 		);
 	}
@@ -263,7 +263,7 @@ public class SuperSystem extends SubsystemBase {
 			Commands.waitSeconds(1),
 			shooter.runPassingCommand(turret::getPassDistance),
 			hood.runPassingCommand(),
-			ShufflaSubsystem.mInstance.runShootCommand(),
+			RollerFloorSubsystem.mInstance.runShootCommand(),
 			ChuteSubsystem.mInstance.runShootCommand()
 		).beforeStarting(disableStow()).finallyDo(()->{
 			turret.setStowed(true);
@@ -311,7 +311,7 @@ public class SuperSystem extends SubsystemBase {
 			Commands.waitSeconds(1),
 			shooter.runLobPassingCommand(turret::getPassDistance),
 			
-			ShufflaSubsystem.mInstance.runShootCommand(),
+			RollerFloorSubsystem.mInstance.runShootCommand(),
 			ChuteSubsystem.mInstance.runShootCommand()
 		).beforeStarting(disableStow()).finallyDo(()->{
 			turret.setStowed(true);
@@ -433,7 +433,7 @@ public class SuperSystem extends SubsystemBase {
 	public Command reverseAllSystems(){
 		return Commands.parallel(
 			IntakeSubsystem.mInstance.setpointCommand(IntakeSubsystem.REVERSE),
-			ShufflaSubsystem.mInstance.setpointCommand(ShufflaSubsystem.REVERSE),
+			RollerFloorSubsystem.mInstance.setpointCommand(RollerFloorSubsystem.REVERSE),
 			ChuteSubsystem.mInstance.setpointCommand(ChuteSubsystem.REVERSE)
 		);
 	}
@@ -441,7 +441,7 @@ public class SuperSystem extends SubsystemBase {
 	public Command idleAllSystems(){
 		return Commands.parallel(
 			IntakeSubsystem.mInstance.setpointCommand(IntakeSubsystem.IDLE),
-			ShufflaSubsystem.mInstance.setpointCommand(ShufflaSubsystem.IDLE),
+			RollerFloorSubsystem.mInstance.setpointCommand(RollerFloorSubsystem.IDLE),
 			ChuteSubsystem.mInstance.setpointCommand(ChuteSubsystem.IDLE)
 		);
 	}
