@@ -20,6 +20,7 @@ public class VisionIOLimelight extends VisionIO {
 	private Pose2d latestEstimate = new Pose2d();
 	private Time latestEstimateTime = Units.Seconds.of(0.0);
 	private PoseEstimate latestPoseEstimate = null;
+	private double lastTimestampSeconds = -1;
 	private final VisionIOConfig config;
 
 	protected StructPublisher<Pose2d> visPose = NetworkTableInstance.getDefault()
@@ -50,6 +51,11 @@ public class VisionIOLimelight extends VisionIO {
 				config.name + "/Estimate to FGPA Timestamp", Utils.fpgaToCurrentTime(poseEstimate.timestampSeconds));
 
 		if (poseEstimate.tagCount >= minTagNum) {
+			if (poseEstimate.timestampSeconds <= lastTimestampSeconds) {
+				latestPoseEstimate = null;
+				return;
+			}
+			lastTimestampSeconds = poseEstimate.timestampSeconds;
 			latestEstimate = poseEstimate.pose;
 			latestEstimateTime = Units.Seconds.of(poseEstimate.timestampSeconds);
 			latestPoseEstimate = poseEstimate;
