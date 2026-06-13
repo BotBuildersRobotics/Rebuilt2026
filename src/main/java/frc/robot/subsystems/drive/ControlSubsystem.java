@@ -178,6 +178,8 @@ public class ControlSubsystem {
 		// Turret offset correction
 		operator.leftTrigger().onTrue(s.offsetTurretLeft());
 		operator.rightTrigger().onTrue(s.offsetTurretRight());
+		operator.povRight().onTrue(s.incrementFlywheelSpeed());
+		operator.povLeft().onTrue(s.decrementFlywheelSpeed());
 
 		// Climb: left bumper = climb to position, right bumper = stow back to zero
 		operator.leftBumper().onTrue(s.climbExtend());

@@ -455,37 +455,39 @@ public class SuperSystem extends SubsystemBase {
 	 * turret/hood. State persists after command ends — call disableDefenceModeCommand() to exit.
 	 */
 	public Command enableDefenceModeCommand() {
-		return Commands.runOnce(() -> {
-			defenceModeActive = true;
-			shooter.setFlywheelPreset(0);
-			turret.setStowed(true);
-			hood.setStowed(true);
-			Commands.waitSeconds(1);
-			PivotSubsystem.mInstance.applySetpoint(PivotSubsystem.STOW_DEFENCE);
-			SmartDashboard.putBoolean("SuperSystem/DefenceMode", true);
-		});
+		return Commands.parallel(
+			shooter.runAtVelocityCommand(0),
+			Commands.runOnce(() -> {
+				defenceModeActive = true;
+				turret.setStowed(true);
+				hood.setStowed(true);
+				Commands.waitSeconds(1);
+				PivotSubsystem.mInstance.applySetpoint(PivotSubsystem.STOW_DEFENCE);
+				SmartDashboard.putBoolean("SuperSystem/DefenceMode", true);
+			}));
 	}
 
 	/**
 	 * Disables defence mode and restores normal shooter/turret/hood behaviour.
 	 */
 	public Command disableDefenceModeCommand() {
-		return Commands.runOnce(() -> {
-			defenceModeActive = false;
-			PivotSubsystem.mInstance.applySetpoint(PivotSubsystem.DEPLOY);
-			Commands.waitSeconds(0.2);
-			shooter.setDefaultCommand(shooter.runTrackTargetActiveShootingCommand());
-			SmartDashboard.putBoolean("SuperSystem/DefenceMode", false);
-		});
+		return Commands.parallel(
+			shooter.runTrackTargetActiveShootingCommand(),
+			Commands.runOnce(() -> {
+				defenceModeActive = false;
+				PivotSubsystem.mInstance.applySetpoint(PivotSubsystem.DEPLOY);
+				Commands.waitSeconds(0.2);
+				SmartDashboard.putBoolean("SuperSystem/DefenceMode", false);
+			}));
 	}
 
 	/** Toggles defence mode on or off. */
 	public Command toggleDefenceModeCommand() {
 		return Commands.runOnce(() -> {
 			if (defenceModeActive) {
-				disableDefenceModeCommand();
+				disableDefenceModeCommand().schedule();
 			} else {
-				enableDefenceModeCommand();
+				enableDefenceModeCommand().schedule();
 			}
 		});
 	}
