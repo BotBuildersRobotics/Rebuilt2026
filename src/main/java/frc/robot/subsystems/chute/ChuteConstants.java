@@ -46,15 +46,24 @@ public class ChuteConstants {
 		MotorIOTalonFXS.MotorIOTalonFXSConfig config = new MotorIOTalonFXS.MotorIOTalonFXSConfig();
 		config.mainConfig = getRollerFXSConfig();
 		config.motorArrangement = MotorArrangementValue.Minion_JST;
+		config.mainConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 		config.time = Units.Minute;
 		config.unit = Units.Rotations;
 		config.mainID = Ports.CHUTE_TOP_ROLLER.getDeviceNumber();
 		config.mainBus = Ports.CHUTE_TOP_ROLLER.getBus();
 
-		/*config.followerConfig = getRollerFXSConfig();
-		config.followerOpposeMain = new boolean[] {true};
-		config.followerIDs = new int[] {Ports.CHUTE_BOTTOM_ROLLER.getDeviceNumber()};
-		config.followerBuses = new String[] {Ports.CHUTE_BOTTOM_ROLLER.getBus()};*/
+		return config;
+	}
+
+	public static MotorIOTalonFXS.MotorIOTalonFXSConfig getBottomRollerIOConfig() {
+		MotorIOTalonFXS.MotorIOTalonFXSConfig config = new MotorIOTalonFXS.MotorIOTalonFXSConfig();
+		config.mainConfig = getRollerFXSConfig();
+		config.motorArrangement = MotorArrangementValue.Minion_JST;
+		config.time = Units.Minute;
+		config.unit = Units.Rotations;
+		config.mainID = Ports.CHUTE_BOTTOM_ROLLER.getDeviceNumber();
+		config.mainBus = Ports.CHUTE_BOTTOM_ROLLER.getBus();
+
 		return config;
 	}
 
@@ -73,6 +82,9 @@ public class ChuteConstants {
 
 	public static MotorIOTalonFXS getRollerIO() {
 		return new MotorIOTalonFXS(getRollerIOConfig());
+	}
+	public static MotorIOTalonFXS getBottomRollerIO() {
+		return new MotorIOTalonFXS(getBottomRollerIOConfig());
 	}
 
 	// ── Feeder roller (TalonFX) ─────────────────────────────────────────────
