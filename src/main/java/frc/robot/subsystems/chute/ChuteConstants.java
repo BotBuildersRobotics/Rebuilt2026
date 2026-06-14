@@ -51,10 +51,23 @@ public class ChuteConstants {
 		config.mainID = Ports.CHUTE_TOP_ROLLER.getDeviceNumber();
 		config.mainBus = Ports.CHUTE_TOP_ROLLER.getBus();
 
-		config.followerConfig = getRollerFXSConfig();
+		/*config.followerConfig = getRollerFXSConfig();
 		config.followerOpposeMain = new boolean[] {true};
 		config.followerIDs = new int[] {Ports.CHUTE_BOTTOM_ROLLER.getDeviceNumber()};
-		config.followerBuses = new String[] {Ports.CHUTE_BOTTOM_ROLLER.getBus()};
+		config.followerBuses = new String[] {Ports.CHUTE_BOTTOM_ROLLER.getBus()};*/
+		return config;
+	}
+
+	public static MotorIOTalonFXS.MotorIOTalonFXSConfig getVertRollerIOConfig() {
+		MotorIOTalonFXS.MotorIOTalonFXSConfig config = new MotorIOTalonFXS.MotorIOTalonFXSConfig();
+		config.mainConfig = getRollerFXSConfig();
+		config.motorArrangement = MotorArrangementValue.Minion_JST;
+		config.mainConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+		config.time = Units.Minute;
+		config.unit = Units.Rotations;
+		config.mainID = Ports.CHUTE_SIDE_FEEDER.getDeviceNumber();
+		config.mainBus = Ports.CHUTE_SIDE_FEEDER.getBus();
+
 		return config;
 	}
 
@@ -95,6 +108,11 @@ public class ChuteConstants {
 		config.mainID = Ports.CHUTE_FEEDER.getDeviceNumber();
 		config.mainBus = Ports.CHUTE_FEEDER.getBus();
 		return config;
+	}
+
+
+	public static MotorIOTalonFXS getVertFeederIO() {
+		return new MotorIOTalonFXS(getVertRollerIOConfig());
 	}
 
 	public static MotorIOTalonFX getFeederIO() {

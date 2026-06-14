@@ -16,9 +16,12 @@ public class Ports {
 
     public static final CanDeviceId ROLLER_FLOOR = new CanDeviceId(16, "canivore");
     public static final CanDeviceId CHUTE_FEEDER = new CanDeviceId(37, "canivore");
-    public static final CanDeviceId CHUTE_TOP_ROLLER = new CanDeviceId(38, "canivore");
-    public static final CanDeviceId CHUTE_BOTTOM_ROLLER = new CanDeviceId(39, "canivore");
+    public static final CanDeviceId CHUTE_TOP_ROLLER = new CanDeviceId(39, "canivore");
+    public static final CanDeviceId CHUTE_BOTTOM_ROLLER = new CanDeviceId(38, "canivore");
    
+    public static final CanDeviceId CHUTE_SIDE_FEEDER = new CanDeviceId(41, "canivore");
+   
+
     public static final CanDeviceId PIVOT = new CanDeviceId(15, "canivore");
 
     public static final CanDeviceId CLIMB = new CanDeviceId(27, "canivore");

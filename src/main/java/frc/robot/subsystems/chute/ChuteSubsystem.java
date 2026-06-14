@@ -20,12 +20,16 @@ public class ChuteSubsystem extends SubsystemBase {
 	public static final ChuteSubsystem mInstance = new ChuteSubsystem();
 
 	private final MotorIOTalonFXS rollers;
+	private final MotorIOTalonFXS bottomRoller;
+	private final MotorIOTalonFXS sideFeeder;
 	private final MotorIOTalonFX feeder;
 
 	public ChuteSubsystem() {
 		super("Chute");
 		rollers = ChuteConstants.getRollerIO();
+		bottomRoller = ChuteConstants.getRollerIO();
 		feeder = ChuteConstants.getFeederIO();
+		sideFeeder = ChuteConstants.getVertFeederIO();
 		shootSpeed.initDefault(30); // RPS
 	}
 
@@ -33,11 +37,14 @@ public class ChuteSubsystem extends SubsystemBase {
 	public void periodic() {
 		rollers.updateInputs();
 		feeder.updateInputs();
+		bottomRoller.updateInputs();;
 	}
 
 	public void applySetpoint(Setpoint setpoint) {
 		rollers.applySetpoint(setpoint);
 		feeder.applySetpoint(setpoint);
+		sideFeeder.applySetpoint(setpoint);
+		bottomRoller.applySetpoint(setpoint);
 	}
 
 	/** Runs all three motors at the closed-loop velocity setpoint. Re-evaluates the tunable each cycle. */

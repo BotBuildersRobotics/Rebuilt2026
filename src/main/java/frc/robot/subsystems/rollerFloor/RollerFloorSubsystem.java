@@ -36,7 +36,7 @@ public class RollerFloorSubsystem extends MotorSubsystem<MotorIOTalonFX> {
 	public Command runShootCommandGated(BooleanSupplier ready) {
 		return run(() -> {
 			if (ready.getAsBoolean()) {
-				applySetpoint(Setpoint.withVelocitySetpoint(RotationsPerSecond.of(shootSpeed.get())));
+				applySetpoint(Setpoint.withVoltageSetpoint(RollerFloorConstants.kFloorVoltage));//.withVelocitySetpoint(RotationsPerSecond.of(shootSpeed.get())));
 			} else {
 				applySetpoint(IDLE);
 			}
