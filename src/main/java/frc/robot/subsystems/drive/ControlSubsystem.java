@@ -112,8 +112,8 @@ public class ControlSubsystem {
 					),
 					Commands.defer(() -> Commands.waitSeconds(shootDelay.get()), Set.of()),
 					Commands.parallel(
-						s.Shoot(),
-						s.intakePulseCommand()
+						s.Shoot()
+						// s.intakePulseCommand()
 					)
 				)
 			).onFalse(
@@ -135,7 +135,7 @@ public class ControlSubsystem {
 				Commands.defer(() -> Commands.waitSeconds(shootDelay.get()), Set.of()),
 				Commands.parallel(
 					s.Shoot(),
-					s.intakePulseCommand(),
+					// s.intakePulseCommand(),
 					s.pivotAgitateLoopCommand()
 				)
 			)
