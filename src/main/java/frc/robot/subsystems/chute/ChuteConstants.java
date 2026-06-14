@@ -23,11 +23,11 @@ public class ChuteConstants {
 		TalonFXSConfiguration config = new TalonFXSConfiguration();
 
 		config.CurrentLimits.StatorCurrentLimitEnable = Robot.isReal();
-		config.CurrentLimits.StatorCurrentLimit = 80.0;
+		config.CurrentLimits.StatorCurrentLimit = 40.0;
 
 		config.CurrentLimits.SupplyCurrentLimitEnable = Robot.isReal();
-		config.CurrentLimits.SupplyCurrentLimit = 40.0;
-		config.CurrentLimits.SupplyCurrentLowerLimit = 40.0;
+		config.CurrentLimits.SupplyCurrentLimit = 20.0;
+		config.CurrentLimits.SupplyCurrentLowerLimit = 20.0;
 		config.CurrentLimits.SupplyCurrentLowerTime = 0.1;
 
 		config.Voltage.PeakForwardVoltage = 12.0;
@@ -68,11 +68,11 @@ public class ChuteConstants {
 		TalonFXConfiguration config = new TalonFXConfiguration();
 
 		config.CurrentLimits.StatorCurrentLimitEnable = Robot.isReal();
-		config.CurrentLimits.StatorCurrentLimit = 100.0;
+		config.CurrentLimits.StatorCurrentLimit = 50.0;
 
 		config.CurrentLimits.SupplyCurrentLimitEnable = Robot.isReal();
-		config.CurrentLimits.SupplyCurrentLimit = 40.0;
-		config.CurrentLimits.SupplyCurrentLowerLimit = 40.0;
+		config.CurrentLimits.SupplyCurrentLimit = 20.0;
+		config.CurrentLimits.SupplyCurrentLowerLimit = 20.0;
 		config.CurrentLimits.SupplyCurrentLowerTime = 0.1;
 
 		config.Voltage.PeakForwardVoltage = 12.0;
