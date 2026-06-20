@@ -45,7 +45,6 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.SuperSystem;
 import frc.robot.subsystems.chute.ChuteSubsystem;
-import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
 import frc.robot.subsystems.drive.ControlSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem;
@@ -92,7 +91,6 @@ public class RobotContainer {
 			Limelight.mInstance,
 			IntakeSubsystem.mInstance,
 			PivotSubsystem.mInstance,
-			ClimbSubsystem.mInstance,
 			ChuteSubsystem.mInstance,
 			RollerFloorSubsystem.mInstance,
 			SuperSystem.mInstance,
@@ -106,7 +104,6 @@ public class RobotContainer {
 
 		// Dashboard buttons for zeroing mechanisms
 		SmartDashboard.putData("Zero Turret", SuperSystem.mInstance.zeroTurretCommand());
-		SmartDashboard.putData("Zero Climb", SuperSystem.mInstance.zeroClimb());
 
 		// SignalLogger control
 		SmartDashboard.putData("SysId/Signal Logger Start", Commands.runOnce(SignalLogger::start).ignoringDisable(true).withName("Signal Logger Start"));
@@ -168,16 +165,6 @@ public class RobotContainer {
 
 		);
 
-		NamedCommands.registerCommand("deployHook",
-			SuperSystem.mInstance.extendAutoCommand()
-		);
-
-		NamedCommands.registerCommand("climb",
-			SuperSystem.mInstance.climbAutoCommand()
-		);
-
-		
-
 		NamedCommands.registerCommand("agitateChassisCommand",
 			SuperSystem.mInstance.agitateChassisCommand().repeatedly().withTimeout(3.0)
 		);
@@ -236,18 +223,6 @@ public class RobotContainer {
 
 		NamedCommands.registerCommand("clearTurretAngleOffset",
 			SuperSystem.mInstance.zeroTurretOffset()
-		);
-
-		NamedCommands.registerCommand("extendClimb",
-
-			SuperSystem.mInstance.extendAutoCommand()
-
-		);
-
-		NamedCommands.registerCommand("climb",
-
-			SuperSystem.mInstance.climbStow()
-
 		);
 
 		autoChooser = AutoBuilder.buildAutoChooser();

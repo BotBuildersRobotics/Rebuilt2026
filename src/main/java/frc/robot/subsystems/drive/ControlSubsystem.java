@@ -16,8 +16,6 @@ import frc.robot.lib.LoggedTunableNumber;
 import frc.robot.lib.io.MotorIO.Setpoint;
 import frc.robot.subsystems.SuperSystem;
 import frc.robot.subsystems.chute.ChuteSubsystem;
-import frc.robot.subsystems.climb.ClimbConstants;
-import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.intake.IntakeConstants;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.pivot.PivotSubsystem;
@@ -179,12 +177,6 @@ public class ControlSubsystem {
 		operator.leftTrigger().onTrue(s.offsetTurretLeft());
 		operator.rightTrigger().onTrue(s.offsetTurretRight());
 
-		// Climb: left bumper = climb to position, right bumper = stow back to zero
-		//operator.leftBumper().onTrue(s.climbExtend());
-		//operator.rightBumper().onTrue(s.climb());
-
-		//operator.a().onTrue(s.climbStow());
-
 		operator.x()
 			.onTrue(Commands.runOnce(() -> {
 			
@@ -214,15 +206,6 @@ public class ControlSubsystem {
 					RollerFloorSubsystem.mInstance.applySetpoint(RollerFloorSubsystem.IDLE);
 			}
 			));
-
-		operator.povDown().onTrue(ClimbSubsystem.mInstance.setpointCommand(ClimbSubsystem.CLIMB)).onFalse(
-			ClimbSubsystem.mInstance.setpointCommand(ClimbSubsystem.STOP)
-		);
-
-		operator.povUp().onTrue(ClimbSubsystem.mInstance.setpointCommand(ClimbSubsystem.REVERSE)).onFalse(
-			ClimbSubsystem.mInstance.setpointCommand(ClimbSubsystem.STOP)
-		);
-
 
 		// Zero turret
 		//operator.x().onTrue(s.zeroTurretCommand());
