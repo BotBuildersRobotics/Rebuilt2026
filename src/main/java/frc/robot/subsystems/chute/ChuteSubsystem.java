@@ -39,7 +39,7 @@ public class ChuteSubsystem extends SubsystemBase {
 	public void periodic() {
 		rollers.updateInputs();
 		feeder.updateInputs();
-		bottomRoller.updateInputs();;
+		bottomRoller.updateInputs();
 	}
 
 	public void applySetpoint(Setpoint setpoint) {

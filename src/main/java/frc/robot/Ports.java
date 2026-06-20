@@ -22,7 +22,7 @@ public class Ports {
     public static final CanDeviceId CHUTE_SIDE_FEEDER = new CanDeviceId(41, "canivore");
    
 
-    public static final CanDeviceId PIVOT = new CanDeviceId(15, "canivore");
+    public static final CanDeviceId PIVOT = new CanDeviceId(43, "canivore");
 
     public static final CanDeviceId CLIMB = new CanDeviceId(27, "canivore");
 

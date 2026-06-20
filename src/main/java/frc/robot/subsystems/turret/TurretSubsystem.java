@@ -48,7 +48,7 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
   private boolean turretZeroed = true;
 
   // TEMP: cable issue — set false to re-enable tracking
-  private static final boolean LOCKED_TO_ZERO = true;
+  private static final boolean LOCKED_TO_ZERO = false;
 
   // 1.0 = use position+velocity feedforward, 0.0 = use Motion Magic
   private static final LoggedTunableNumber useVelocityFeedforward =

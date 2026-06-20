@@ -72,7 +72,7 @@ public class ShotCalculator {
   private static final InterpolatingDoubleTreeMap timeOfFlightMap =
       new InterpolatingDoubleTreeMap();
 
-  public static Transform3d robotToTurret = new Transform3d(-0.20, -0.20, 0.44, Rotation3d.kZero);
+  public static Transform3d robotToTurret = new Transform3d(-0.11, 0.105, 0.44, Rotation3d.kZero);
   
 
   static {
@@ -96,31 +96,32 @@ public class ShotCalculator {
     launchHoodAngleMap.put(5.60, Rotation2d.fromDegrees(41.0));
     launchHoodAngleMap.put(5.70, Rotation2d.fromDegrees(41.0));
 
-    launchFlywheelSpeedMap.put(0.00, 175.0);
-    launchFlywheelSpeedMap.put(1.0, 175.0);
-    launchFlywheelSpeedMap.put(1.68, 180.0); //
-    launchFlywheelSpeedMap.put(2.13, 184.0); //
-    launchFlywheelSpeedMap.put(2.81, 190.0); //in front of climb
-    launchFlywheelSpeedMap.put(3.08, 194.0); //AUTO 
-    launchFlywheelSpeedMap.put(3.18, 197.0);
-    launchFlywheelSpeedMap.put(3.28, 203.0);
-    launchFlywheelSpeedMap.put(3.35, 206.0);  
-    launchFlywheelSpeedMap.put(3.42,208.0); //
-    launchFlywheelSpeedMap.put(3.50, 209.0);
-    launchFlywheelSpeedMap.put(3.6, 210.0); //
-    launchFlywheelSpeedMap.put(3.7, 213.0);
-    launchFlywheelSpeedMap.put(3.82, 216.0);
-    launchFlywheelSpeedMap.put(4.09, 219.0);
-    launchFlywheelSpeedMap.put(4.20, 221.0);
-    launchFlywheelSpeedMap.put(4.30, 223.0); // near depot
-    launchFlywheelSpeedMap.put(4.40, 227.0); // near depot
-    launchFlywheelSpeedMap.put(4.60, 230.0); // near depot
-    launchFlywheelSpeedMap.put(4.77, 233.0);
-    launchFlywheelSpeedMap.put(4.97, 236.0);
-    launchFlywheelSpeedMap.put(5.17, 240.0);
-    launchFlywheelSpeedMap.put(5.57, 242.0);
-    launchFlywheelSpeedMap.put(5.60, 245.0);
-    launchFlywheelSpeedMap.put(5.70, 247.0);
+    launchFlywheelSpeedMap.put(0.00, 160.0);
+    launchFlywheelSpeedMap.put(1.0, 160.0);
+    launchFlywheelSpeedMap.put(1.68, 163.0); 
+    launchFlywheelSpeedMap.put(2.13, 165.0);
+    launchFlywheelSpeedMap.put(2.81, 168.0);
+    launchFlywheelSpeedMap.put(3.08, 171.0);
+    launchFlywheelSpeedMap.put(3.18, 174.0);
+    launchFlywheelSpeedMap.put(3.28, 177.0);
+    launchFlywheelSpeedMap.put(3.35, 180.0);  
+    launchFlywheelSpeedMap.put(3.42,183.0);
+    launchFlywheelSpeedMap.put(3.50, 185.0);
+    launchFlywheelSpeedMap.put(3.6, 187.5); 
+    launchFlywheelSpeedMap.put(3.7, 190.0);
+    launchFlywheelSpeedMap.put(3.82, 192.5);
+    launchFlywheelSpeedMap.put(4.09, 195.0);
+    launchFlywheelSpeedMap.put(4.20, 197.0); 
+    launchFlywheelSpeedMap.put(4.30, 198.0); // far  
+    launchFlywheelSpeedMap.put(4.40, 201.5);  
+    launchFlywheelSpeedMap.put(4.60, 204.0);  
+    launchFlywheelSpeedMap.put(4.77, 207.0);
+    launchFlywheelSpeedMap.put(4.97, 211.0);  
+    launchFlywheelSpeedMap.put(5.17, 214.0);
+    launchFlywheelSpeedMap.put(5.30, 217.0);
+    launchFlywheelSpeedMap.put(5.57, 220.0);
+    launchFlywheelSpeedMap.put(5.60, 223.0);
+    launchFlywheelSpeedMap.put(5.70, 226.0);
 
     timeOfFlightMap.put(5.68,0.93);
     timeOfFlightMap.put(4.55, 0.85);

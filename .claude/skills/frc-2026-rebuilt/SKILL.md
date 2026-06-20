@@ -38,15 +38,15 @@ Teleop based on AUTO performance, creating shifting gameplay across the field.
 
 ## 2. Field Elements
 
-| Element | Description |
-|---|---|
-| **HUB** | Central scoring structure. Robots score FUEL here. Has a sensor array. Can be active or inactive. |
-| **DEPOT** | Storage area holding up to 24 FUEL on the field |
-| **OUTPOST** | Human Player (HP) station. Has a CHUTE arm to deliver FUEL. Bottom opening for floor-level delivery. |
-| **TOWER** | Vertical climbing structure, 32.25" wide. Has 3 RUNGS: Low (27" from carpet), Mid (45"), High (63"). All rungs are 18" apart. |
-| **BUMP** | 6.5" tall, 73" wide obstacle — robots drive **over** it to cross the field |
-| **TRENCH** | 40.25" tall, 65.65" wide opening — robots drive **under** it to cross the field |
-| **NEUTRAL ZONE** | Center zone. FUEL can be collected here but not scored from here. HUB deposits excess FUEL here via chutes. |
+| Element          | Description                                                                                                                   |
+| ---------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| **HUB**          | Central scoring structure. Robots score FUEL here. Has a sensor array. Can be active or inactive.                             |
+| **DEPOT**        | Storage area holding up to 24 FUEL on the field                                                                               |
+| **OUTPOST**      | Human Player (HP) station. Has a CHUTE arm to deliver FUEL. Bottom opening for floor-level delivery.                          |
+| **TOWER**        | Vertical climbing structure, 32.25" wide. Has 3 RUNGS: Low (27" from carpet), Mid (45"), High (63"). All rungs are 18" apart. |
+| **BUMP**         | 6.5" tall, 73" wide obstacle — robots drive **over** it to cross the field                                                    |
+| **TRENCH**       | 40.25" tall, 65.65" wide opening — robots drive **under** it to cross the field                                               |
+| **NEUTRAL ZONE** | Center zone. FUEL can be collected here but not scored from here. HUB deposits excess FUEL here via chutes.                   |
 
 ---
 
@@ -54,13 +54,13 @@ Teleop based on AUTO performance, creating shifting gameplay across the field.
 
 ### Point Values
 
-| Action | Points |
-|---|---|
-| FUEL in HUB (AUTO) | 1 pt each |
-| FUEL in HUB (Teleop) | 1 pt each |
-| Tower — Level 1 climb | 10 pts |
-| Tower — Level 2 climb | 20 pts |
-| Tower — Level 3 climb | 30 pts |
+| Action                | Points                        |
+| --------------------- | ----------------------------- |
+| FUEL in HUB (AUTO)    | 1 pt each                     |
+| FUEL in HUB (Teleop)  | 1 pt each                     |
+| Tower — Level 1 climb | 10 pts                        |
+| Tower — Level 2 climb | 20 pts                        |
+| Tower — Level 3 climb | 30 pts                        |
 | Level 1 climb in AUTO | 15 pts (max 2 robots in AUTO) |
 
 ### Ranking Points (RP)
@@ -82,13 +82,13 @@ Teleop based on AUTO performance, creating shifting gameplay across the field.
 
 ### Teleop Shift Schedule
 
-| Shift | Time Window | Duration |
-|---|---|---|
-| Transition | 2:20 – 2:10 | 10 sec |
-| Shift 1 | 2:10 – 1:45 | 25 sec |
-| Shift 2 | 1:45 – 1:20 | 25 sec |
-| Shift 3 | 1:20 – 0:55 | 25 sec |
-| Shift 4 | 0:55 – 0:30 | 25 sec |
+| Shift      | Time Window | Duration |
+| ---------- | ----------- | -------- |
+| Transition | 2:20 – 2:10 | 10 sec   |
+| Shift 1    | 2:10 – 1:45 | 25 sec   |
+| Shift 2    | 1:45 – 1:20 | 25 sec   |
+| Shift 3    | 1:20 – 0:55 | 25 sec   |
+| Shift 4    | 0:55 – 0:30 | 25 sec   |
 
 ### HUB Activity Rules
 - **HUB 100% brightness** → HUB is active (score FUEL now!)
