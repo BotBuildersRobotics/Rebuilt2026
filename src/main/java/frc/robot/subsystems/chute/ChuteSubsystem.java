@@ -8,8 +8,6 @@ import frc.robot.lib.LoggedTunableNumber;
 import frc.robot.lib.io.MotorIO.Setpoint;
 import frc.robot.lib.io.MotorIOTalonFX;
 import frc.robot.lib.io.MotorIOTalonFXS;
-import edu.wpi.first.units.Units;
-import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -17,7 +15,11 @@ public class ChuteSubsystem extends SubsystemBase {
 	public static final Setpoint IDLE = Setpoint.withNeutralSetpoint();
 	public static final Setpoint REVERSE = Setpoint.withVoltageSetpoint(ChuteConstants.kReverseVoltage);
 
-	private static final LoggedTunableNumber shootSpeed = new LoggedTunableNumber("Chute/ShootSpeed");
+	// Per-motor shoot speeds (RPS) so each motor can be tuned independently.
+	private static final LoggedTunableNumber topRollerSpeed = new LoggedTunableNumber("Chute/TopRollerSpeed");
+	private static final LoggedTunableNumber bottomRollerSpeed = new LoggedTunableNumber("Chute/BottomRollerSpeed");
+	private static final LoggedTunableNumber sideFeederSpeed = new LoggedTunableNumber("Chute/SideFeederSpeed");
+	private static final LoggedTunableNumber feederSpeed = new LoggedTunableNumber("Chute/FeederSpeed");
 
 	public static final ChuteSubsystem mInstance = new ChuteSubsystem();
 
@@ -32,7 +34,10 @@ public class ChuteSubsystem extends SubsystemBase {
 		bottomRoller = ChuteConstants.getBottomRollerIO();
 		feeder = ChuteConstants.getFeederIO();
 		sideFeeder = ChuteConstants.getVertFeederIO();
-		shootSpeed.initDefault(80); // RPS
+		topRollerSpeed.initDefault(80); // RPS
+		bottomRollerSpeed.initDefault(80); // RPS
+		sideFeederSpeed.initDefault(80); // RPS
+		feederSpeed.initDefault(80); // RPS
 	}
 
 	@Override
@@ -49,27 +54,29 @@ public class ChuteSubsystem extends SubsystemBase {
 		bottomRoller.applySetpoint(setpoint);
 	}
 
-	/** Runs all three motors at the closed-loop velocity setpoint. Re-evaluates the tunable each cycle. */
+	/** Drives each motor at its own tunable velocity setpoint. Re-evaluates the tunables each call. */
+	private void applyShootSpeeds() {
+		rollers.applySetpoint(Setpoint.withVelocitySetpoint(RotationsPerSecond.of(topRollerSpeed.get())));
+		bottomRoller.applySetpoint(Setpoint.withVelocitySetpoint(RotationsPerSecond.of(bottomRollerSpeed.get())));
+		sideFeeder.applySetpoint(Setpoint.withVelocitySetpoint(RotationsPerSecond.of(sideFeederSpeed.get())));
+		feeder.applySetpoint(Setpoint.withVelocitySetpoint(RotationsPerSecond.of(feederSpeed.get())));
+	}
+
+	/** Runs every motor at its own closed-loop velocity setpoint. Re-evaluates the tunables each cycle. */
 	public Command runShootCommand() {
-		return runOnce(() -> {
-			Setpoint s = Setpoint.withVelocitySetpoint(RotationsPerSecond.of(shootSpeed.get()));
-			applySetpoint(s);
-		});
+		return runOnce(this::applyShootSpeeds);
 	}
 
 	/**
-	 * Runs all three motors at shoot speed when {@code ready} is true, idles otherwise.
+	 * Runs every motor at its own shoot speed when {@code ready} is true, idles otherwise.
 	 */
 	public Command runShootCommandGated(BooleanSupplier ready) {
 		return run(() -> {
-			//if (ready.getAsBoolean()) {
-				//Setpoint s = Setpoint.withVelocitySetpoint(RotationsPerSecond.of(shootSpeed.get()));
-				Setpoint s = Setpoint.withVoltageSetpoint(Units.Volts.of(12));
-				
-				applySetpoint(s);
-			//} else {
-			//	applySetpoint(IDLE);
-			//}
+			if (ready.getAsBoolean()) {
+				applyShootSpeeds();
+			} else {
+				applySetpoint(IDLE);
+			}
 		});
 	}
 

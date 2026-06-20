@@ -385,24 +385,6 @@ public class SuperSystem extends SubsystemBase {
 		shooter.clearflywheelPreset();
 	}
 
-	public Command setManualShooterVelocity(){
-		//use the tunable value;
-
-		return
-		Commands.parallel(
-			shooter.setManualShooterVelocity(),
-			hood.setManualHoodAngle()
-		);
-	}
-
-	public Command resetAutoMap(){
-		return 
-		Commands.sequence(		
-			shooter.resetAutoMap(),
-		 	hood.resetAutoMap()
-		);
-	}
-
 	public Command incrementFlywheelSpeed() {
 		return Commands.runOnce(() -> shooter.incrementFlywheelOffset());
 	}

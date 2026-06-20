@@ -15,19 +15,23 @@ import frc.robot.Robot;
 
 public class IntakeConstants {
 	
-	public static final Voltage kIntakeVoltage = Units.Volts.of( 12);
+	public static final Voltage kIntakeVoltage = Units.Volts.of( 9);
 	public static final Voltage kReverseVoltage = Units.Volts.of(-5);
 
 	public static TalonFXConfiguration getFXConfig() {
 		TalonFXConfiguration config = new TalonFXConfiguration();
 
+		// NOTE: these limits are PER MOTOR and the intake runs two opposing motors,
+		// so the battery sees roughly double each of these numbers.
 		config.CurrentLimits.StatorCurrentLimitEnable = Robot.isReal();
-		config.CurrentLimits.StatorCurrentLimit = 120.0;
+		config.CurrentLimits.StatorCurrentLimit = 80.0; // torque/heat cap (was 120)
 
+		// Allow a 50 A burst to grab/unjam a game piece, then clamp to 25 A steady
+		// so a stall doesn't sit at full current draining the battery.
 		config.CurrentLimits.SupplyCurrentLimitEnable = Robot.isReal();
-		config.CurrentLimits.SupplyCurrentLimit = 60.0;
-		config.CurrentLimits.SupplyCurrentLowerLimit = 60.0;
-		config.CurrentLimits.SupplyCurrentLowerTime = 0.1;
+		config.CurrentLimits.SupplyCurrentLimit = 50.0; // burst ceiling (was 60)
+		config.CurrentLimits.SupplyCurrentLowerLimit = 25.0; // steady-state (was 60 = no step-down)
+		config.CurrentLimits.SupplyCurrentLowerTime = 0.5; // seconds at burst before clamping
 
 		config.Voltage.PeakForwardVoltage = 12.0;
 		config.Voltage.PeakReverseVoltage = -12.0;

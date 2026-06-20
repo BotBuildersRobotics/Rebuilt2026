@@ -19,7 +19,8 @@ public class ChuteConstants {
 
 	// ── Roller pair (top + bottom, TalonFXS / Minion) ──────────────────────
 
-	public static TalonFXSConfiguration getRollerFXSConfig() {
+	/** Shared electrical limits and kP for the roller Minions. Per-motor feedforward (kS/kV) and inversion are set by the callers. */
+	private static TalonFXSConfiguration getBaseRollerFXSConfig() {
 		TalonFXSConfiguration config = new TalonFXSConfiguration();
 
 		config.CurrentLimits.StatorCurrentLimitEnable = Robot.isReal();
@@ -33,20 +34,39 @@ public class ChuteConstants {
 		config.Voltage.PeakForwardVoltage = 12.0;
 		config.Voltage.PeakReverseVoltage = -12.0;
 
-		config.Slot1.kS = 0.25;
-		config.Slot1.kV = 0.12;
 		config.Slot1.kP = 0.1;
 
-		config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+		return config;
+	}
 
+	public static TalonFXSConfiguration getTopRollerFXSConfig() {
+		TalonFXSConfiguration config = getBaseRollerFXSConfig();
+		config.Slot1.kS = 0.2;
+		config.Slot1.kV = 0.098;
+		config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+		return config;
+	}
+
+	public static TalonFXSConfiguration getBottomRollerFXSConfig() {
+		TalonFXSConfiguration config = getBaseRollerFXSConfig();
+		config.Slot1.kS = 0.2;
+		config.Slot1.kV = 0.098;
+		config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+		return config;
+	}
+
+	public static TalonFXSConfiguration getSideFeederFXSConfig() {
+		TalonFXSConfiguration config = getBaseRollerFXSConfig();
+		config.Slot1.kS = 0.2;
+		config.Slot1.kV = 0.098;
+		config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 		return config;
 	}
 
 	public static MotorIOTalonFXS.MotorIOTalonFXSConfig getRollerIOConfig() {
 		MotorIOTalonFXS.MotorIOTalonFXSConfig config = new MotorIOTalonFXS.MotorIOTalonFXSConfig();
-		config.mainConfig = getRollerFXSConfig();
+		config.mainConfig = getTopRollerFXSConfig();
 		config.motorArrangement = MotorArrangementValue.Minion_JST;
-		config.mainConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 		config.time = Units.Minute;
 		config.unit = Units.Rotations;
 		config.mainID = Ports.CHUTE_TOP_ROLLER.getDeviceNumber();
@@ -57,7 +77,7 @@ public class ChuteConstants {
 
 	public static MotorIOTalonFXS.MotorIOTalonFXSConfig getBottomRollerIOConfig() {
 		MotorIOTalonFXS.MotorIOTalonFXSConfig config = new MotorIOTalonFXS.MotorIOTalonFXSConfig();
-		config.mainConfig = getRollerFXSConfig();
+		config.mainConfig = getBottomRollerFXSConfig();
 		config.motorArrangement = MotorArrangementValue.Minion_JST;
 		config.time = Units.Minute;
 		config.unit = Units.Rotations;
@@ -69,9 +89,8 @@ public class ChuteConstants {
 
 	public static MotorIOTalonFXS.MotorIOTalonFXSConfig getVertRollerIOConfig() {
 		MotorIOTalonFXS.MotorIOTalonFXSConfig config = new MotorIOTalonFXS.MotorIOTalonFXSConfig();
-		config.mainConfig = getRollerFXSConfig();
+		config.mainConfig = getSideFeederFXSConfig();
 		config.motorArrangement = MotorArrangementValue.Minion_JST;
-		config.mainConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 		config.time = Units.Minute;
 		config.unit = Units.Rotations;
 		config.mainID = Ports.CHUTE_SIDE_FEEDER.getDeviceNumber();
