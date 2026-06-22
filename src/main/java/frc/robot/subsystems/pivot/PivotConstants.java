@@ -43,8 +43,16 @@ public class PivotConstants {
 		config.Voltage.PeakForwardVoltage = 12.0;
 		config.Voltage.PeakReverseVoltage = -12.0;
 
+		// Stator cap limits torque/heat during a move and protects against a stall.
+		config.CurrentLimits.StatorCurrentLimitEnable = true;
+		config.CurrentLimits.StatorCurrentLimit = 60.0;
+
+		// Supply: allow a 40 A burst to swing the pivot, then drop to 15 A once the
+		// move has been drawing the burst current for longer than the lower-time.
 		config.CurrentLimits.SupplyCurrentLimitEnable = true;
-		config.CurrentLimits.SupplyCurrentLimit = 40.0;
+		config.CurrentLimits.SupplyCurrentLimit = 40.0; // burst ceiling
+		config.CurrentLimits.SupplyCurrentLowerLimit = 15.0; // steady-state hold
+		config.CurrentLimits.SupplyCurrentLowerTime = 0.5; // seconds at burst before clamping
 
 		config.Feedback.SensorToMechanismRatio = kGearing;
 

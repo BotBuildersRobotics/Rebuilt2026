@@ -16,7 +16,6 @@ import frc.robot.ShiftHelpers;
 import frc.robot.lib.AllianceFlipUtil;
 import frc.robot.lib.LoggedTunableNumber;
 import frc.robot.subsystems.chute.ChuteSubsystem;
-import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.hood.HoodSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.pivot.PivotSubsystem;
@@ -385,24 +384,6 @@ public class SuperSystem extends SubsystemBase {
 		shooter.clearflywheelPreset();
 	}
 
-	public Command setManualShooterVelocity(){
-		//use the tunable value;
-
-		return
-		Commands.parallel(
-			shooter.setManualShooterVelocity(),
-			hood.setManualHoodAngle()
-		);
-	}
-
-	public Command resetAutoMap(){
-		return 
-		Commands.sequence(		
-			shooter.resetAutoMap(),
-		 	hood.resetAutoMap()
-		);
-	}
-
 	public Command incrementFlywheelSpeed() {
 		return Commands.runOnce(() -> shooter.incrementFlywheelOffset());
 	}
@@ -488,29 +469,6 @@ public class SuperSystem extends SubsystemBase {
 				enableDefenceModeCommand();
 			}
 		});
-	}
-
-	public Command climb(){
-		return ClimbSubsystem.mInstance.climbCommand();
-	}
-	public Command climbExtend(){
-		return ClimbSubsystem.mInstance.extendCommand();
-	}
-
-	public Command climbStow(){
-		return ClimbSubsystem.mInstance.stowCommand();
-	}
-
-	public Command climbAutoCommand(){
-		return ClimbSubsystem.mInstance.climeAutoCommand();
-	}
-
-	public Command extendAutoCommand(){
-		return ClimbSubsystem.mInstance.extendAutoCommand();
-	}
-
-	public Command zeroClimb(){
-		return ClimbSubsystem.mInstance.zeroCommand();
 	}
 
 	public Command agitateChassisCommand() {

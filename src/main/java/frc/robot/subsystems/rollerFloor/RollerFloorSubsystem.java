@@ -20,7 +20,7 @@ public class RollerFloorSubsystem extends MotorSubsystem<MotorIOTalonFX> {
 
 	public RollerFloorSubsystem() {
 		super(RollerFloorConstants.getMotorIO(), "Roller Floor");
-		shootSpeed.initDefault(200); // RPS
+		shootSpeed.initDefault(75); // RPS - max is around 80
 	}
 
 	/** Runs the roller floor at a closed-loop velocity setpoint. Re-evaluates the tunable each cycle. */

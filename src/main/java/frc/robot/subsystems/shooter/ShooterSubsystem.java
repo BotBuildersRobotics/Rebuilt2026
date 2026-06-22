@@ -3,7 +3,6 @@ package frc.robot.subsystems.shooter;
 import frc.robot.lib.LoggedTunableNumber;
 import frc.robot.lib.io.MotorIO.Setpoint;
 
-import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
@@ -26,12 +25,10 @@ public class ShooterSubsystem  extends MotorSubsystem<MotorIOTalonFX> {
 	
     public static final Setpoint IDLE = Setpoint.withNeutralSetpoint();
 
-    private static final LoggedTunableNumber manualShooter = new LoggedTunableNumber("Shooter/Manual");
     private static final LoggedTunableNumber passingSpeed = new LoggedTunableNumber("Shooter/PassingSpeed");
     private static final LoggedTunableNumber lobPassingSpeed = new LoggedTunableNumber("Shooter/LobPassingSpeed");
     private static final LoggedTunableNumber atSpeedToleranceRPS = new LoggedTunableNumber("Shooter/AtSpeedToleranceRPS");
 
-    private boolean manualTune = false;
     private double flywheelSpeedOffset = 0.0;
     private Double flywheelSpeedPreset = null; // null = use shot calculator
     
@@ -49,7 +46,6 @@ public class ShooterSubsystem  extends MotorSubsystem<MotorIOTalonFX> {
 
 	public ShooterSubsystem() {
 		super(ShooterConstants.getMotorIO(), "Shooter Rollers");
-        manualShooter.initDefault(200);
         passingSpeed.initDefault(275);
         lobPassingSpeed.initDefault(360);
         atSpeedToleranceRPS.initDefault(10.0);
@@ -83,39 +79,18 @@ public class ShooterSubsystem  extends MotorSubsystem<MotorIOTalonFX> {
         //    RotationsPerSecond.of(rps)));
     }
 
-    public Command setManualShooterVelocity(){
-
-        return run(() -> {
-            this.manualTune = true;
-            
-            this.applySetpoint(Setpoint.withVelocitySetpoint(
-            RotationsPerSecond.of(manualShooter.get())));
-
-           //   this.applySetpoint(Setpoint.withVelocityFOCSetpoint(
-            //RotationsPerSecond.of(manualShooter.get())));
-
-        });
-
-    }
-
      public void periodic() {
         super.periodic();
         double velocityRPS = this.getVelocity().in(RotationsPerSecond);
         SmartDashboard.putNumber("Shooter/SpeedRPS", velocityRPS);
         SmartDashboard.putNumber("Shooter/SetpointRPS", setpointVal);
         SmartDashboard.putBoolean("Shooter/AtSpeed", isAtSpeed());
-        SmartDashboard.putBoolean("Shooter/Manual", manualTune);
 
         Logger.recordOutput("Shooter/VelocityRPS", velocityRPS);
         Logger.recordOutput("Shooter/VelocitySetPoint", setpointVal);
-        Logger.recordOutput("Shooter/ManualTune", manualTune);
         Logger.recordOutput("Shooter/SpeedOffset", flywheelSpeedOffset);
         Logger.recordOutput("Shooter/AtSpeed", isAtSpeed());
      }
-
-    public Command resetAutoMap(){
-        return Commands.runOnce(() -> this.manualTune = false);
-    }
 
     private void stop() {
         this.applySetpoint(IDLE);
@@ -136,14 +111,12 @@ public class ShooterSubsystem  extends MotorSubsystem<MotorIOTalonFX> {
     public Command runTrackTargetActiveShootingCommand() {
         return run(
             () -> {
-                if(!this.manualTune){
-                    if (flywheelSpeedPreset != null) {
-                        setpointVal = flywheelSpeedPreset + flywheelSpeedOffset;
-                    } else {
-                        setpointVal = shotCalc.getParameters().flywheelSpeed() + flywheelSpeedOffset;
-                    }
-                    runVelocity(setpointVal);
+                if (flywheelSpeedPreset != null) {
+                    setpointVal = flywheelSpeedPreset + flywheelSpeedOffset;
+                } else {
+                    setpointVal = shotCalc.getParameters().flywheelSpeed() + flywheelSpeedOffset;
                 }
+                runVelocity(setpointVal);
             });
     }
 
