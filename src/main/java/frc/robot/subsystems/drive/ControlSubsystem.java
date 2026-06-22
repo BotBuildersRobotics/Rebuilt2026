@@ -98,7 +98,7 @@ public class ControlSubsystem {
 		driver.rightTrigger()
 			.and(() -> passingEnabled && ShiftHelpers.isOnOpponentSide())
 			.whileTrue(new ConditionalCommand(s.passLobAuto(), s.passAutoSCR(), ShiftHelpers::isInOpponentZone))
-			.onFalse(Commands.parallel(s.stowTurretHood(), s.idleShooter(), s.idleIntakes()));
+			.onFalse(Commands.parallel(s.stowTurretHood(), s.idleShooter()));
 
 		// Trigger pull (alliance side, or passing disabled): normal shoot.
 		// No turret requirement here — turret default command provides field-relative tracking.
@@ -120,7 +120,6 @@ public class ControlSubsystem {
 				Commands.parallel(
 					s.stowTurretHood(),
 					s.idleShooter(),
-					s.idleIntakes(),
 					Commands.runOnce(() -> DriveConstants.setShootingSpeedLimited(false))
 				)
 			);
@@ -143,7 +142,6 @@ public class ControlSubsystem {
 			Commands.parallel(
 				s.stowTurretHood(),
 				s.idleShooter(),
-				s.idleIntakes(),
 				PivotSubsystem.mInstance.setpointCommand(PivotSubsystem.DEPLOY),
 				Commands.runOnce(() -> DriveConstants.setShootingSpeedLimited(false))
 			)
@@ -167,6 +165,22 @@ public class ControlSubsystem {
 		driver.start().onTrue(DriveSubsystem.mInstance.runOnce( () ->DriveSubsystem.mInstance.getDrivetrain().seedFieldCentric()));
 
 		driver.a().onTrue(s.toggleDefenceModeCommand());
+
+		driver.y()
+			.onTrue(Commands.runOnce(() -> {
+			
+					IntakeSubsystem.mInstance.applySetpoint(IntakeSubsystem.REVERSE);
+					ChuteSubsystem.mInstance.applySetpoint(ChuteSubsystem.REVERSE);
+					RollerFloorSubsystem.mInstance.applySetpoint(RollerFloorSubsystem.REVERSE);
+			
+			}))
+			.onFalse(Commands.runOnce(() -> {
+
+					IntakeSubsystem.mInstance.applySetpoint(IntakeSubsystem.IDLE);
+					ChuteSubsystem.mInstance.applySetpoint(ChuteSubsystem.IDLE);
+					RollerFloorSubsystem.mInstance.applySetpoint(RollerFloorSubsystem.IDLE);
+			}
+			));
     }
 
 	public void operatorControls(){
