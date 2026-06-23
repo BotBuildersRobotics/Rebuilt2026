@@ -30,8 +30,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class TurretSubsystem extends MotorSubsystem<MotorIO> {
     
-  private static final double minAngle = Units.degreesToRadians(-210.0);
-  private static final double maxAngle = Units.degreesToRadians(210.0);
+  private static final double minAngle = Units.degreesToRadians(-180.0);
+  private static final double maxAngle = Units.degreesToRadians(180.0);
   private static final double trackOverlapMargin = Units.degreesToRadians(10);
   private static final double trackCenterRads = (minAngle + maxAngle) / 2;
   private static final double trackMinAngle = trackCenterRads - Math.PI - trackOverlapMargin;

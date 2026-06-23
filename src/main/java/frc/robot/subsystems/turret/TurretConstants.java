@@ -41,8 +41,8 @@ public class TurretConstants {
 
 		// Mechanism units (after SensorToMechanismRatio). Kraken X60 free speed ≈ 100 rot/s rotor
 		// ÷ 41.67 ≈ 2.4 rot/s at the turret, so cruise must stay below that to actually profile.
-		config.MotionMagic.MotionMagicCruiseVelocity = 2.0; // rot/s at mechanism (~83% of free speed)
-		config.MotionMagic.MotionMagicAcceleration = 6.0; // rot/s² at mechanism (reaches cruise in ~0.33s)
+		config.MotionMagic.MotionMagicCruiseVelocity = 2.4; // rot/s at mechanism (~83% of free speed)
+		config.MotionMagic.MotionMagicAcceleration = 12.0; // rot/s² at mechanism (reaches cruise in ~0.33s)
     	//config.MotionMagic.MotionMagicJerk = 1100;
 		
 
@@ -53,7 +53,7 @@ public class TurretConstants {
 		config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
 
-		config.Slot0.kP = 50;//25.88; 
+		config.Slot0.kP = 30;//25.88; 
 		config.Slot0.kI = 0.002;
 		config.Slot0.kD = 0.005;
 		config.Slot0.kS = 1.90;

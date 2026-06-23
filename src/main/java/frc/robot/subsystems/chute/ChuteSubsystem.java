@@ -34,9 +34,9 @@ public class ChuteSubsystem extends SubsystemBase {
 		bottomRoller = ChuteConstants.getBottomRollerIO();
 		feeder = ChuteConstants.getFeederIO();
 		sideFeeder = ChuteConstants.getVertFeederIO();
-		topRollerSpeed.initDefault(80); // RPS
-		bottomRollerSpeed.initDefault(80); // RPS
-		sideFeederSpeed.initDefault(80); // RPS
+		topRollerSpeed.initDefault(90); // RPS
+		bottomRollerSpeed.initDefault(90); // RPS
+		sideFeederSpeed.initDefault(50); // RPS
 		feederSpeed.initDefault(80); // RPS
 	}
 
