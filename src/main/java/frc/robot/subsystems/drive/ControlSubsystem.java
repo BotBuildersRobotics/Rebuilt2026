@@ -48,12 +48,6 @@ public class ControlSubsystem {
 	private static final LoggedTunableNumber shootDelay =
 		new LoggedTunableNumber("Driver/ShootDelaySec");
 
-	// How long after releasing the trigger before the turret/hood stow.
-	// Holds aim so any ball still clearing the shooter lands on target instead of
-	// being flung off-axis as the turret returns home.
-	private static final LoggedTunableNumber stowDelay =
-		new LoggedTunableNumber("Driver/StowDelaySec");
-
 
     public void configureBindings() {
 		DriveSubsystem.mInstance.setDefaultCommand(DriveSubsystem.mInstance.followSwerveRequestCommand(
@@ -95,7 +89,6 @@ public class ControlSubsystem {
 		);
 
 		shootDelay.initDefault(0.3);
-		stowDelay.initDefault(0.3);
 
 		// Trigger pull (opponent side + passing enabled): pass over the bump.
 		// Separate binding so the pass commands' turret requirement doesn't bleed into
@@ -123,10 +116,7 @@ public class ControlSubsystem {
 				)
 			).onFalse(
 				Commands.parallel(
-					Commands.sequence(
-						Commands.defer(() -> Commands.waitSeconds(stowDelay.get()), Set.of()),
-						s.stowTurretHood()
-					),
+					s.stowTurretHood(),
 					s.idleShooter(),
 					Commands.runOnce(() -> DriveConstants.setShootingSpeedLimited(false))
 				)
@@ -148,10 +138,7 @@ public class ControlSubsystem {
 			)
 		).onFalse(
 			Commands.parallel(
-				Commands.sequence(
-					Commands.defer(() -> Commands.waitSeconds(stowDelay.get()), Set.of()),
-					s.stowTurretHood()
-				),
+				s.stowTurretHood(),
 				s.idleShooter(),
 				PivotSubsystem.mInstance.setpointCommand(PivotSubsystem.DEPLOY),
 				Commands.runOnce(() -> DriveConstants.setShootingSpeedLimited(false))
