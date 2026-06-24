@@ -98,21 +98,21 @@ public class ShotCalculator {
 
     launchFlywheelSpeedMap.put(0.00, 160.0);
     launchFlywheelSpeedMap.put(1.0, 160.0);
-    launchFlywheelSpeedMap.put(1.68, 163.0); 
-    launchFlywheelSpeedMap.put(2.13, 165.0);
-    launchFlywheelSpeedMap.put(2.81, 168.0);
-    launchFlywheelSpeedMap.put(3.08, 171.0);
-    launchFlywheelSpeedMap.put(3.18, 174.0);
-    launchFlywheelSpeedMap.put(3.28, 177.0);
-    launchFlywheelSpeedMap.put(3.35, 180.0);  
-    launchFlywheelSpeedMap.put(3.42,183.0);
-    launchFlywheelSpeedMap.put(3.50, 185.0);
-    launchFlywheelSpeedMap.put(3.6, 187.5); 
-    launchFlywheelSpeedMap.put(3.7, 190.0);
-    launchFlywheelSpeedMap.put(3.82, 192.5);
-    launchFlywheelSpeedMap.put(4.09, 195.0);
+    launchFlywheelSpeedMap.put(1.68, 165.0); 
+    launchFlywheelSpeedMap.put(2.13, 168.0);
+    launchFlywheelSpeedMap.put(2.81, 171.0);
+    launchFlywheelSpeedMap.put(3.08, 174.0);
+    launchFlywheelSpeedMap.put(3.18, 177.0);
+    launchFlywheelSpeedMap.put(3.28, 180.0);
+    launchFlywheelSpeedMap.put(3.35, 183.0);  
+    launchFlywheelSpeedMap.put(3.42,186.0);
+    launchFlywheelSpeedMap.put(3.50, 189.0);
+    launchFlywheelSpeedMap.put(3.6, 191.0); 
+    launchFlywheelSpeedMap.put(3.7, 192.5);
+    launchFlywheelSpeedMap.put(3.82, 194.0);
+    launchFlywheelSpeedMap.put(4.09, 195.5);
     launchFlywheelSpeedMap.put(4.20, 197.0); 
-    launchFlywheelSpeedMap.put(4.30, 198.0); // far  
+    launchFlywheelSpeedMap.put(4.30, 198.5);
     launchFlywheelSpeedMap.put(4.40, 201.5);  
     launchFlywheelSpeedMap.put(4.60, 204.0);  
     launchFlywheelSpeedMap.put(4.77, 207.0);
