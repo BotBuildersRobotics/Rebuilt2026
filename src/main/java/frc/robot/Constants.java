@@ -22,9 +22,16 @@ public final class Constants {
   public static class OperatorConstants {
   public static final int kDriverControllerPort = 0;
 
- 
+  public enum ControllerType {
+    XBOX,
+    PS5
   }
 
+  /** Controler Type Configuration (XBOX/PS5). */
+  public static final ControllerType kDriverControllerType = ControllerType.XBOX; // Driver
+  public static final ControllerType kOperatorControllerType = ControllerType.XBOX; // Operator
+
+  }
 
   public static boolean tuningMode = true;
 }

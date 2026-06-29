@@ -3,11 +3,21 @@ package frc.robot.subsystems.drive;
 
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Time;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.Constants.OperatorConstants;
+import frc.robot.Constants.OperatorConstants.ControllerType;
 
 public class ControlBoardConstants {
-	public static final CommandXboxController mDriverController = new CommandXboxController(0);
-	public static final CommandXboxController mOperatorController = new CommandXboxController(1);
+
+	public static final ControllerMap mDriverController =
+			makeController(0, OperatorConstants.kDriverControllerType);
+	public static final ControllerMap mOperatorController =
+			makeController(1, OperatorConstants.kOperatorControllerType);
+
+	private static ControllerMap makeController(int port, ControllerType type) {
+		return type == ControllerType.PS5
+				? new PS5ControllerMap(port)
+				: new XboxControllerMap(port);
+	}
 
 	public static final Time kIntakeRumbleTime = Units.Seconds.of(0.2);
 
