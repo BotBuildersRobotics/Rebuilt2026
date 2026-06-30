@@ -9,7 +9,6 @@ import java.util.Set;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import frc.robot.ShiftHelpers;
 import frc.robot.lib.LoggedTunableNumber;
@@ -32,8 +31,8 @@ public class ControlSubsystem {
 
     public static final ControlSubsystem mInstance = new ControlSubsystem();
 
-	private CommandXboxController driver = ControlBoardConstants.mDriverController;
-	private CommandXboxController operator = ControlBoardConstants.mOperatorController;
+	private ControllerMap driver = ControlBoardConstants.mDriverController;
+	private ControllerMap operator = ControlBoardConstants.mOperatorController;
 	
 
 	private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
