@@ -13,7 +13,7 @@ import frc.robot.Robot;
 public class RollerFloorConstants {
 
 	public static final Voltage kReverseVoltage = Units.Volts.of(-3);
-	public static final Voltage kFloorVoltage = Units.Volts.of(8);
+	public static final Voltage kFloorVoltage = Units.Volts.of(10);
 
 	public static TalonFXConfiguration getFXConfig() {
 		TalonFXConfiguration config = new TalonFXConfiguration();

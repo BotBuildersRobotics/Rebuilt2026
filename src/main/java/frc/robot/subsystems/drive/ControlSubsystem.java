@@ -191,6 +191,9 @@ public class ControlSubsystem {
 		operator.leftTrigger().onTrue(s.offsetTurretLeft());
 		operator.rightTrigger().onTrue(s.offsetTurretRight());
 
+		operator.povUp().onTrue(s.incrementFlywheelSpeed());
+		operator.povDown().onTrue(s.decrementFlywheelSpeed());
+
 		operator.x()
 			.onTrue(Commands.runOnce(() -> {
 			

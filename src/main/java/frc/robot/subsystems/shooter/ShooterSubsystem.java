@@ -29,7 +29,7 @@ public class ShooterSubsystem  extends MotorSubsystem<MotorIOTalonFX> {
     private static final LoggedTunableNumber lobPassingSpeed = new LoggedTunableNumber("Shooter/LobPassingSpeed");
     private static final LoggedTunableNumber atSpeedToleranceRPS = new LoggedTunableNumber("Shooter/AtSpeedToleranceRPS");
 
-    private double flywheelSpeedOffset = 0.0;
+    private double flywheelSpeedOffset = 15.0;
     private Double flywheelSpeedPreset = null; // null = use shot calculator
     
     //RPM = radians / second * 9.5493
