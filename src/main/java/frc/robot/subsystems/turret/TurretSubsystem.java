@@ -94,6 +94,14 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
     // Initialize field visualization for AdvantageScope
     fieldViz = new Field2d();
     SmartDashboard.putData("Turret Field Viz", fieldViz);
+
+    // Gear-ratio calibration buttons (run from AdvantageScope/Shuffleboard):
+    //  1. Point turret straight ahead, press "Turret/Zero".
+    //  2. Set Turret/TestAngleDeg (start at 45), press "Turret/RunTest".
+    //  3. Measure the ACTUAL physical sweep, type it into Turret/Test/MeasuredDeg.
+    //  4. Read the corrected value off Turret/Test/SuggestedRatio.
+    SmartDashboard.putData("Turret/Zero", zeroCommand());
+    SmartDashboard.putData("Turret/RunTest", testAimRobotRelative());
   }
 
   public void setShotCalculator(ShotCalculator shotCalc){
@@ -195,6 +203,15 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
     }
 
     SmartDashboard.putString("State", shootState.toString());
+
+    // Live gear-ratio calibration: suggested = currentRatio * (commanded / measured).
+    double measuredDeg = testMeasuredDeg.get();
+    if (Math.abs(measuredDeg) > 1e-3) {
+      double suggestedRatio =
+          TurretConstants.SENSOR_TO_MECHANISM_RATIO * (testAngleDeg.get() / measuredDeg);
+      SmartDashboard.putNumber("Turret/Test/SuggestedRatio", suggestedRatio);
+      SmartDashboard.putNumber("Turret/Test/CurrentRatio", TurretConstants.SENSOR_TO_MECHANISM_RATIO);
+    }
 
     // AdvantageKit structured logging for replay
     Logger.recordOutput("Turret/RobotRelativeAngleDeg", robotRelativeAngleDeg);
@@ -402,6 +419,10 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
    */
   private static final LoggedTunableNumber testAngleDeg =
       new LoggedTunableNumber("Turret/TestAngleDeg", 90.0);
+
+  // Type the physically-measured sweep here after running the test; SuggestedRatio updates live.
+  private static final LoggedTunableNumber testMeasuredDeg =
+      new LoggedTunableNumber("Turret/Test/MeasuredDeg", 0.0);
 
   public Command testAimStraightAhead() {
     return run(() -> {

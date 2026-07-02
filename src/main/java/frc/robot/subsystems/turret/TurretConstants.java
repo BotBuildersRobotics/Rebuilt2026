@@ -26,6 +26,10 @@ public class TurretConstants {
 	public static final double maxLimit = 90;
 	public static final double minLimit = -90;
 
+	// Rotor rotations per turret rotation. If the turret physically under/over-travels
+	// vs commanded, this is the value to correct (see TurretSubsystem calibration buttons).
+	public static final double SENSOR_TO_MECHANISM_RATIO = 41.666667;
+
 
 	public static TalonFXConfiguration getFXConfig() {
 		TalonFXConfiguration config = new TalonFXConfiguration();
@@ -49,7 +53,7 @@ public class TurretConstants {
 		config.Voltage.PeakForwardVoltage = 12.0;
 		config.Voltage.PeakReverseVoltage = -12.0;
 		
-		config.Feedback.SensorToMechanismRatio = 41.666667;
+		config.Feedback.SensorToMechanismRatio = SENSOR_TO_MECHANISM_RATIO;
 		config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
 
