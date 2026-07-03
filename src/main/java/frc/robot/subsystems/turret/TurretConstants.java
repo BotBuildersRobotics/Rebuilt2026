@@ -26,6 +26,19 @@ public class TurretConstants {
 	public static final double maxLimit = 90;
 	public static final double minLimit = -90;
 
+	// Rotor rotations per turret rotation. If the turret physically under/over-travels
+	// vs commanded, this is the value to correct (see TurretSubsystem calibration buttons).
+	public static final double SENSOR_TO_MECHANISM_RATIO = 41.666667;
+
+	// --- Homing (drift-correction) sensor -------------------------------------------------
+	// roboRIO analog input channel (0-3) for the fixed absolute encoder that reads the
+	// magnet on the moving turret. Used to re-zero the turret when it returns to stow.
+	public static final int HOMING_ANALOG_CHANNEL = 0;
+	// True turret angle (radians, robot-relative) when the homing magnet is centered on the
+	// sensor. Stow == turret zero on this robot, so this is 0. If the sensor is physically
+	// mounted a few degrees off stow, put that offset here instead.
+	public static final double HOMING_INDEX_POSITION_RAD = 0.0;
+
 
 	public static TalonFXConfiguration getFXConfig() {
 		TalonFXConfiguration config = new TalonFXConfiguration();
@@ -49,7 +62,7 @@ public class TurretConstants {
 		config.Voltage.PeakForwardVoltage = 12.0;
 		config.Voltage.PeakReverseVoltage = -12.0;
 		
-		config.Feedback.SensorToMechanismRatio = 41.666667;
+		config.Feedback.SensorToMechanismRatio = SENSOR_TO_MECHANISM_RATIO;
 		config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
 
