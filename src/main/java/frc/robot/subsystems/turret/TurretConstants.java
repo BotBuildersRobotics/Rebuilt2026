@@ -54,9 +54,12 @@ public class TurretConstants {
 
 
 		// Mechanism units (after SensorToMechanismRatio). Kraken X60 free speed ≈ 100 rot/s rotor
-		// ÷ 41.67 ≈ 2.4 rot/s at the turret, so cruise must stay below that to actually profile.
-		config.MotionMagic.MotionMagicCruiseVelocity = 2.4; // rot/s at mechanism (~83% of free speed)
-		config.MotionMagic.MotionMagicAcceleration = 12.0; // rot/s² at mechanism (reaches cruise in ~0.33s)
+		// ÷ 41.67 ≈ 2.4 rot/s at the turret. The 07-03 tuning log showed cruise at 2.4 == free speed,
+		// which left no voltage headroom for kP and let the turret carry max momentum into the target
+		// (33%+ overshoot, ~2s ring). Dropped to ~75% of free speed to restore headroom and cut
+		// arrival momentum — the biggest lever on the overshoot. Retune after re-logging.
+		config.MotionMagic.MotionMagicCruiseVelocity = 1.8; // rot/s at mechanism (~75% of free speed)
+		config.MotionMagic.MotionMagicAcceleration = 12.0; // rot/s² at mechanism (reaches cruise in ~0.15s)
     	//config.MotionMagic.MotionMagicJerk = 1100;
 		
 
@@ -67,14 +70,18 @@ public class TurretConstants {
 		config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
 
-		config.Slot0.kP = 30;//25.88; 
+		// First-pass gains from the 07-03 tuning-log analysis (overshoot + ~2s ring, kD contribution
+		// was ~0V). Lowered kP now that cruise gives headroom, added real kD for damping, and added
+		// kA so the profile's acceleration is fed forward instead of leaning on kP. Starting points —
+		// re-log and trim (watch Turret Motor/ClosedLoop/Error and overshoot).
+		config.Slot0.kP = 20;   // was 30 — reduce aggression; let kD do the damping
 		config.Slot0.kI = 0.002;
-		config.Slot0.kD = 0.005;
+		config.Slot0.kD = 1.5;  // was 0.005 (effectively zero) — add derivative braking
 		config.Slot0.kS = 1.90;
-		// Volts per mechanism rot/s. Starting estimate: (12 - kS) / 2.4 rot/s free speed ≈ 4.2.
-		// Lets Motion Magic feed-forward the profile velocity instead of leaning on kP alone.
+		// Volts per mechanism rot/s. (12 - kS) / 2.4 rot/s free speed ≈ 4.2. Feeds the profile
+		// velocity forward instead of leaning on kP alone.
 		config.Slot0.kV = 4.2;
-		//config.Slot0.kA = 0.20;
+		config.Slot0.kA = 0.15; // was 0 — feed profile acceleration forward (SysId would refine this)
 		
 
 		
