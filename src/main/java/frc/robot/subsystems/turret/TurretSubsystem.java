@@ -45,7 +45,7 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
 
   // Position tolerance for reporting the turret "on target" before feeding a ball.
   private static final LoggedTunableNumber onTargetToleranceDeg =
-      new LoggedTunableNumber("Turret/OnTargetToleranceDeg", 1.5);
+      new LoggedTunableNumber("Turret/OnTargetToleranceDeg", 10.5);
 
    //1st game red - needed 3 ticks to right - 15
    //2nd game - we have none
@@ -73,6 +73,13 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
   private double stowStartTimestamp = 0.0;
   private boolean rezeroedThisStow = false;
   private int rezeroCount = 0;
+  // Encoder value the auto-home snaps to (i.e. the calibrated offset from the magnet's physical
+  // position to true zero). Starts at the constant; a manual zero jog trims it so auto-homing
+  // reproduces the operator's corrected zero instead of undoing it.
+  private double homingIndexRad = TurretConstants.HOMING_INDEX_POSITION_RAD;
+  // Step size (degrees) for a single manual zero jog. Positive = turret moves left (CCW).
+  private static final LoggedTunableNumber zeroNudgeStepDeg =
+      new LoggedTunableNumber("Turret/ZeroNudgeStepDeg", 1.0);
 
   // TEMP: cable issue — set false to re-enable tracking
   private static final boolean LOCKED_TO_ZERO = false;
@@ -131,6 +138,9 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
     SmartDashboard.putData("Turret/RunTest", testAimRobotRelative());
     // Drive to stow and re-zero off the homing magnet (drift correction).
     SmartDashboard.putData("Turret/Home", homeCommand());
+    // Manual zero jog (use while stowed to nudge onto true forward).
+    SmartDashboard.putData("Turret/NudgeZeroLeft", nudgeZeroLeftCommand());
+    SmartDashboard.putData("Turret/NudgeZeroRight", nudgeZeroRightCommand());
   }
 
   public void setShotCalculator(ShotCalculator shotCalc){
@@ -211,6 +221,15 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
       SmartDashboard.putNumber("Turret/SetpointPositionRad", clampedAngle);
       SmartDashboard.putNumber("Turret/Offset", turretOffset);
 
+    } else {
+      // Disabled (or not yet zeroed): keep the goal pinned to "hold current position" so the
+      // control loop doesn't lunge on the first enabled loop. Otherwise goalAngle sits at its
+      // field-relative default (0 deg field) and — until the stow default command overwrites it a
+      // loop later — the turret would try to point at absolute field zero, a large robot-relative
+      // swing that reads as the turret "searching" before settling home.
+      goalAngle = DriveSubsystem.mInstance.getState().Pose.getRotation(); // robot-relative 0 == home
+      goalVelocityRadPerSec = 0.0;
+      lastGoalAngle = getPosition().in(Radians);
     }
 
     // Always update the turret mechanism visual (even when disabled)
@@ -319,8 +338,8 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
    */
   private void rezeroFromHoming() {
     turretZeroed = true;
-    setCurrentPosition(Radians.of(TurretConstants.HOMING_INDEX_POSITION_RAD));
-    lastGoalAngle = TurretConstants.HOMING_INDEX_POSITION_RAD;
+    setCurrentPosition(Radians.of(homingIndexRad));
+    lastGoalAngle = homingIndexRad;
     rezeroCount++;
   }
 
@@ -350,6 +369,43 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
 
   public void zeroOffset(){
     turretOffset = 0;
+  }
+
+  /**
+   * Manually jog the turret's zero position. Intended for use while stowed: if the true zero has
+   * drifted, jog the turret onto true forward and that shifted position becomes the new zero.
+   *
+   * <p>Works by shifting the encoder reference. While stowed the setpoint is a fixed 0, so shifting
+   * the reference makes the turret physically rotate by {@code deltaDeg} and then hold there as the
+   * new zero. This is independent of {@code turretOffset} (the shooting-only aiming trim). The
+   * homing index is trimmed by the same amount so a later auto-home reproduces this corrected zero
+   * rather than snapping back to the raw magnet position.
+   *
+   * @param deltaDeg Degrees to jog; positive moves the turret left (CCW).
+   */
+  public void nudgeZero(double deltaDeg){
+    double deltaRad = Units.degreesToRadians(deltaDeg);
+    setCurrentPosition(Radians.of(getPosition().in(Radians) - deltaRad));
+    homingIndexRad -= deltaRad;
+    Logger.recordOutput("Turret/ZeroNudgeTotalIndexRad", homingIndexRad);
+  }
+
+  public void nudgeZeroLeft(){
+    nudgeZero(zeroNudgeStepDeg.get());
+  }
+
+  public void nudgeZeroRight(){
+    nudgeZero(-zeroNudgeStepDeg.get());
+  }
+
+  /** Jog the zero one step left (CCW). Runs while disabled too, for bench calibration. */
+  public Command nudgeZeroLeftCommand(){
+    return runOnce(this::nudgeZeroLeft).ignoringDisable(true);
+  }
+
+  /** Jog the zero one step right (CW). Runs while disabled too, for bench calibration. */
+  public Command nudgeZeroRightCommand(){
+    return runOnce(this::nudgeZeroRight).ignoringDisable(true);
   }
 
   /**

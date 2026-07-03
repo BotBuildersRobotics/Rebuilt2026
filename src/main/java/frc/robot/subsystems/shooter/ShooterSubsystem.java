@@ -11,6 +11,8 @@ import java.util.function.DoubleSupplier;
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.controls.VoltageOut;
 
+import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -33,9 +35,18 @@ public class ShooterSubsystem  extends MotorSubsystem<MotorIOTalonFX> {
     // 1.0 = spin down the flywheels while the robot is in the neutral zone (can't score the hub
     // from there, so save energy/wear). 0.0 = always spin per the shot calculator.
     private static final LoggedTunableNumber offInNeutralZone = new LoggedTunableNumber("Shooter/OffInNeutralZone", 1.0);
+    // Debounce the neutral-zone boundary so pose jitter at the line doesn't strobe the flywheel
+    // between idle and spun-up while parked on the edge.
+    private static final LoggedTunableNumber neutralZoneDebounceSec = new LoggedTunableNumber("Shooter/NeutralZoneDebounceSec", 0.15);
+    private Debouncer neutralZoneDebouncer = new Debouncer(0.15, DebounceType.kBoth);
+    private double neutralZoneDebounceConfigured = 0.15;
 
     private double flywheelSpeedOffset = 15.0;
     private Double flywheelSpeedPreset = null; // null = use shot calculator
+    // Set true while a shot is actively being commanded. Suppresses the neutral-zone spin-down so
+    // the flywheel still runs when the driver shoots from the neutral zone; the gate only idles the
+    // flywheel when we're NOT shooting.
+    private boolean activelyShooting = false;
     
     //RPM = radians / second * 9.5493
     // 10 rads / sec = 95.493 RPM
@@ -121,7 +132,14 @@ public class ShooterSubsystem  extends MotorSubsystem<MotorIOTalonFX> {
     public Command runTrackTargetActiveShootingCommand() {
         return run(
             () -> {
-                boolean neutralZoneOff = offInNeutralZone.get() >= 0.5 && inNeutralZone();
+                // Rebuild the debouncer if its tunable changed (rare, only while tuning).
+                if (neutralZoneDebounceSec.get() != neutralZoneDebounceConfigured) {
+                    neutralZoneDebounceConfigured = neutralZoneDebounceSec.get();
+                    neutralZoneDebouncer = new Debouncer(neutralZoneDebounceConfigured, DebounceType.kBoth);
+                }
+                // Advance the debouncer every loop (regardless of activelyShooting) so its timing stays consistent.
+                boolean inZoneDebounced = neutralZoneDebouncer.calculate(inNeutralZone());
+                boolean neutralZoneOff = offInNeutralZone.get() >= 0.5 && !activelyShooting && inZoneDebounced;
                 Logger.recordOutput("Shooter/OffInNeutralZone", neutralZoneOff);
 
                 if (neutralZoneOff) {
@@ -151,6 +169,11 @@ public class ShooterSubsystem  extends MotorSubsystem<MotorIOTalonFX> {
 
     public Command runAtVelocityCommand(double rps) {
         return run(() -> runVelocity(rps));
+    }
+
+    /** Suppress the neutral-zone spin-down while a shot is being commanded. */
+    public void setActivelyShooting(boolean value) {
+        activelyShooting = value;
     }
 
     public void setFlywheelPreset(double rps) {

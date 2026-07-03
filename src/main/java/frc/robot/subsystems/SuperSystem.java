@@ -140,7 +140,10 @@ public class SuperSystem extends SubsystemBase {
 		Commands.parallel(
 			RollerFloorSubsystem.mInstance.runShootCommandGated(shooterFeedReady()),
 			ChuteSubsystem.mInstance.runShootCommandGated(shooterFeedReady())
-		);
+		)
+		// Tell the shooter we're actively shooting so it doesn't spin down in the neutral zone.
+		.beforeStarting(() -> shooter.setActivelyShooting(true))
+		.finallyDo(interrupted -> shooter.setActivelyShooting(false));
 	}
 
 	public Command ShootAuto(){
@@ -425,6 +428,15 @@ public class SuperSystem extends SubsystemBase {
 		return Commands.runOnce(() ->
 					turret.zeroOffset()
 				);
+	}
+
+	/** Jog the turret's true-zero position left/right (use while stowed to correct drift). */
+	public Command nudgeTurretZeroLeft(){
+		return turret.nudgeZeroLeftCommand();
+	}
+
+	public Command nudgeTurretZeroRight(){
+		return turret.nudgeZeroRightCommand();
 	}
 
 	public Command reverseAllSystems(){
