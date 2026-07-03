@@ -22,6 +22,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
@@ -55,12 +56,17 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
       new TurretHomingSensor(TurretConstants.HOMING_ANALOG_CHANNEL);
   private static final LoggedTunableNumber autoRezeroEnabled =
       new LoggedTunableNumber("Turret/Homing/AutoRezeroEnabled", 1.0);
-  // Only re-zero when the turret is essentially stationary, so we snap at the magnet centre
-  // rather than mid-sweep.
+  // Wait this long after the turret returns to stow before re-zeroing, so we snap once the
+  // turret has settled at rest — not while the magnet is sweeping past the sensor on the way in.
+  private static final LoggedTunableNumber stowSettleSeconds =
+      new LoggedTunableNumber("Turret/Homing/StowSettleSeconds", 1.0);
+  // Extra safety: only re-zero when the turret is essentially stationary.
   private static final LoggedTunableNumber rezeroMaxVelRadPerSec =
       new LoggedTunableNumber("Turret/Homing/MaxVelRadPerSec", 0.15);
-  // Latched so we re-zero once per pass through the magnet, not every loop it's in-window.
-  private boolean rezeroLatched = false;
+  // Tracks the current stow episode: when stow began, and whether we've already re-zeroed for it.
+  private boolean wasStowed = false;
+  private double stowStartTimestamp = 0.0;
+  private boolean rezeroedThisStow = false;
   private int rezeroCount = 0;
 
   // TEMP: cable issue — set false to re-enable tracking
@@ -269,21 +275,32 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
    * it fires once per pass through the magnet and re-arms only after leaving the window.
    */
   private void updateHomingRezero() {
+    double now = Timer.getFPGATimestamp();
+
+    // Start a fresh stow episode the moment the turret is commanded to stow.
+    if (stowed && !wasStowed) {
+      stowStartTimestamp = now;
+      rezeroedThisStow = false;
+    }
+    wasStowed = stowed;
+
+    double stowedFor = stowed ? now - stowStartTimestamp : 0.0;
+    boolean settled = stowed && stowedFor >= stowSettleSeconds.get();
+
     boolean canRezero =
         autoRezeroEnabled.get() >= 0.5
-        && stowed
+        && settled
+        && !rezeroedThisStow
         && homingSensor.isAtIndex()
         && Math.abs(getTurretVelocity()) < rezeroMaxVelRadPerSec.get();
 
-    if (canRezero && !rezeroLatched) {
+    if (canRezero) {
       rezeroFromHoming();
-      rezeroLatched = true;
-    } else if (!homingSensor.isTriggered()) {
-      // Left the magnet — re-arm so the next stow can correct again.
-      rezeroLatched = false;
+      rezeroedThisStow = true; // once per stow episode
     }
 
-    Logger.recordOutput("Turret/Homing/RezeroLatched", rezeroLatched);
+    Logger.recordOutput("Turret/Homing/StowedForSec", stowedFor);
+    Logger.recordOutput("Turret/Homing/RezeroedThisStow", rezeroedThisStow);
     Logger.recordOutput("Turret/Homing/RezeroCount", rezeroCount);
   }
 
