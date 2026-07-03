@@ -47,6 +47,22 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
    
   private boolean turretZeroed = true;
 
+  // --- Homing / drift correction ---------------------------------------------------------
+  // Fixed analog encoder that reads the magnet on the moving turret. When the turret is
+  // stowed and the magnet is over the sensor, we snap the motor position back to true zero,
+  // cancelling accumulated drift.
+  private final TurretHomingSensor homingSensor =
+      new TurretHomingSensor(TurretConstants.HOMING_ANALOG_CHANNEL);
+  private static final LoggedTunableNumber autoRezeroEnabled =
+      new LoggedTunableNumber("Turret/Homing/AutoRezeroEnabled", 1.0);
+  // Only re-zero when the turret is essentially stationary, so we snap at the magnet centre
+  // rather than mid-sweep.
+  private static final LoggedTunableNumber rezeroMaxVelRadPerSec =
+      new LoggedTunableNumber("Turret/Homing/MaxVelRadPerSec", 0.15);
+  // Latched so we re-zero once per pass through the magnet, not every loop it's in-window.
+  private boolean rezeroLatched = false;
+  private int rezeroCount = 0;
+
   // TEMP: cable issue — set false to re-enable tracking
   private static final boolean LOCKED_TO_ZERO = false;
 
@@ -102,6 +118,8 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
     //  4. Read the corrected value off Turret/Test/SuggestedRatio.
     SmartDashboard.putData("Turret/Zero", zeroCommand());
     SmartDashboard.putData("Turret/RunTest", testAimRobotRelative());
+    // Drive to stow and re-zero off the homing magnet (drift correction).
+    SmartDashboard.putData("Turret/Home", homeCommand());
   }
 
   public void setShotCalculator(ShotCalculator shotCalc){
@@ -110,6 +128,11 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
 
    public void periodic() {
         super.periodic(); // Critical: Updates motor inputs from simulation or hardware
+
+        // Sample the homing encoder every loop (advances its debouncer) and, when the turret
+        // is parked at stow with the magnet over the sensor, snap out any accumulated drift.
+        homingSensor.update();
+        updateHomingRezero();
 
         /*SmartDashboard.putBoolean("Turret/ControlLoopActive", DriverStation.isEnabled() && turretZeroed);
         SmartDashboard.putNumber("Turret/CurrentPositionDeg", Units.radiansToDegrees(getTurretAngle()));
@@ -236,8 +259,62 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
 
   private void zero() {
     turretZeroed = true;
-    turretOffset = 0.0; 
+    turretOffset = 0.0;
     setCurrentPosition(Radians.of(0.0));
+  }
+
+  /**
+   * Auto drift-correction. When the turret is stowed, nearly stationary, and the homing magnet
+   * is over the fixed sensor, resets the motor's position to the known index angle. Latched so
+   * it fires once per pass through the magnet and re-arms only after leaving the window.
+   */
+  private void updateHomingRezero() {
+    boolean canRezero =
+        autoRezeroEnabled.get() >= 0.5
+        && stowed
+        && homingSensor.isAtIndex()
+        && Math.abs(getTurretVelocity()) < rezeroMaxVelRadPerSec.get();
+
+    if (canRezero && !rezeroLatched) {
+      rezeroFromHoming();
+      rezeroLatched = true;
+    } else if (!homingSensor.isInWindow()) {
+      // Left the magnet — re-arm so the next stow can correct again.
+      rezeroLatched = false;
+    }
+
+    Logger.recordOutput("Turret/Homing/RezeroLatched", rezeroLatched);
+    Logger.recordOutput("Turret/Homing/RezeroCount", rezeroCount);
+  }
+
+  /**
+   * Snaps the turret's tracked position to the homing index angle, cancelling drift.
+   *
+   * <p>Only corrects the mechanical encoder position. The operator's aiming trim
+   * ({@code turretOffset}) is a shooting-time correction and is deliberately left untouched,
+   * so it survives every stow/home cycle and still applies only when shooting.
+   */
+  private void rezeroFromHoming() {
+    turretZeroed = true;
+    setCurrentPosition(Radians.of(TurretConstants.HOMING_INDEX_POSITION_RAD));
+    lastGoalAngle = TurretConstants.HOMING_INDEX_POSITION_RAD;
+    rezeroCount++;
+  }
+
+  /**
+   * Manual homing command: hold the turret at stow, then re-zero the moment the magnet is
+   * detected. Useful as a start-of-match routine or an operator button. Does not require the
+   * turret to already be stowed — it drives to stow first.
+   */
+  public Command homeCommand() {
+    return run(() -> {
+          setStowed(true);
+          Rotation2d robotAngle = DriveSubsystem.mInstance.getState().Pose.getRotation();
+          setFieldRelativeTarget(robotAngle); // 0deg robot-relative == stow
+          setShootState(ShootState.ACTIVE_SHOOTING);
+        })
+        .until(homingSensor::isAtIndex)
+        .andThen(runOnce(this::rezeroFromHoming));
   }
 
   public void offsetLeft(){
@@ -252,8 +329,14 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
     turretOffset = 0;
   }
 
+  /**
+   * True mechanical turret angle (robot-relative, radians). Does NOT include the operator
+   * aiming trim ({@code turretOffset}): the trim is added to the aim target in the shoot
+   * commands, so once the turret drives there {@code getPosition()} already reflects it.
+   * Adding it here too would double-count it in the shot calculator and field-relative viz.
+   */
   public double getTurretAngle() {
-    return  Units.degreesToRadians(turretOffset) + getPosition().in(Radians);
+    return getPosition().in(Radians);
   }
 
   public double getTurretVelocity() {
