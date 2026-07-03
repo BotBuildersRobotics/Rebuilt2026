@@ -12,7 +12,6 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.lib.io.MotorIO;
 import frc.robot.lib.io.MotorIO.Setpoint;
 import frc.robot.lib.LoggedTracer;
 import org.littletonrobotics.junction.Logger;
@@ -46,12 +45,7 @@ public class MotorSubsystem<IO extends MotorIO> extends SubsystemBase {
 	 * Outputs subsystem readings and to SmartDashboard.
 	 */
 	public void outputTelemetry() {
-		Logger.recordOutput(name + "/isOK", io.isOK());
-		Logger.recordOutput(name + "/TemperatureCelsius", io.getMotorTemperature().in(Celsius));
-		Logger.recordOutput(name + "/StatorCurrentAmps", io.getStatorCurrent().in(Amps));
-		Logger.recordOutput(name + "/SupplyCurrentAmps", io.getSupplyCurrent().in(Amps));
-		Logger.recordOutput(name + "/VelocityRPS", io.getVelocity().in(RotationsPerSecond));
-		Logger.recordOutput(name + "/VoltageV", io.getMotorVoltage().in(Volts));
+		recordMotorTelemetry(name, io);
 
 		// Closed-loop tuning telemetry (position signals in mechanism units, outputs in volts).
 		Logger.recordOutput(name + "/ClosedLoop/Reference", io.getClosedLoopReference());
@@ -63,6 +57,24 @@ public class MotorSubsystem<IO extends MotorIO> extends SubsystemBase {
 		Logger.recordOutput(name + "/ClosedLoop/Derivative", io.getClosedLoopDerivative());
 		Logger.recordOutput(name + "/ClosedLoop/FeedForward", io.getClosedLoopFeedForward());
 		LoggedTracer.record(name);
+	}
+
+	/**
+	 * Logs the standard motor telemetry (isOK, temperature, currents, velocity, voltage) for a
+	 * MotorIO under the given name. Static so subsystems that hold MotorIOs directly (rather than
+	 * extending MotorSubsystem — e.g. multi-motor subsystems) can reuse the same logging instead of
+	 * losing it.
+	 *
+	 * @param name Log key prefix for this motor.
+	 * @param io MotorIO to read.
+	 */
+	public static void recordMotorTelemetry(String name, MotorIO io) {
+		Logger.recordOutput(name + "/isOK", io.isOK());
+		Logger.recordOutput(name + "/TemperatureCelsius", io.getMotorTemperature().in(Celsius));
+		Logger.recordOutput(name + "/StatorCurrentAmps", io.getStatorCurrent().in(Amps));
+		Logger.recordOutput(name + "/SupplyCurrentAmps", io.getSupplyCurrent().in(Amps));
+		Logger.recordOutput(name + "/VelocityRPS", io.getVelocity().in(RotationsPerSecond));
+		Logger.recordOutput(name + "/VoltageV", io.getMotorVoltage().in(Volts));
 	}
 
 	/**

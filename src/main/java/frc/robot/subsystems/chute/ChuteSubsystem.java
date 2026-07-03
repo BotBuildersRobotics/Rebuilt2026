@@ -8,6 +8,7 @@ import frc.robot.lib.LoggedTunableNumber;
 import frc.robot.lib.io.MotorIO.Setpoint;
 import frc.robot.lib.io.MotorIOTalonFX;
 import frc.robot.lib.io.MotorIOTalonFXS;
+import frc.robot.lib.io.MotorSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -43,8 +44,17 @@ public class ChuteSubsystem extends SubsystemBase {
 	@Override
 	public void periodic() {
 		rollers.updateInputs();
-		feeder.updateInputs();
 		bottomRoller.updateInputs();
+		sideFeeder.updateInputs();
+		feeder.updateInputs();
+
+		// Log the standard motor telemetry (isOK, temperature, currents, velocity, voltage) for each
+		// motor. This subsystem holds MotorIOs directly instead of extending MotorSubsystem, so it
+		// has to invoke the shared logging itself.
+		MotorSubsystem.recordMotorTelemetry("Chute/Rollers", rollers);
+		MotorSubsystem.recordMotorTelemetry("Chute/BottomRoller", bottomRoller);
+		MotorSubsystem.recordMotorTelemetry("Chute/SideFeeder", sideFeeder);
+		MotorSubsystem.recordMotorTelemetry("Chute/Feeder", feeder);
 	}
 
 	public void applySetpoint(Setpoint setpoint) {
