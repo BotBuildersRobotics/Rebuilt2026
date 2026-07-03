@@ -233,6 +233,46 @@ public abstract class MotorIO implements Sendable {
 		return inputs.motorTemperature;
 	}
 
+	/** Profiled closed-loop target position (mechanism units). */
+	public double getClosedLoopReference() {
+		return inputs.closedLoopReference;
+	}
+
+	/** Profiled closed-loop target velocity (mechanism units per second). */
+	public double getClosedLoopReferenceSlope() {
+		return inputs.closedLoopReferenceSlope;
+	}
+
+	/** Closed-loop error, reference minus measured (mechanism units). */
+	public double getClosedLoopError() {
+		return inputs.closedLoopError;
+	}
+
+	/** Total closed-loop output (volts). */
+	public double getClosedLoopOutput() {
+		return inputs.closedLoopOutput;
+	}
+
+	/** Proportional (kP) contribution to the closed-loop output (volts). */
+	public double getClosedLoopProportional() {
+		return inputs.closedLoopProportional;
+	}
+
+	/** Integral (kI) contribution to the closed-loop output (volts). */
+	public double getClosedLoopIntegrated() {
+		return inputs.closedLoopIntegrated;
+	}
+
+	/** Derivative (kD) contribution to the closed-loop output (volts). */
+	public double getClosedLoopDerivative() {
+		return inputs.closedLoopDerivative;
+	}
+
+	/** Feedforward (kS/kV/kA + arbitrary) contribution to the closed-loop output (volts). */
+	public double getClosedLoopFeedForward() {
+		return inputs.closedLoopFeedForward;
+	}
+
 	/**
 	 * Gets the last applied setpoint of the MotorIO.
 	 *
@@ -361,6 +401,18 @@ public abstract class MotorIO implements Sendable {
 		public Voltage motorVoltage = BaseUnits.VoltageUnit.of(0.0);
 		public Temperature motorTemperature = BaseUnits.TemperatureUnit.of(0.0);
 		public boolean isOK = false;
+
+		// Closed-loop telemetry for PID / Motion Magic tuning (mechanism units for the
+		// position signals, volts for the output contributions). Populated only for hardware
+		// that exposes them; 0 otherwise (e.g. simulation).
+		public double closedLoopReference = 0.0; // profiled target position (mechanism units)
+		public double closedLoopReferenceSlope = 0.0; // profiled target velocity (units/s)
+		public double closedLoopError = 0.0; // reference - measured (mechanism units)
+		public double closedLoopOutput = 0.0; // total closed-loop output (volts)
+		public double closedLoopProportional = 0.0; // kP contribution (volts)
+		public double closedLoopIntegrated = 0.0; // kI contribution (volts)
+		public double closedLoopDerivative = 0.0; // kD contribution (volts)
+		public double closedLoopFeedForward = 0.0; // kS/kV/kA + arbitrary FF (volts)
 
 		@Override
 		public void initSendable(SendableBuilder builder) {

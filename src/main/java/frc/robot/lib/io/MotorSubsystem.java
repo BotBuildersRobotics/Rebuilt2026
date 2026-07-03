@@ -52,6 +52,16 @@ public class MotorSubsystem<IO extends MotorIO> extends SubsystemBase {
 		Logger.recordOutput(name + "/SupplyCurrentAmps", io.getSupplyCurrent().in(Amps));
 		Logger.recordOutput(name + "/VelocityRPS", io.getVelocity().in(RotationsPerSecond));
 		Logger.recordOutput(name + "/VoltageV", io.getMotorVoltage().in(Volts));
+
+		// Closed-loop tuning telemetry (position signals in mechanism units, outputs in volts).
+		Logger.recordOutput(name + "/ClosedLoop/Reference", io.getClosedLoopReference());
+		Logger.recordOutput(name + "/ClosedLoop/ReferenceSlope", io.getClosedLoopReferenceSlope());
+		Logger.recordOutput(name + "/ClosedLoop/Error", io.getClosedLoopError());
+		Logger.recordOutput(name + "/ClosedLoop/Output", io.getClosedLoopOutput());
+		Logger.recordOutput(name + "/ClosedLoop/Proportional", io.getClosedLoopProportional());
+		Logger.recordOutput(name + "/ClosedLoop/Integrated", io.getClosedLoopIntegrated());
+		Logger.recordOutput(name + "/ClosedLoop/Derivative", io.getClosedLoopDerivative());
+		Logger.recordOutput(name + "/ClosedLoop/FeedForward", io.getClosedLoopFeedForward());
 		LoggedTracer.record(name);
 	}
 

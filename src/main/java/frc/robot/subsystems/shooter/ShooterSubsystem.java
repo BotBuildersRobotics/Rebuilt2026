@@ -16,8 +16,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.FieldConstants;
 import frc.robot.lib.io.MotorIOTalonFX;
 import frc.robot.lib.io.MotorSubsystem;
+import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.turret.ShotCalculator;
 import org.littletonrobotics.junction.Logger;
 
@@ -28,6 +30,9 @@ public class ShooterSubsystem  extends MotorSubsystem<MotorIOTalonFX> {
     private static final LoggedTunableNumber passingSpeed = new LoggedTunableNumber("Shooter/PassingSpeed");
     private static final LoggedTunableNumber lobPassingSpeed = new LoggedTunableNumber("Shooter/LobPassingSpeed");
     private static final LoggedTunableNumber atSpeedToleranceRPS = new LoggedTunableNumber("Shooter/AtSpeedToleranceRPS");
+    // 1.0 = spin down the flywheels while the robot is in the neutral zone (can't score the hub
+    // from there, so save energy/wear). 0.0 = always spin per the shot calculator.
+    private static final LoggedTunableNumber offInNeutralZone = new LoggedTunableNumber("Shooter/OffInNeutralZone", 1.0);
 
     private double flywheelSpeedOffset = 15.0;
     private Double flywheelSpeedPreset = null; // null = use shot calculator
@@ -108,9 +113,24 @@ public class ShooterSubsystem  extends MotorSubsystem<MotorIOTalonFX> {
         flywheelSpeedOffset = 0.0;
     }
 
+    /** True when the robot is in the central neutral zone (used to gate hub shooting). */
+    private boolean inNeutralZone() {
+        return FieldConstants.inNeutralZone(DriveSubsystem.mInstance.getState().Pose.getX());
+    }
+
     public Command runTrackTargetActiveShootingCommand() {
         return run(
             () -> {
+                boolean neutralZoneOff = offInNeutralZone.get() >= 0.5 && inNeutralZone();
+                Logger.recordOutput("Shooter/OffInNeutralZone", neutralZoneOff);
+
+                if (neutralZoneOff) {
+                    // Can't score the hub from the neutral zone — keep the flywheels off.
+                    setpointVal = 0.0;
+                    stop();
+                    return;
+                }
+
                 if (flywheelSpeedPreset != null) {
                     setpointVal = flywheelSpeedPreset + flywheelSpeedOffset;
                 } else {

@@ -56,6 +56,18 @@ public class FieldConstants {
   }
 
   /**
+   * Whether a field X coordinate lies within the central neutral zone. The neutral zone is an
+   * absolute field region (same physical band for both alliances), so no alliance flip is needed
+   * when the pose is in blue-origin field coordinates.
+   *
+   * @param x Field X coordinate (metres).
+   * @return true if x is between the near and far neutral-zone lines.
+   */
+  public static boolean inNeutralZone(double x) {
+    return x >= LinesVertical.neutralZoneNear && x <= LinesVertical.neutralZoneFar;
+  }
+
+  /**
    * Officially defined and relevant horizontal lines found on the field (defined by Y-axis offset)
    *
    * <p>NOTE: The field element start and end are always left to right from the perspective of the

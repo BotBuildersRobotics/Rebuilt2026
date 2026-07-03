@@ -1,5 +1,6 @@
 package frc.robot.lib.io;
 
+import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -62,10 +63,29 @@ public class MotorIOTalonFX extends MotorIO {
 	@Override
 	public void updateInputs() {
 		updateMotorInputs(inputs, main);
+		updateClosedLoopInputs(inputs, main);
 
 		for (int i = 0; i < followers.length; i++) {
 			updateMotorInputs(followerInputs[i], followers[i]);
 		}
+	}
+
+	/**
+	 * Reads the main motor's closed-loop telemetry for PID / Motion Magic tuning. Only meaningful
+	 * while the motor is in a closed-loop control mode; otherwise the values are stale/zero.
+	 *
+	 * @param inputsToUpdate Inputs to update.
+	 * @param motor Motor to read from (the closed-loop-controlled main motor).
+	 */
+	protected void updateClosedLoopInputs(Inputs inputsToUpdate, TalonFX motor) {
+		inputsToUpdate.closedLoopReference = motor.getClosedLoopReference().getValueAsDouble();
+		inputsToUpdate.closedLoopReferenceSlope = motor.getClosedLoopReferenceSlope().getValueAsDouble();
+		inputsToUpdate.closedLoopError = motor.getClosedLoopError().getValueAsDouble();
+		inputsToUpdate.closedLoopOutput = motor.getClosedLoopOutput().getValueAsDouble();
+		inputsToUpdate.closedLoopProportional = motor.getClosedLoopProportionalOutput().getValueAsDouble();
+		inputsToUpdate.closedLoopIntegrated = motor.getClosedLoopIntegratedOutput().getValueAsDouble();
+		inputsToUpdate.closedLoopDerivative = motor.getClosedLoopDerivativeOutput().getValueAsDouble();
+		inputsToUpdate.closedLoopFeedForward = motor.getClosedLoopFeedForward().getValueAsDouble();
 	}
 
 	/**
@@ -236,6 +256,22 @@ public class MotorIOTalonFX extends MotorIO {
 			main.getVelocity().setUpdateFrequency(config.velocityUpdateHz);
 		}
 
+		// Optionally publish closed-loop tuning signals at a high rate so PID/Motion Magic traces
+		// have enough resolution to read overshoot, settling and per-term contributions. Opt-in
+		// per motor (via closedLoopUpdateHz) to avoid adding CAN traffic on motors that don't need it.
+		if (config.closedLoopUpdateHz > 0) {
+			BaseStatusSignal.setUpdateFrequencyForAll(
+					config.closedLoopUpdateHz,
+					main.getClosedLoopReference(),
+					main.getClosedLoopReferenceSlope(),
+					main.getClosedLoopError(),
+					main.getClosedLoopOutput(),
+					main.getClosedLoopProportionalOutput(),
+					main.getClosedLoopIntegratedOutput(),
+					main.getClosedLoopDerivativeOutput(),
+					main.getClosedLoopFeedForward());
+		}
+
 		followers = new TalonFX[config.followerIDs.length];
 		for (int i = 0; i < config.followerIDs.length; i++) {
 			followers[i] = new TalonFX(config.followerIDs[i], new CANBus(config.followerBuses[i]));
@@ -267,6 +303,9 @@ public class MotorIOTalonFX extends MotorIO {
 		public boolean[] followerOpposeMain = new boolean[0];
 		public ControlRequestGetter requestGetter = new ControlRequestGetter();
 		public double velocityUpdateHz = 0;
+		// >0 publishes the main motor's closed-loop tuning signals at this rate (Hz). 0 = leave at
+		// Phoenix defaults. Enable per motor when you need high-resolution PID/Motion Magic traces.
+		public double closedLoopUpdateHz = 0;
 	}
 
 

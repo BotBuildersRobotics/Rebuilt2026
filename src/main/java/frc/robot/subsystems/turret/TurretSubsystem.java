@@ -41,6 +41,11 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
   private Rotation2d goalAngle = Rotation2d.kZero;
   private double goalVelocityRadPerSec = 0.0;
   private double lastGoalAngle = 0.0;
+  private double lastClampedAngle = 0.0; // last commanded mechanism setpoint (rad), for isOnTarget()
+
+  // Position tolerance for reporting the turret "on target" before feeding a ball.
+  private static final LoggedTunableNumber onTargetToleranceDeg =
+      new LoggedTunableNumber("Turret/OnTargetToleranceDeg", 1.5);
 
    //1st game red - needed 3 ticks to right - 15
    //2nd game - we have none
@@ -190,6 +195,7 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
       lastGoalAngle = bestAngle;
 
       double clampedAngle = MathUtil.clamp(bestAngle, minLegalAngle, maxLegalAngle);
+      lastClampedAngle = clampedAngle; // remember the commanded setpoint for isOnTarget()
 
       // Choose control mode: position+velocity feedforward for shoot-on-the-move,
       // or Motion Magic for smooth profiled movement
@@ -357,7 +363,22 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
   }
 
   public double getTurretVelocity() {
-    return getVelocity().in(RadiansPerSecond); 
+    return getVelocity().in(RadiansPerSecond);
+  }
+
+  /**
+   * True when the turret has arrived at its commanded angle (within tolerance) and is zeroed.
+   * Gate the shooter feed on this so a ball isn't fed mid-slew during a large turn.
+   */
+  public boolean isOnTarget() {
+    if (!turretZeroed) {
+      return false;
+    }
+    double errorRad = Math.abs(getPosition().in(Radians) - lastClampedAngle);
+    boolean onTarget = errorRad <= Units.degreesToRadians(onTargetToleranceDeg.get());
+    Logger.recordOutput("Turret/OnTarget", onTarget);
+    Logger.recordOutput("Turret/OnTargetErrorDeg", Units.radiansToDegrees(errorRad));
+    return onTarget;
   }
 
   public void setShootState(ShootState state){

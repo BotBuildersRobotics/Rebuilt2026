@@ -2,7 +2,9 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.util.sendable.SendableBuilder;
 import com.ctre.phoenix6.swerve.SwerveRequest;
+import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.geometry.Rotation2d;
+import java.util.function.BooleanSupplier;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.RobotController;
@@ -34,6 +36,10 @@ public class SuperSystem extends SubsystemBase {
         new LoggedTunableNumber("SuperSystem/IntakePulseOnTimeSec");
     private static final LoggedTunableNumber intakePulseOffTime =
         new LoggedTunableNumber("SuperSystem/IntakePulseOffTimeSec");
+    // Extra settle time after the flywheel is at speed AND the turret is on target before a ball
+    // is fed, so a big turret turn fully finishes first. Bump up if shots still leak out early.
+    private static final LoggedTunableNumber feedSettleSeconds =
+        new LoggedTunableNumber("SuperSystem/FeedSettleSeconds", 0.12);
 
 	private TurretSubsystem turret;
 
@@ -119,11 +125,21 @@ public class SuperSystem extends SubsystemBase {
 	}
 
 
+	/**
+	 * Feed-readiness gate: flywheel at speed AND turret on target, held for {@code feedSettleSeconds}
+	 * before returning true. Each caller gets its own debouncer so the timing stays correct when the
+	 * roller floor and chute each poll once per loop. Freshly built per shot so it resets each time.
+	 */
+	private BooleanSupplier shooterFeedReady() {
+		Debouncer settle = new Debouncer(feedSettleSeconds.get(), Debouncer.DebounceType.kRising);
+		return () -> settle.calculate(shooter.isAtSpeed() && turret.isOnTarget());
+	}
+
 	public Command Shoot(){
 		return
 		Commands.parallel(
-			RollerFloorSubsystem.mInstance.runShootCommandGated(shooter::isAtSpeed),
-			ChuteSubsystem.mInstance.runShootCommandGated(shooter::isAtSpeed)
+			RollerFloorSubsystem.mInstance.runShootCommandGated(shooterFeedReady()),
+			ChuteSubsystem.mInstance.runShootCommandGated(shooterFeedReady())
 		);
 	}
 
@@ -413,7 +429,8 @@ public class SuperSystem extends SubsystemBase {
 
 	public Command reverseAllSystems(){
 		return Commands.parallel(
-			IntakeSubsystem.mInstance.setpointCommand(IntakeSubsystem.REVERSE),
+			// Intake stays off while reversing; only the roller floor and chute run in reverse.
+			IntakeSubsystem.mInstance.setpointCommand(IntakeSubsystem.IDLE),
 			RollerFloorSubsystem.mInstance.setpointCommand(RollerFloorSubsystem.REVERSE),
 			ChuteSubsystem.mInstance.setpointCommand(ChuteSubsystem.REVERSE)
 		);

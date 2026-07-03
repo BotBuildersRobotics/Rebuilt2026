@@ -88,6 +88,8 @@ public class TurretConstants {
 		config.unit = Units.Rotations;
 		config.mainID = Ports.TURRET.getDeviceNumber();
 		config.mainBus = Ports.TURRET.getBus();
+		// High-rate closed-loop telemetry for PID / Motion Magic tuning (turret only).
+		config.closedLoopUpdateHz = 100.0;
 		return config;
 	}
 
