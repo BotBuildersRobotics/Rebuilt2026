@@ -31,9 +31,10 @@ public class TurretConstants {
 	public static final double SENSOR_TO_MECHANISM_RATIO = 41.666667;
 
 	// --- Homing (drift-correction) sensor -------------------------------------------------
-	// roboRIO analog input channel (0-3) for the fixed absolute encoder that reads the
-	// magnet on the moving turret. Used to re-zero the turret when it returns to stow.
-	public static final int HOMING_ANALOG_CHANNEL = 0;
+	// roboRIO analog input channel for the fixed active-high digital sensor that detects the
+	// magnet on the moving turret (digital sensor wired into an analog port). Used to re-zero
+	// the turret when it returns to stow.
+	public static final int HOMING_ANALOG_CHANNEL = 3;
 	// True turret angle (radians, robot-relative) when the homing magnet is centered on the
 	// sensor. Stow == turret zero on this robot, so this is 0. If the sensor is physically
 	// mounted a few degrees off stow, put that offset here instead.

@@ -48,9 +48,9 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
   private boolean turretZeroed = true;
 
   // --- Homing / drift correction ---------------------------------------------------------
-  // Fixed analog encoder that reads the magnet on the moving turret. When the turret is
-  // stowed and the magnet is over the sensor, we snap the motor position back to true zero,
-  // cancelling accumulated drift.
+  // Fixed active-high digital sensor (wired into an analog port) that detects the magnet on
+  // the moving turret. When the turret is stowed and the magnet is over the sensor, we snap
+  // the motor position back to true zero, cancelling accumulated drift.
   private final TurretHomingSensor homingSensor =
       new TurretHomingSensor(TurretConstants.HOMING_ANALOG_CHANNEL);
   private static final LoggedTunableNumber autoRezeroEnabled =
@@ -278,7 +278,7 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
     if (canRezero && !rezeroLatched) {
       rezeroFromHoming();
       rezeroLatched = true;
-    } else if (!homingSensor.isInWindow()) {
+    } else if (!homingSensor.isTriggered()) {
       // Left the magnet — re-arm so the next stow can correct again.
       rezeroLatched = false;
     }

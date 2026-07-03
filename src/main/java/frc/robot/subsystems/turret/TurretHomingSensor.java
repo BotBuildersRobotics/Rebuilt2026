@@ -9,29 +9,30 @@ import frc.robot.lib.LoggedTunableNumber;
 import org.littletonrobotics.junction.Logger;
 
 /**
- * Fixed analog absolute encoder used as a homing index for the turret.
+ * Fixed digital homing sensor used as a homing index for the turret.
  *
- * <p>A magnet rides on the moving part of the turret; this encoder is bolted to the frame at the
- * stow position. As the magnet sweeps past, the encoder's analog output rises to a repeatable
- * value. We treat that reading as a <em>digital</em> index: when the voltage sits inside a
- * calibrated window (and stays there long enough to debounce), the turret is physically at its
- * true stow/zero, so the motor's accumulated drift can be reset.
+ * <p>A magnet rides on the moving part of the turret; this sensor is bolted to the frame at the
+ * stow position. It is a digital, <em>active-high</em> sensor whose output is wired into a
+ * roboRIO <em>analog</em> input, so we read its voltage and threshold it: voltage above
+ * {@code triggerVolts} means the line is high and the magnet is over the sensor. When that
+ * reading holds long enough to debounce, the turret is physically at its true stow/zero, so the
+ * motor's accumulated drift can be reset.
  *
  * <p>Only active on real hardware. In simulation the input is null and every reading reports
- * "not present", so nothing can false-trigger a re-zero.
+ * {@code false}, so nothing can false-trigger a re-zero.
  *
- * <p>Calibration: park the turret at stow, watch {@code Turret/Homing/Voltage} in AdvantageScope,
- * and set {@code WindowLowVolts}/{@code WindowHighVolts} to bracket the value you see (with a
- * little margin on each side).
+ * <p>If a future sensor is wired active-low, flip {@link #ACTIVE_HIGH}.
  */
 public class TurretHomingSensor {
 
-  // Voltage window that corresponds to the magnet sitting over the sensor at stow.
-  private static final LoggedTunableNumber windowLowVolts =
-      new LoggedTunableNumber("Turret/Homing/WindowLowVolts", 2.3);
-  private static final LoggedTunableNumber windowHighVolts =
-      new LoggedTunableNumber("Turret/Homing/WindowHighVolts", 2.7);
-  // How long the reading must stay in-window before we trust it (rejects fly-by noise).
+  // Sensor polarity. True: line is high (voltage above threshold) when the magnet is present.
+  private static final boolean ACTIVE_HIGH = true;
+
+  // Digital high/low split point (volts). A digital sensor drives ~0V low and ~3.3-5V high,
+  // so the midpoint is a safe default; expose it in case the sensor's high level is unusual.
+  private static final LoggedTunableNumber triggerVolts =
+      new LoggedTunableNumber("Turret/Homing/TriggerVolts", 2.5);
+  // How long the reading must stay triggered before we trust it (rejects fly-by noise).
   private static final LoggedTunableNumber debounceSeconds =
       new LoggedTunableNumber("Turret/Homing/DebounceSeconds", 0.10);
 
@@ -39,7 +40,7 @@ public class TurretHomingSensor {
   private Debouncer debouncer;
   private double debounceConfigured;
 
-  private boolean inWindow = false;
+  private boolean triggered = false;
   private boolean atIndex = false;
 
   public TurretHomingSensor(int analogChannel) {
@@ -60,25 +61,24 @@ public class TurretHomingSensor {
     }
 
     double voltage = getVoltage();
-    inWindow = input != null
-        && voltage >= windowLowVolts.get()
-        && voltage <= windowHighVolts.get();
-    atIndex = debouncer.calculate(inWindow);
+    boolean high = input != null && voltage >= triggerVolts.get();
+    triggered = ACTIVE_HIGH ? high : !high;
+    atIndex = debouncer.calculate(triggered);
 
     Logger.recordOutput("Turret/Homing/Present", input != null);
     Logger.recordOutput("Turret/Homing/Voltage", voltage);
-    Logger.recordOutput("Turret/Homing/InWindow", inWindow);
+    Logger.recordOutput("Turret/Homing/Triggered", triggered);
     Logger.recordOutput("Turret/Homing/AtIndex", atIndex);
   }
 
-  /** Raw analog voltage; 0 in simulation. */
+  /** Raw analog voltage from the digital sensor's output line; 0 in simulation. */
   public double getVoltage() {
     return input != null ? input.getVoltage() : 0.0;
   }
 
   /** True the instant the magnet is over the sensor (not debounced). Used to re-arm the latch. */
-  public boolean isInWindow() {
-    return inWindow;
+  public boolean isTriggered() {
+    return triggered;
   }
 
   /** Debounced "turret is at its homing index" — gate a re-zero on this. */
