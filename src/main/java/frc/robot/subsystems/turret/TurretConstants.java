@@ -78,9 +78,11 @@ public class TurretConstants {
 		config.Slot0.kI = 0.002;
 		config.Slot0.kD = 1.5;  // was 0.005 (effectively zero) — add derivative braking
 		config.Slot0.kS = 1.90;
-		// Volts per mechanism rot/s. (12 - kS) / 2.4 rot/s free speed ≈ 4.2. Feeds the profile
-		// velocity forward instead of leaning on kP alone.
-		config.Slot0.kV = 4.2;
+		// Volts per mechanism rot/s. Measured empirically from the 07-03 23:30 log: on a cruise
+		// plateau (vel≈refslope≈1.8), (V - kS)/vel ≈ 3.4 — the old 4.2 over-drove the FF, so the
+		// mechanism ran ~30° AHEAD of the profile (ClosedLoop/Error ≈ -30°) and overshot. 3.4 makes
+		// kV·refslope match actual velocity. (Implies real free speed ≈ 3.0 rot/s, so cruise 1.8 is fine.)
+		config.Slot0.kV = 3.4;
 		config.Slot0.kA = 0.15; // was 0 — feed profile acceleration forward (SysId would refine this)
 		
 
