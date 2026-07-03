@@ -28,8 +28,8 @@ public final class Constants {
   }
 
   /** Controler Type Configuration (XBOX/PS5). */
-  public static final ControllerType kDriverControllerType = ControllerType.XBOX; // Driver
-  public static final ControllerType kOperatorControllerType = ControllerType.XBOX; // Operator
+  public static final ControllerType kDriverControllerType = ControllerType.PS5; // Driver
+  public static final ControllerType kOperatorControllerType = ControllerType.PS5; // Operator
 
   }
 

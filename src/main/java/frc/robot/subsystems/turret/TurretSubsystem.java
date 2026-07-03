@@ -224,11 +224,11 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
   }
 
   public void offsetLeft(){
-    turretOffset += 5.0;
+    turretOffset += 2;
   }
 
   public void offsetRight(){
-    turretOffset -= 5.0;
+    turretOffset -= 2;
   }
 
   public void zeroOffset(){
