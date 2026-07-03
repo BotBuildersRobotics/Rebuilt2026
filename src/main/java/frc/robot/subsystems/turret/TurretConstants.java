@@ -59,7 +59,10 @@ public class TurretConstants {
 		// (33%+ overshoot, ~2s ring). Dropped to ~75% of free speed to restore headroom and cut
 		// arrival momentum — the biggest lever on the overshoot. Retune after re-logging.
 		config.MotionMagic.MotionMagicCruiseVelocity = 1.8; // rot/s at mechanism (~75% of free speed)
-		config.MotionMagic.MotionMagicAcceleration = 12.0; // rot/s² at mechanism (reaches cruise in ~0.15s)
+		// Lowered from 12: with kV correct, big steps track well but the light turret still blasted
+		// through the SHORT profile on small steps (32deg step peaked at 49deg). Less accel = less
+		// momentum built during a small move = less overshoot. Modest cost to big-move time.
+		config.MotionMagic.MotionMagicAcceleration = 8.0; // rot/s² at mechanism
     	//config.MotionMagic.MotionMagicJerk = 1100;
 		
 
@@ -76,7 +79,7 @@ public class TurretConstants {
 		// re-log and trim (watch Turret Motor/ClosedLoop/Error and overshoot).
 		config.Slot0.kP = 20;   // was 30 — reduce aggression; let kD do the damping
 		config.Slot0.kI = 0.002;
-		config.Slot0.kD = 1.5;  // was 0.005 (effectively zero) — add derivative braking
+		config.Slot0.kD = 3.0;  // was 1.5 — more derivative braking now that kV tracks; targets remaining overshoot
 		config.Slot0.kS = 1.90;
 		// Volts per mechanism rot/s. Measured empirically from the 07-03 23:30 log: on a cruise
 		// plateau (vel≈refslope≈1.8), (V - kS)/vel ≈ 3.4 — the old 4.2 over-drove the FF, so the

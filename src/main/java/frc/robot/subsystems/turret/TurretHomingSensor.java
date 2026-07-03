@@ -25,8 +25,11 @@ import org.littletonrobotics.junction.Logger;
  */
 public class TurretHomingSensor {
 
-  // Sensor polarity. True: line is high (voltage above threshold) when the magnet is present.
-  private static final boolean ACTIVE_HIGH = true;
+  // Sensor polarity. The 07-03 23:42 log proved this sensor is ACTIVE-LOW: voltage drops to ~0V
+  // only when the turret is near home (magnet over the sensor) and sits at ~4.5V everywhere else.
+  // With ACTIVE_HIGH=true the index fired when the turret was AWAY from home, corrupting the zero.
+  // False: line is LOW (voltage below threshold) when the magnet is present.
+  private static final boolean ACTIVE_HIGH = false;
 
   // Digital high/low split point (volts). A digital sensor drives ~0V low and ~3.3-5V high,
   // so the midpoint is a safe default; expose it in case the sensor's high level is unusual.
