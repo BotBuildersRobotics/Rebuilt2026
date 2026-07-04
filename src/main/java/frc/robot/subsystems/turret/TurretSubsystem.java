@@ -68,6 +68,27 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
   // Extra safety: only re-zero when the turret is essentially stationary.
   private static final LoggedTunableNumber rezeroMaxVelRadPerSec =
       new LoggedTunableNumber("Turret/Homing/MaxVelRadPerSec", 0.15);
+  // Max position error from home to allow a settle-based auto re-zero (fallback when the turret
+  // parks at home without sweeping fully through the sensor).
+  private static final LoggedTunableNumber rezeroMaxErrorDeg =
+      new LoggedTunableNumber("Turret/Homing/RezeroMaxErrorDeg", 3.0);
+  // Edge-midpoint homing: when the turret sweeps fully across the digital sensor, the rising and
+  // falling edges bracket the magnet; their midpoint is true home, independent of stiction/direction.
+  private boolean prevHomingTriggered = false;
+  private double risingEdgePos = Double.NaN;   // mechanism angle (rad) where the band was entered
+  private double risingEdgeTime = 0.0;
+  private int edgeHomeCount = 0;
+  // Reject spurious crossings: the band width must be plausible and the sweep must be reasonably quick
+  // (a genuine pass through, not enter-sit-leave).
+  private static final LoggedTunableNumber edgeBandMinDeg =
+      new LoggedTunableNumber("Turret/Homing/EdgeBandMinDeg", 1.0);
+  private static final LoggedTunableNumber edgeBandMaxDeg =
+      new LoggedTunableNumber("Turret/Homing/EdgeBandMaxDeg", 30.0);
+  private static final LoggedTunableNumber edgeMaxCrossSeconds =
+      new LoggedTunableNumber("Turret/Homing/EdgeMaxCrossSeconds", 1.5);
+  // Guard against a huge correction from a bad reading.
+  private static final LoggedTunableNumber edgeMaxCorrectionDeg =
+      new LoggedTunableNumber("Turret/Homing/EdgeMaxCorrectionDeg", 15.0);
   // Tracks the current stow episode: when stow began, and whether we've already re-zeroed for it.
   private boolean wasStowed = false;
   private double stowStartTimestamp = 0.0;
@@ -89,9 +110,11 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
   private static final LoggedTunableNumber useVelocityFeedforward =
       new LoggedTunableNumber("Turret/UseVelocityFeedforward", 1.0);
   // Position error (deg) below which we switch from Motion Magic (acquiring) to velocity feedforward
-  // (tracking). Big enough that normal moving-target lag stays in tracking mode.
+  // (tracking). Raised from 20: at 20 the loop dropped OUT of feedforward into Motion Magic during
+  // fast robot rotation (exactly when the yaw-rate FF is needed), so lag grew. Keep FF engaged
+  // through normal moving-target error; only the initial big acquisition slew uses Motion Magic.
   private static final LoggedTunableNumber trackingFeedforwardErrorDeg =
-      new LoggedTunableNumber("Turret/TrackingFeedforwardErrorDeg", 20.0);
+      new LoggedTunableNumber("Turret/TrackingFeedforwardErrorDeg", 45.0);
 
   private ShootState shootState = ShootState.ACTIVE_SHOOTING;
   private boolean stowed = true;
@@ -158,6 +181,7 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
         // Sample the homing encoder every loop (advances its debouncer) and, when the turret
         // is parked at stow with the magnet over the sensor, snap out any accumulated drift.
         homingSensor.update();
+        updateHomingEdges();
         updateHomingRezero();
 
         /*SmartDashboard.putBoolean("Turret/ControlLoopActive", DriverStation.isEnabled() && turretZeroed);
@@ -313,6 +337,49 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
   }
 
   /**
+   * Edge-midpoint homing for the digital sensor. When the turret sweeps fully through the sensor,
+   * the rising edge (enter band) and falling edge (exit band) bracket the magnet; their midpoint is
+   * true home — independent of where stiction would let it settle and of the sweep direction. On a
+   * valid crossing, shifts the encoder frame so that midpoint reads the calibrated home index.
+   * Purely observational (reads position at the transitions) plus a small frame shift.
+   */
+  private void updateHomingEdges() {
+    boolean trig = homingSensor.isTriggered();
+    double pos = getPosition().in(Radians);
+    double now = Timer.getFPGATimestamp();
+
+    if (trig && !prevHomingTriggered) {
+      // Entered the band.
+      risingEdgePos = pos;
+      risingEdgeTime = now;
+    } else if (!trig && prevHomingTriggered && !Double.isNaN(risingEdgePos)) {
+      // Exited the band — a full crossing. Validate width and duration, then correct.
+      double bandDeg = Math.abs(Units.radiansToDegrees(pos - risingEdgePos));
+      boolean plausible =
+          bandDeg >= edgeBandMinDeg.get()
+          && bandDeg <= edgeBandMaxDeg.get()
+          && (now - risingEdgeTime) <= edgeMaxCrossSeconds.get();
+      if (plausible && autoRezeroEnabled.get() >= 0.5) {
+        double midpoint = (risingEdgePos + pos) / 2.0;
+        double drift = midpoint - homingIndexRad; // how far the band centre has walked from home
+        if (Math.abs(Units.radiansToDegrees(drift)) <= edgeMaxCorrectionDeg.get()) {
+          // Shift the whole frame so the band centre now reads the home index.
+          setCurrentPosition(Radians.of(pos - drift));
+          lastGoalAngle -= drift;
+          lastClampedAngle -= drift;
+          turretZeroed = true;
+          edgeHomeCount++;
+          Logger.recordOutput("Turret/Homing/EdgeDriftDeg", Units.radiansToDegrees(drift));
+          Logger.recordOutput("Turret/Homing/EdgeBandDeg", bandDeg);
+        }
+      }
+      risingEdgePos = Double.NaN;
+    }
+    prevHomingTriggered = trig;
+    Logger.recordOutput("Turret/Homing/EdgeHomeCount", edgeHomeCount);
+  }
+
+  /**
    * Auto drift-correction. When the turret is stowed, nearly stationary, and the homing magnet
    * is over the fixed sensor, resets the motor's position to the known index angle. Latched so
    * it fires once per pass through the magnet and re-arms only after leaving the window.
@@ -330,12 +397,22 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
     double stowedFor = stowed ? now - stowStartTimestamp : 0.0;
     boolean settled = stowed && stowedFor >= stowSettleSeconds.get();
 
+    // Only re-zero when the turret is already settled CLOSE to home. The magnet's detection band is
+    // wider than the stiction settling band, so if we snap to zero while parked a few degrees off
+    // (stiction), we inject that offset into the zero — that walks the aim over a match. Requiring a
+    // small position error means we only correct genuine small encoder drift, never stiction offset.
+    double homeErrorRad = Math.abs(getPosition().in(Radians) - homingIndexRad);
+    boolean nearHome = homeErrorRad <= Units.degreesToRadians(rezeroMaxErrorDeg.get());
+
     boolean canRezero =
         autoRezeroEnabled.get() >= 0.5
         && settled
         && !rezeroedThisStow
         && homingSensor.isAtIndex()
+        && nearHome
         && Math.abs(getTurretVelocity()) < rezeroMaxVelRadPerSec.get();
+
+    Logger.recordOutput("Turret/Homing/HomeErrorDeg", Units.radiansToDegrees(homeErrorRad));
 
     if (canRezero) {
       rezeroFromHoming();
