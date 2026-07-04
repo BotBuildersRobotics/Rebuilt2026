@@ -84,9 +84,14 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
   // TEMP: cable issue — set false to re-enable tracking
   private static final boolean LOCKED_TO_ZERO = false;
 
-  // 1.0 = use position+velocity feedforward, 0.0 = use Motion Magic
+  // 1.0 = use position+velocity feedforward (with robot yaw-rate compensation) once close to target;
+  // 0.0 = always Motion Magic. Enabled by default so shoot-on-the-move tracks instead of lagging.
   private static final LoggedTunableNumber useVelocityFeedforward =
-      new LoggedTunableNumber("Turret/UseVelocityFeedforward", 0.0);
+      new LoggedTunableNumber("Turret/UseVelocityFeedforward", 1.0);
+  // Position error (deg) below which we switch from Motion Magic (acquiring) to velocity feedforward
+  // (tracking). Big enough that normal moving-target lag stays in tracking mode.
+  private static final LoggedTunableNumber trackingFeedforwardErrorDeg =
+      new LoggedTunableNumber("Turret/TrackingFeedforwardErrorDeg", 20.0);
 
   private ShootState shootState = ShootState.ACTIVE_SHOOTING;
   private boolean stowed = true;
@@ -207,15 +212,28 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
       double clampedAngle = MathUtil.clamp(bestAngle, minLegalAngle, maxLegalAngle);
       lastClampedAngle = clampedAngle; // remember the commanded setpoint for isOnTarget()
 
-      // Choose control mode: position+velocity feedforward for shoot-on-the-move,
-      // or Motion Magic for smooth profiled movement
-      if (useVelocityFeedforward.get() >= 0.5 && goalVelocityRadPerSec != 0.0) {
+      // Robot-relative turret slew rate needed to hold aim. The setpoint is (goalAngle - robotAngle),
+      // so its derivative is (field bearing rate) - (robot yaw rate). Without the yaw-rate term the
+      // turret lags badly whenever the robot rotates (logs showed 49-111deg error when slewing fast).
+      double robotYawRate = DriveSubsystem.mInstance.getState().Speeds.omegaRadiansPerSecond;
+      double turretVelFF = goalVelocityRadPerSec - robotYawRate;
+
+      // Hybrid control: while acquiring (far from target) use Motion Magic so big moves stay smoothly
+      // profiled (preserves the overshoot tuning). Once close, switch to position + velocity
+      // feedforward so the turret tracks a moving target instead of chasing it.
+      double posErrRad = Math.abs(clampedAngle - getPosition().in(Radians));
+      boolean tracking = posErrRad < Units.degreesToRadians(trackingFeedforwardErrorDeg.get());
+      if (useVelocityFeedforward.get() >= 0.5 && tracking) {
         this.applySetpoint(Setpoint.withPositionVelocitySetpoint(
             Radians.of(clampedAngle),
-            RadiansPerSecond.of(goalVelocityRadPerSec)));
+            RadiansPerSecond.of(turretVelFF)));
       } else {
         this.applySetpoint(Setpoint.withMotionMagicSetpoint(Radians.of(clampedAngle)));
       }
+
+      SmartDashboard.putNumber("Turret/RobotYawRate", robotYawRate);
+      Logger.recordOutput("Turret/TurretVelFF", turretVelFF);
+      Logger.recordOutput("Turret/Tracking", tracking);
 
       SmartDashboard.putNumber("Turret/BestAngleRad", bestAngle);
       SmartDashboard.putNumber("Turret/SetpointPositionRad", clampedAngle);
