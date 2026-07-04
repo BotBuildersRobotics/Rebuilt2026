@@ -36,10 +36,20 @@ public class SuperSystem extends SubsystemBase {
         new LoggedTunableNumber("SuperSystem/IntakePulseOnTimeSec");
     private static final LoggedTunableNumber intakePulseOffTime =
         new LoggedTunableNumber("SuperSystem/IntakePulseOffTimeSec");
-    // Extra settle time after the flywheel is at speed AND the turret is on target before a ball
-    // is fed, so a big turret turn fully finishes first. Bump up if shots still leak out early.
+    // Feed readiness uses a hysteretic latch so it works both for stationary shots and shoot-on-
+    // the-move. ARM: on-target + at-speed must hold for feedSettleSeconds before the first ball
+    // (stops a ball being fed mid-slew during a big turn). HOLD: once armed, the feed keeps going
+    // through brief tracking/at-speed flickers until they're lost for feedHoldSeconds — this is what
+    // lets it keep shooting while the turret is continuously tracking a moving target.
     private static final LoggedTunableNumber feedSettleSeconds =
         new LoggedTunableNumber("SuperSystem/FeedSettleSeconds", 0.12);
+    private static final LoggedTunableNumber feedHoldSeconds =
+        new LoggedTunableNumber("SuperSystem/FeedHoldSeconds", 0.30);
+    private Debouncer feedArmDebounce = new Debouncer(0.12, Debouncer.DebounceType.kRising);
+    private Debouncer feedHoldDebounce = new Debouncer(0.30, Debouncer.DebounceType.kFalling);
+    private double feedArmConfigured = 0.12;
+    private double feedHoldConfigured = 0.30;
+    private boolean feedReady = false;
 
 	private TurretSubsystem turret;
 
@@ -98,6 +108,8 @@ public class SuperSystem extends SubsystemBase {
     @Override
 	public void periodic() {
 
+		updateFeedReady();
+
 		 // Clear shooting parameters so they are recalculated each tick
     	shotCalc.clearShootingParameters();
 		SmartDashboard.putBoolean("SuperSystem/DefenceMode", defenceModeActive);
@@ -126,13 +138,34 @@ public class SuperSystem extends SubsystemBase {
 
 
 	/**
-	 * Feed-readiness gate: flywheel at speed AND turret on target, held for {@code feedSettleSeconds}
-	 * before returning true. Each caller gets its own debouncer so the timing stays correct when the
-	 * roller floor and chute each poll once per loop. Freshly built per shot so it resets each time.
+	 * Hysteretic feed-readiness latch, evaluated once per loop so the roller floor and chute share
+	 * identical timing. ARM requires sustained on-target+at-speed (feedSettleSeconds) so a ball is
+	 * not fed mid-slew; once armed, the feed HOLDS through brief flickers and only drops after the
+	 * conditions are lost for feedHoldSeconds — which keeps it feeding while tracking a moving target.
 	 */
+	private void updateFeedReady() {
+		// Rebuild debouncers if their tunables changed (rare, only while tuning).
+		if (feedSettleSeconds.get() != feedArmConfigured) {
+			feedArmConfigured = feedSettleSeconds.get();
+			feedArmDebounce = new Debouncer(feedArmConfigured, Debouncer.DebounceType.kRising);
+		}
+		if (feedHoldSeconds.get() != feedHoldConfigured) {
+			feedHoldConfigured = feedHoldSeconds.get();
+			feedHoldDebounce = new Debouncer(feedHoldConfigured, Debouncer.DebounceType.kFalling);
+		}
+
+		boolean raw = shooter.isAtSpeed() && turret.isOnTarget();
+		boolean armed = feedArmDebounce.calculate(raw);  // kRising: true after raw held for arm time
+		boolean held = feedHoldDebounce.calculate(raw);  // kFalling: stays true until raw false for hold time
+		// Hysteresis: need a sustained lock to start feeding, then tolerate brief losses while feeding.
+		feedReady = feedReady ? held : armed;
+
+		org.littletonrobotics.junction.Logger.recordOutput("SuperSystem/FeedRaw", raw);
+		org.littletonrobotics.junction.Logger.recordOutput("SuperSystem/FeedReady", feedReady);
+	}
+
 	private BooleanSupplier shooterFeedReady() {
-		Debouncer settle = new Debouncer(feedSettleSeconds.get(), Debouncer.DebounceType.kRising);
-		return () -> settle.calculate(shooter.isAtSpeed() && turret.isOnTarget());
+		return () -> feedReady;
 	}
 
 	public Command Shoot(){

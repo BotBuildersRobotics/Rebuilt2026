@@ -63,7 +63,11 @@ public class TurretConstants {
 		// through the SHORT profile on small steps (32deg step peaked at 49deg). Less accel = less
 		// momentum built during a small move = less overshoot. Modest cost to big-move time.
 		config.MotionMagic.MotionMagicAcceleration = 8.0; // rot/s² at mechanism
-    	//config.MotionMagic.MotionMagicJerk = 1100;
+		// Gentle jerk limit to soften the acceleration onset. The 23:56 log showed the turret lunged
+		// ~24deg AHEAD of the profile during the abrupt accel start, then had to come back (the last
+		// bit of overshoot). Limiting jerk rounds that onset. 80 rot/s³ ramps accel to full in ~0.1s
+		// — small containment. Lower = smoother/slower onset; raise toward 1100 to effectively disable.
+		config.MotionMagic.MotionMagicJerk = 80.0; // rot/s³ at mechanism
 		
 
 		config.Voltage.PeakForwardVoltage = 12.0;
