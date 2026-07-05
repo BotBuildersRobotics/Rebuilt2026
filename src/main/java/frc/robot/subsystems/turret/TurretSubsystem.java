@@ -288,9 +288,7 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
     Pose2d robotPose = DriveSubsystem.mInstance.getState().Pose;
     Rotation2d robotAngle = robotPose.getRotation();
     double fieldRelativeAngleDeg = robotAngle.getDegrees() + robotRelativeAngleDeg;
-    SmartDashboard.putNumber("Turret/RobotRelativeAngleDeg", robotRelativeAngleDeg);
-    SmartDashboard.putNumber("Turret/FieldRelativeAngleDeg", fieldRelativeAngleDeg);
-    SmartDashboard.putBoolean("Turret/Stowed", stowed);
+    
 
     Rotation2d turretFieldAngle = Rotation2d.fromDegrees(fieldRelativeAngleDeg);
     Pose2d turretAimPose = new Pose2d(robotPose.getTranslation(), turretFieldAngle);
@@ -299,15 +297,20 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
     // re-serialized by SmartDashboard.updateValues() every loop. Turret/AimPose is still
     // logged below for AdvantageScope regardless.
     if (Constants.tuningMode) {
+      SmartDashboard.putNumber("Turret/RobotRelativeAngleDeg", robotRelativeAngleDeg);
+      SmartDashboard.putNumber("Turret/FieldRelativeAngleDeg", fieldRelativeAngleDeg);
+      SmartDashboard.putBoolean("Turret/Stowed", stowed);
+
       turretLigament.setAngle(robotRelativeAngleDeg);
       SmartDashboard.putData("Turret Mech", turretMech);
       fieldViz.setRobotPose(turretAimPose);
       if (currentTarget != null) {
         fieldViz.getObject("Target").setPose(new Pose2d(currentTarget, new Rotation2d()));
       }
+      SmartDashboard.putString("State", shootState.toString());
     }
 
-    SmartDashboard.putString("State", shootState.toString());
+    
 
     // Live gear-ratio calibration: suggested = currentRatio * (commanded / measured).
     double measuredDeg = testMeasuredDeg.get();
