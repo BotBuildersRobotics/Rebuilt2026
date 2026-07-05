@@ -1,5 +1,6 @@
 package frc.robot.subsystems.shooter;
 
+import frc.robot.lib.LoggedTracer;
 import frc.robot.lib.LoggedTunableNumber;
 import frc.robot.lib.io.MotorIO.Setpoint;
 
@@ -106,6 +107,7 @@ public class ShooterSubsystem  extends MotorSubsystem<MotorIOTalonFX> {
         Logger.recordOutput("Shooter/VelocitySetPoint", setpointVal);
         Logger.recordOutput("Shooter/SpeedOffset", flywheelSpeedOffset);
         Logger.recordOutput("Shooter/AtSpeed", isAtSpeed());
+        LoggedTracer.record("ShooterPeriodic");
      }
 
     private void stop() {

@@ -1,6 +1,7 @@
 package frc.robot.subsystems.drive;
 
 
+import frc.robot.lib.LoggedTracer;
 import com.ctre.phoenix6.swerve.SwerveDrivetrain.SwerveDriveState;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import edu.wpi.first.math.Matrix;
@@ -63,6 +64,7 @@ public class DriveSubsystem extends SubsystemBase {
 	public void periodic() {
 		lastReadState = drivetrain.getState();
 		outputTelemetry();
+		LoggedTracer.record("Drive");
 	}
 
 	public void outputTelemetry() {

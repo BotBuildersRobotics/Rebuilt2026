@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.lib.LoggedTracer;
 import frc.robot.subsystems.SuperSystem;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.turret.FuelPhysicsSim;
@@ -63,7 +64,11 @@ public class Robot extends LoggedRobot {
     // commands, running already-scheduled commands, removing finished or interrupted commands,
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
     // block in order for anything in the Command-based framework to work.
+    // Per-section loop timing: each subsystem periodic() records its own epoch, and the record
+    // after run() captures everything left (button polling + command execution).
+    LoggedTracer.reset();
     CommandScheduler.getInstance().run();
+    LoggedTracer.record("Commands");
     //Logger.recordOutput("Robot", power.getAllCurrents());
 
     // Seconds left in the current hub shift (-1 in auto, 0 when no match running).

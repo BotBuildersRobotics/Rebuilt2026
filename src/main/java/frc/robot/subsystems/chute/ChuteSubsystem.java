@@ -1,5 +1,6 @@
 package frc.robot.subsystems.chute;
 
+import frc.robot.lib.LoggedTracer;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import java.util.function.BooleanSupplier;
@@ -55,6 +56,7 @@ public class ChuteSubsystem extends SubsystemBase {
 		MotorSubsystem.recordMotorTelemetry("Chute/BottomRoller", bottomRoller);
 		MotorSubsystem.recordMotorTelemetry("Chute/SideFeeder", sideFeeder);
 		MotorSubsystem.recordMotorTelemetry("Chute/Feeder", feeder);
+		LoggedTracer.record("Chute");
 	}
 
 	public void applySetpoint(Setpoint setpoint) {

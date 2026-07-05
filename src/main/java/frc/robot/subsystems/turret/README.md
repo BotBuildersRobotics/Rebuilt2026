@@ -61,6 +61,13 @@ offset into the zero and walks the aim over a match.**
    Runs passively any time the turret slews across home — no routine needed. Guards: plausible band
    width (`EdgeBandMin/MaxDeg`), quick crossing (`EdgeMaxCrossSeconds`), capped correction
    (`EdgeMaxCorrectionDeg`).
+   **Edge latency compensation (2026-07-05):** an edge is only observed one loop late — up to
+   `velocity × loop-time` past the true transition, biased in the sweep direction. At overrun loop
+   times (~43 ms) this produced alternating ±5–15° "drift corrections" that oscillated the zero
+   (seen as `EdgeDriftDeg` flipping sign every crossing and `EdgeBandDeg` varying 1–20°). Each edge
+   is now estimated as the midpoint of the previous and current loop's positions, which removes the
+   directional bias to first order. If `EdgeDriftDeg` still alternates sign with large magnitude,
+   suspect loop overrun first.
 2. **Level-snap (fallback, ±3° guarded) — `updateHomingRezero()`**
    When the turret just *parks* at home without a full crossing: after `StowSettleSeconds` stowed +
    sensor triggered + nearly stationary + **already within `RezeroMaxErrorDeg` of home**, snap to

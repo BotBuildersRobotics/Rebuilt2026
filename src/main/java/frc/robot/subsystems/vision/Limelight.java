@@ -1,6 +1,7 @@
 package frc.robot.subsystems.vision;
 
 
+import frc.robot.lib.LoggedTracer;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Time;
@@ -50,6 +51,7 @@ public class Limelight extends LimelightSubsystem {
 			}
 
 			SmartDashboard.putNumber("Vision/Num Agreed Stable Updates", numPoseStableUpdates);
+			LoggedTracer.record("VisionAgg");
 		} catch (Exception e) {
 			SmartDashboard.putNumber("Limelight/Crash", Timer.getFPGATimestamp());
 			SmartDashboard.putString("Limelight/Crash Exception", e.getMessage());

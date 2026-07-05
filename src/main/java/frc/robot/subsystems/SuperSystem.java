@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import frc.robot.lib.LoggedTracer;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import edu.wpi.first.math.filter.Debouncer;
@@ -119,6 +120,7 @@ public class SuperSystem extends SubsystemBase {
 		SmartDashboard.putBoolean("Hub/RedActive", ShiftHelpers.isRedHubActive());
 		SmartDashboard.putBoolean("Hub/AreWeRedActive", ShiftHelpers.isRedHubActive() && DriverStation.getAlliance().get() == DriverStation.Alliance.Red);
 		SmartDashboard.putBoolean("Hub/AreWeActive", (ShiftHelpers.isRedHubActive() && DriverStation.getAlliance().get() == DriverStation.Alliance.Red) || (ShiftHelpers.isBlueHubActive() && DriverStation.getAlliance().get() == DriverStation.Alliance.Blue));
+		LoggedTracer.record("SuperSystem");
 	}
 
 	 public Command idleIntakes() {

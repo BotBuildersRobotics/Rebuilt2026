@@ -1,5 +1,6 @@
 package frc.robot.subsystems.turret;
 
+import frc.robot.lib.LoggedTracer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.FieldConstants;
 import frc.robot.lib.AllianceFlipUtil;
@@ -77,6 +78,11 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
   private boolean prevHomingTriggered = false;
   private double risingEdgePos = Double.NaN;   // mechanism angle (rad) where the band was entered
   private double risingEdgeTime = 0.0;
+  // Position at the previous loop's sensor sample. An edge is only observed one loop late — up to
+  // velocity × loop-time past the true transition, always biased in the sweep direction (at 40+ ms
+  // loops this alone produced alternating ±5–15° "drift corrections"). The true edge lies between
+  // the previous and current samples, so their midpoint is the unbiased estimate.
+  private double prevHomingPos = Double.NaN;
   private int edgeHomeCount = 0;
   // Reject spurious crossings: the band width must be plausible and the sweep must be reasonably quick
   // (a genuine pass through, not enter-sit-leave).
@@ -317,6 +323,7 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
     Logger.recordOutput("Turret/Stowed", stowed);
     Logger.recordOutput("Turret/GoalAngleDeg", goalAngle.getDegrees());
     Logger.recordOutput("Turret/Offset", turretOffset);
+    LoggedTracer.record("TurretPeriodic");
 
    }
 
@@ -348,23 +355,29 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
     double pos = getPosition().in(Radians);
     double now = Timer.getFPGATimestamp();
 
+    // Velocity compensation: the transition happened somewhere between the previous sample and
+    // this one, so use the midpoint of the two positions instead of the (late, direction-biased)
+    // current position.
+    double edgePos = Double.isNaN(prevHomingPos) ? pos : (prevHomingPos + pos) / 2.0;
+
     if (trig && !prevHomingTriggered) {
       // Entered the band.
-      risingEdgePos = pos;
+      risingEdgePos = edgePos;
       risingEdgeTime = now;
     } else if (!trig && prevHomingTriggered && !Double.isNaN(risingEdgePos)) {
       // Exited the band — a full crossing. Validate width and duration, then correct.
-      double bandDeg = Math.abs(Units.radiansToDegrees(pos - risingEdgePos));
+      double bandDeg = Math.abs(Units.radiansToDegrees(edgePos - risingEdgePos));
       boolean plausible =
           bandDeg >= edgeBandMinDeg.get()
           && bandDeg <= edgeBandMaxDeg.get()
           && (now - risingEdgeTime) <= edgeMaxCrossSeconds.get();
       if (plausible && autoRezeroEnabled.get() >= 0.5) {
-        double midpoint = (risingEdgePos + pos) / 2.0;
+        double midpoint = (risingEdgePos + edgePos) / 2.0;
         double drift = midpoint - homingIndexRad; // how far the band centre has walked from home
         if (Math.abs(Units.radiansToDegrees(drift)) <= edgeMaxCorrectionDeg.get()) {
           // Shift the whole frame so the band centre now reads the home index.
           setCurrentPosition(Radians.of(pos - drift));
+          pos -= drift; // keep the local sample (stored as prevHomingPos below) in the new frame
           lastGoalAngle -= drift;
           lastClampedAngle -= drift;
           turretZeroed = true;
@@ -376,6 +389,7 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
       risingEdgePos = Double.NaN;
     }
     prevHomingTriggered = trig;
+    prevHomingPos = pos;
     Logger.recordOutput("Turret/Homing/EdgeHomeCount", edgeHomeCount);
   }
 

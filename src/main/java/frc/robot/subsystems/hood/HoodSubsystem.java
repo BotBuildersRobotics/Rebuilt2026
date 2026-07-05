@@ -1,5 +1,6 @@
 package frc.robot.subsystems.hood;
 
+import frc.robot.lib.LoggedTracer;
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.math.util.Units;
@@ -54,6 +55,7 @@ public class HoodSubsystem extends ServoMotorSubsystem<MotorIOTalonFX> {
        // AdvantageKit structured logging for replay
        Logger.recordOutput("Hood/PositionDeg", this.getPosition().in(Degrees));
        Logger.recordOutput("Hood/GoalAngleDeg", goalAngleDeg);
+       LoggedTracer.record("HoodPeriodic");
     }
 
     private void setGoalAngleDeg(double angleDeg){

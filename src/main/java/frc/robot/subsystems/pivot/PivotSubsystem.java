@@ -1,6 +1,7 @@
 package frc.robot.subsystems.pivot;
 
 
+import frc.robot.lib.LoggedTracer;
 import frc.robot.lib.io.ServoMotorSubsystem;
 import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.units.Units;
@@ -45,6 +46,7 @@ public class PivotSubsystem extends ServoMotorSubsystem<MotorIOTalonFX> {
         // AdvantageKit structured logging for replay
         Logger.recordOutput("Pivot/PositionDeg", getPosition().in(Degrees));
         Logger.recordOutput("Pivot/StatorCurrentAmps", getStatorCurrent().in(Units.Amps));
+        LoggedTracer.record("PivotPeriodic");
     }
 
     public BooleanSupplier isPositionWithinTolerance(){
