@@ -2,6 +2,7 @@ package frc.robot.subsystems.vision;
 
 
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.lib.LoggedTracer;
@@ -58,6 +59,9 @@ public class LimelightSubsystem extends SubsystemBase {
 		for (VisionIOLimelight io : ios) {
 			io.update();
 		}
+		// Single NT flush so MegaTag2 gets the fresh robot orientation with low latency
+		// (the per-camera SetRobotOrientation calls are the NoFlush variant).
+		NetworkTableInstance.getDefault().flush();
 
 		if (calibrationMode) {
 			// In calibration mode: log per-camera poses but don't push to drivetrain

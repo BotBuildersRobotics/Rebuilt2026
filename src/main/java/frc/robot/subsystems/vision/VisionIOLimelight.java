@@ -134,7 +134,9 @@ public class VisionIOLimelight extends VisionIO {
 	private void updateGyro() {
 
 		Rotation2d theta = DriveSubsystem.mInstance.getPose().getRotation();
-		LimelightHelpers.SetRobotOrientation(config.name, theta.getDegrees(), 0, 0, 0, 0, 0);
+		// NoFlush: LimelightSubsystem.periodic() flushes NT once after all cameras update,
+		// instead of paying a full NT flush per camera per loop.
+		LimelightHelpers.SetRobotOrientation_NoFlush(config.name, theta.getDegrees(), 0, 0, 0, 0, 0);
 	}
 
 	public String getName() {

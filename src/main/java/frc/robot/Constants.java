@@ -33,5 +33,6 @@ public final class Constants {
 
   }
 
-  public static boolean tuningMode = true;
+  // Live NT reads for every LoggedTunableNumber.get() — costs loop time; enable only while tuning.
+  public static boolean tuningMode = false;
 }
