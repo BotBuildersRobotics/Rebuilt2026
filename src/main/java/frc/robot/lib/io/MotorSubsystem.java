@@ -48,14 +48,18 @@ public class MotorSubsystem<IO extends MotorIO> extends SubsystemBase {
 		recordMotorTelemetry(name, io);
 
 		// Closed-loop tuning telemetry (position signals in mechanism units, outputs in volts).
-		Logger.recordOutput(name + "/ClosedLoop/Reference", io.getClosedLoopReference());
-		Logger.recordOutput(name + "/ClosedLoop/ReferenceSlope", io.getClosedLoopReferenceSlope());
-		Logger.recordOutput(name + "/ClosedLoop/Error", io.getClosedLoopError());
-		Logger.recordOutput(name + "/ClosedLoop/Output", io.getClosedLoopOutput());
-		Logger.recordOutput(name + "/ClosedLoop/Proportional", io.getClosedLoopProportional());
-		Logger.recordOutput(name + "/ClosedLoop/Integrated", io.getClosedLoopIntegrated());
-		Logger.recordOutput(name + "/ClosedLoop/Derivative", io.getClosedLoopDerivative());
-		Logger.recordOutput(name + "/ClosedLoop/FeedForward", io.getClosedLoopFeedForward());
+		// Opt-in per motor: 8 signal reads + 8 log entries per loop is only worth it on
+		// mechanisms actively being tuned (see MotorIO.hasClosedLoopTelemetry).
+		if (io.hasClosedLoopTelemetry()) {
+			Logger.recordOutput(name + "/ClosedLoop/Reference", io.getClosedLoopReference());
+			Logger.recordOutput(name + "/ClosedLoop/ReferenceSlope", io.getClosedLoopReferenceSlope());
+			Logger.recordOutput(name + "/ClosedLoop/Error", io.getClosedLoopError());
+			Logger.recordOutput(name + "/ClosedLoop/Output", io.getClosedLoopOutput());
+			Logger.recordOutput(name + "/ClosedLoop/Proportional", io.getClosedLoopProportional());
+			Logger.recordOutput(name + "/ClosedLoop/Integrated", io.getClosedLoopIntegrated());
+			Logger.recordOutput(name + "/ClosedLoop/Derivative", io.getClosedLoopDerivative());
+			Logger.recordOutput(name + "/ClosedLoop/FeedForward", io.getClosedLoopFeedForward());
+		}
 		LoggedTracer.record(name);
 	}
 

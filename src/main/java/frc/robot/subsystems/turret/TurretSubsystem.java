@@ -1,5 +1,6 @@
 package frc.robot.subsystems.turret;
 
+import frc.robot.Constants;
 import frc.robot.lib.LoggedTracer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.FieldConstants;
@@ -159,9 +160,12 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
     MechanismRoot2d turretRoot = turretMech.getRoot("root", 1.5, 0.1);
     turretLigament = turretRoot.append(new MechanismLigament2d("Turret", 1, 0));
 
-    // Initialize field visualization for AdvantageScope
+    // Initialize field visualization for AdvantageScope. Only registered in tuning mode —
+    // once registered, SmartDashboard.updateValues() re-serializes it every loop.
     fieldViz = new Field2d();
-    SmartDashboard.putData("Turret Field Viz", fieldViz);
+    if (Constants.tuningMode) {
+      SmartDashboard.putData("Turret Field Viz", fieldViz);
+    }
 
     // Gear-ratio calibration buttons (run from AdvantageScope/Shuffleboard):
     //  1. Point turret straight ahead, press "Turret/Zero".
@@ -280,12 +284,7 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
       lastGoalAngle = getPosition().in(Radians);
     }
 
-    // Always update the turret mechanism visual (even when disabled)
     double robotRelativeAngleDeg = Units.radiansToDegrees(getTurretAngle());
-    turretLigament.setAngle(robotRelativeAngleDeg);
-    SmartDashboard.putData("Turret Mech", turretMech);
-
-    // Calculate and display field-relative angle
     Pose2d robotPose = DriveSubsystem.mInstance.getState().Pose;
     Rotation2d robotAngle = robotPose.getRotation();
     double fieldRelativeAngleDeg = robotAngle.getDegrees() + robotRelativeAngleDeg;
@@ -293,15 +292,19 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
     SmartDashboard.putNumber("Turret/FieldRelativeAngleDeg", fieldRelativeAngleDeg);
     SmartDashboard.putBoolean("Turret/Stowed", stowed);
 
-    // Update field visualization for AdvantageScope
-    // Create a pose at the robot's position with the turret's field-relative angle
     Rotation2d turretFieldAngle = Rotation2d.fromDegrees(fieldRelativeAngleDeg);
     Pose2d turretAimPose = new Pose2d(robotPose.getTranslation(), turretFieldAngle);
-    fieldViz.setRobotPose(turretAimPose);
 
-    // Show the target position if using pointAtFieldPosition
-    if (currentTarget != null) {
-      fieldViz.getObject("Target").setPose(new Pose2d(currentTarget, new Rotation2d()));
+    // Visualization widgets (Mechanism2d + turret Field2d) only in tuning mode — they are
+    // re-serialized by SmartDashboard.updateValues() every loop. Turret/AimPose is still
+    // logged below for AdvantageScope regardless.
+    if (Constants.tuningMode) {
+      turretLigament.setAngle(robotRelativeAngleDeg);
+      SmartDashboard.putData("Turret Mech", turretMech);
+      fieldViz.setRobotPose(turretAimPose);
+      if (currentTarget != null) {
+        fieldViz.getObject("Target").setPose(new Pose2d(currentTarget, new Rotation2d()));
+      }
     }
 
     SmartDashboard.putString("State", shootState.toString());

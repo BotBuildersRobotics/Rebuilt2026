@@ -233,6 +233,15 @@ public abstract class MotorIO implements Sendable {
 		return inputs.motorTemperature;
 	}
 
+	/**
+	 * Whether this motor reads + logs closed-loop tuning telemetry each loop. Off by default —
+	 * the 8 extra signal reads and log entries per motor per loop are only worth paying on
+	 * mechanisms actively being tuned (the turret opts in via closedLoopUpdateHz).
+	 */
+	public boolean hasClosedLoopTelemetry() {
+		return false;
+	}
+
 	/** Profiled closed-loop target position (mechanism units). */
 	public double getClosedLoopReference() {
 		return inputs.closedLoopReference;

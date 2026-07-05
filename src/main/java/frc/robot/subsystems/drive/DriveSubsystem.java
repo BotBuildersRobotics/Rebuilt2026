@@ -1,6 +1,7 @@
 package frc.robot.subsystems.drive;
 
 
+import frc.robot.Constants;
 import frc.robot.lib.LoggedTracer;
 import com.ctre.phoenix6.swerve.SwerveDrivetrain.SwerveDriveState;
 import com.ctre.phoenix6.swerve.SwerveRequest;
@@ -68,11 +69,18 @@ public class DriveSubsystem extends SubsystemBase {
 	}
 
 	public void outputTelemetry() {
-		mechanismPublisher.set(new Pose3d(getPose()));
-		telemetry.telemeterize(lastReadState);
-		SmartDashboard.putData("Drive", this);
+		// Elastic Field2d stays on always: the drive team uses it to sanity-check odometry.
 		elasticPose.setRobotPose(getPose());
 		SmartDashboard.putData("Elastic Field 2D", elasticPose);
+
+		// Heavy visualization/tuning telemetry only in tuning mode. The "Drive" sendable alone
+		// wires ~28 CTRE signal getters that SmartDashboard.updateValues() invokes every loop,
+		// and telemeterize() republishes four Mechanism2d widgets — measurable loop time.
+		if (Constants.tuningMode) {
+			mechanismPublisher.set(new Pose3d(getPose()));
+			telemetry.telemeterize(lastReadState);
+			SmartDashboard.putData("Drive", this);
+		}
 
 		// AdvantageKit structured logging for replay
 		

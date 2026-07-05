@@ -63,7 +63,9 @@ public class MotorIOTalonFX extends MotorIO {
 	@Override
 	public void updateInputs() {
 		updateMotorInputs(inputs, main);
-		updateClosedLoopInputs(inputs, main);
+		if (hasClosedLoopTelemetry()) {
+			updateClosedLoopInputs(inputs, main);
+		}
 
 		for (int i = 0; i < followers.length; i++) {
 			updateMotorInputs(followerInputs[i], followers[i]);
@@ -244,9 +246,18 @@ public class MotorIOTalonFX extends MotorIO {
 	 * @param config Configuration to create MotorIOTalonFX from.
 	 */
 	@SuppressWarnings("removal") // TalonFX constructor deprecated in Phoenix 6 but is still the correct API
+	@Override
+	public boolean hasClosedLoopTelemetry() {
+		return closedLoopTelemetry;
+	}
+
+	/** True when this motor opted into closed-loop tuning telemetry (closedLoopUpdateHz > 0). */
+	private final boolean closedLoopTelemetry;
+
 	public MotorIOTalonFX(MotorIOTalonFXConfig config) {
 		super(config.unit, config.time, config.followerIDs.length);
 		requestGetter = config.requestGetter;
+		closedLoopTelemetry = config.closedLoopUpdateHz > 0;
 		var cb = new CANBus(config.mainBus);
 		main = new TalonFX(config.mainID, cb);
 		
