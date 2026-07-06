@@ -225,6 +225,20 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     }
 
     /**
+     * Drives the robot with robot-relative {@link ChassisSpeeds}.
+     * <p>
+     * This is the plain speeds consumer used by path followers that do not supply wheel-force
+     * feedforwards (e.g. BLine). PathPlanner uses its own feedforward-aware consumer inside
+     * {@link #configureAutoBuilder()}; both share the same {@link SwerveRequest.ApplyRobotSpeeds}
+     * request object.
+     *
+     * @param speeds Robot-relative chassis speeds to apply
+     */
+    public void driveRobotRelative(ChassisSpeeds speeds) {
+        setControl(m_pathApplyRobotSpeeds.withSpeeds(speeds));
+    }
+
+    /**
      * Returns a command that applies the specified control request to this swerve drivetrain.
      *
      * @param request Function returning the request to apply

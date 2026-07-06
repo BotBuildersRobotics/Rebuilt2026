@@ -42,6 +42,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 
 
 
+import frc.robot.auto.BLineAutos;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.SuperSystem;
 import frc.robot.subsystems.chute.ChuteSubsystem;
@@ -226,6 +227,8 @@ public class RobotContainer {
 		);
 
 		autoChooser = AutoBuilder.buildAutoChooser();
+		// Add BLine autos into the same chooser (prefixed "BLine: ") so getAutonomousCommand() is unchanged.
+		BLineAutos.getInstance().registerBLineAutos(autoChooser);
 		/*if(SmartDashboard.containsKey("Auto Mode")) {
 			SmartDashboard.getEntry("Auto Mode").close();
 		}*/
