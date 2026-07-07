@@ -9,10 +9,20 @@
         { "type": "named", "data": { "name": "clearFlywheelPreset" } },
         { "type": "path", "data": { "pathName": "bluelefttrench" } },
         { "type": "named", "data": { "name": "aimTurret" } },
+        { "type": "wait", "data": { "waitTime": 0.5 } },
         { "type": "named", "data": { "name": "Shoot" } },
         { "type": "wait", "data": { "waitTime": 3.0 } },
         { "type": "named", "data": { "name": "idleShooter" } },
-        { "type": "named", "data": { "name": "stowTurret" } }
+        { "type": "named", "data": { "name": "stowTurret" } },
+         { "type": "wait", "data": { "waitTime": 1.0 } },
+        { "type": "path", "data": { "pathName": "bluelefttrench" } },
+         { "type": "named", "data": { "name": "aimTurret" } },
+        { "type": "wait", "data": { "waitTime": 0.5 } },
+        { "type": "named", "data": { "name": "Shoot" } },
+        { "type": "wait", "data": { "waitTime": 3.0 } },
+        { "type": "named", "data": { "name": "idleShooter" } },
+        { "type": "named", "data": { "name": "stowTurret" } },
+         { "type": "wait", "data": { "waitTime": 1.0 } }
       ]
     }
   },
