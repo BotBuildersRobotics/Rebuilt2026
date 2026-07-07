@@ -169,6 +169,23 @@ identical timing. Signals: `SuperSystem/FeedRaw` (instant) vs `SuperSystem/FeedR
 > while spinning hard, check `OnTargetErrorDeg` — residual lag means bump the velocity-path effort,
 > not loosen the gate.
 
+### c) Cap robot yaw rate while shooting (so the turret *can* keep up)
+Feedforward (§7a) only helps up to the turret's own top slew rate. The turret cruises at ~648°/s
+(1.8 rot/s); the robot can yaw at 495°/s normally and ~990°/s in FAST mode — so at high yaw the required
+turret rate physically exceeds what it can deliver, and no amount of feedforward wins.
+
+**Fix:** while shooting, the drivetrain caps yaw rate hard — the same mechanism that already limits
+translation. In `DriveConstants.teleopRequestUpdater`, when `shootingSpeedLimited` is set (engaged on the
+right-trigger / right-bumper shoot in `ControlSubsystem`, *before* the shoot delay), rotation is scaled by
+its **own** fraction, separate from and lower than the translation cap:
+- `Drive/ShootingSpeedFraction` = 0.30 → translation = 0.30 × max linear speed.
+- `Drive/ShootingRotationFraction` = 0.15 → yaw ≈ 0.15 × 495 ≈ **74°/s**, far inside the turret's ~648°/s.
+
+Rotation gets a tighter cap than translation on purpose: yaw is the axis the turret can't out-slew, so it's
+limited more. Raise `ShootingRotationFraction` toward 0.30 for more driver turn authority; lower it if aim
+still lags. If lag persists even at a low fraction, it's not the yaw speed — it's the §7a 45° feedforward
+dropout (spinning hard *before* the trigger, then shooting while already >45° off).
+
 ---
 
 ## 8. Neutral-zone flywheel spin-down
@@ -214,6 +231,11 @@ To read profile-following vs steady-state: `Reference` vs actual position. To va
 **Control mode**
 - `Turret/UseVelocityFeedforward` = 1.0 — 1 = velocity FF when tracking, 0 = always Motion Magic.
 - `Turret/TrackingFeedforwardErrorDeg` = 45 — error below which we use velocity FF (else Motion Magic).
+
+**Aim-while-moving (drivetrain, lives in `DriveConstants`)**
+- `Drive/ShootingSpeedFraction` = 0.30 — translation cap while shooting.
+- `Drive/ShootingRotationFraction` = 0.15 — yaw cap while shooting; lower than translation so the turret
+  can keep up (see §7c). Raise for driver turn authority, lower if aim lags.
 
 **Homing**
 - `Turret/Homing/AutoRezeroEnabled` = 1.0

@@ -202,8 +202,8 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
         if(DriverStation.isEnabled() && turretZeroed){
           Rotation2d robotAngle = DriveSubsystem.mInstance.getState().Pose.getRotation();
 
-          if (LOCKED_TO_ZERO) {
-            goalAngle = robotAngle; // hold 0° robot-relative regardless of commands
+          if (LOCKED_TO_ZERO || stowed) {
+            goalAngle = robotAngle; // hold 0° robot-relative regardless of commands (stow overrides tracking)
             goalVelocityRadPerSec = 0.0;
           }
 

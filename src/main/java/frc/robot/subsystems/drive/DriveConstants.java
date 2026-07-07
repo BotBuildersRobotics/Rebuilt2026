@@ -33,9 +33,14 @@ public class DriveConstants {
 	public static final AngularAcceleration kMaxAngularAcceleration =
 			kMaxAngularRate.div(0.1).per(Units.Second);
 
-	// Fraction of max speed allowed while shooting (0.0 to 1.0)
+	// Fraction of max translational speed allowed while shooting (0.0 to 1.0)
 	private static final LoggedTunableNumber shootingSpeedFraction =
 			new LoggedTunableNumber("Drive/ShootingSpeedFraction", 0.3);
+	// Fraction of max angular rate allowed while shooting. Separate from (and lower than) the
+	// translation cap because the turret can't slew as fast as the robot can yaw — a tighter rotation
+	// limit keeps the required turret rate within what it can track, so aim doesn't lag while shooting.
+	private static final LoggedTunableNumber shootingRotationFraction =
+			new LoggedTunableNumber("Drive/ShootingRotationFraction", 0.15);
 	private static boolean shootingSpeedLimited = false;
 
 	public static void setShootingSpeedLimited(boolean limited) {
@@ -65,9 +70,8 @@ public class DriveConstants {
 				AngularVelocity rotLimit;
 
 				if (shootingSpeedLimited) {
-					double fraction = shootingSpeedFraction.get();
-					speedLimit = DriveConstants.kMaxSpeed.times(fraction);
-					rotLimit = DriveConstants.kMaxAngularRate.times(fraction);
+					speedLimit = DriveConstants.kMaxSpeed.times(shootingSpeedFraction.get());
+					rotLimit = DriveConstants.kMaxAngularRate.times(shootingRotationFraction.get());
 				} else if (ControlBoardConstants.mDriverController.leftStick().getAsBoolean()) {
 					speedLimit = DriveConstants.kMaxSpeedFAST;
 					rotLimit = DriveConstants.kMaxAngularRateFAST;
