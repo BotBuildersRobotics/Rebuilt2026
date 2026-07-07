@@ -6,11 +6,11 @@
       "commands": [
         { "type": "named", "data": { "name": "DeployIntake" } },
         { "type": "named", "data": { "name": "Intake" } },
-        { "type": "named", "data": { "name": "setFlywheelHub" } },
-        { "type": "named", "data": { "name": "aimTurret" } },
+        { "type": "named", "data": { "name": "clearFlywheelPreset" } },
         { "type": "path", "data": { "pathName": "bluelefttrench" } },
+        { "type": "named", "data": { "name": "aimTurret" } },
         { "type": "named", "data": { "name": "Shoot" } },
-        { "type": "wait", "data": { "waitTime": 2.0 } },
+        { "type": "wait", "data": { "waitTime": 3.0 } },
         { "type": "named", "data": { "name": "idleShooter" } },
         { "type": "named", "data": { "name": "stowTurret" } }
       ]
