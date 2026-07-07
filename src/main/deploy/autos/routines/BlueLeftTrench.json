@@ -15,7 +15,7 @@
         { "type": "named", "data": { "name": "idleShooter" } },
         { "type": "named", "data": { "name": "stowTurret" } },
          { "type": "wait", "data": { "waitTime": 1.0 } },
-        { "type": "path", "data": { "pathName": "bluelefttrench" } },
+        { "type": "path", "data": { "pathName": "bluelefttrench2" } },
          { "type": "named", "data": { "name": "aimTurret" } },
         { "type": "wait", "data": { "waitTime": 0.5 } },
         { "type": "named", "data": { "name": "Shoot" } },
