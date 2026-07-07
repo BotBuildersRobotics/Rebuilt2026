@@ -12,11 +12,7 @@
         "profiled_rotation": true
       }
     },
-    {
-      "type": "event_trigger",
-      "t_ratio": 0.5,
-      "lib_key": "intakeDeploy"
-    },
+   
     {
       "type": "rotation",
       "rotation_radians": -3.14159,
