@@ -151,13 +151,31 @@ public class BLineAutos {
      * @return A follow command for the path, or a no-op command if it could not be loaded
      */
     public Command path(String name, boolean resetPoseAtStart) {
+        return path(name, resetPoseAtStart, false);
+    }
+
+    /**
+     * As {@link #path(String, boolean)}, but when {@code mirror} is true the path is reflected
+     * left&harr;right across the field using BLine's own {@link Path#mirror()} (which mirrors every
+     * waypoint, translation and rotation target via {@code FlippingUtil}). This is how a routine
+     * produces the mirror-image auto — e.g. a right-side auto from the left-side path files — with no
+     * duplicated geometry. Mirroring composes with the builder's alliance flip, so a mirrored blue path
+     * still flips correctly for red.
+     *
+     * @param mirror true to reflect the path left&harr;right across the field
+     */
+    public Command path(String name, boolean resetPoseAtStart, boolean mirror) {
         try {
             if (resetPoseAtStart) {
                 builder.withPoseReset(DriveSubsystem.mInstance.getGeneratedDrive()::resetPose);
             } else {
                 builder.withPoseReset(pose -> {});
             }
-            return builder.build(new Path(name)).withName("BLinePath:" + name);
+            Path p = new Path(name);
+            if (mirror) {
+                p.mirror();
+            }
+            return builder.build(p).withName("BLinePath:" + name + (mirror ? "(mirrored)" : ""));
         } catch (Exception ex) {
             DriverStation.reportError("BLine: failed to load path '" + name + "'", ex.getStackTrace());
             return Commands.none().withName("BLinePath(missing):" + name);
@@ -207,7 +225,9 @@ public class BLineAutos {
                 JSONObject root = (JSONObject) new JSONParser().parse(reader);
                 // resetOdom defaults to true; false only if explicitly set false.
                 boolean[] resetPending = { !Boolean.FALSE.equals(root.get("resetOdom")) };
-                Command cmd = buildCommand((JSONObject) root.get("command"), resetPending)
+                // mirror defaults to false; a mirrored routine reflects all its paths left<->right.
+                boolean mirror = Boolean.TRUE.equals(root.get("mirror"));
+                Command cmd = buildCommand((JSONObject) root.get("command"), resetPending, mirror)
                         .withName("BLine:" + name);
                 chooser.addOption("BLine: " + name, cmd);
             } catch (Exception ex) {
@@ -221,7 +241,7 @@ public class BLineAutos {
      * Compositions use {@link BLineCommands} so child requirements are proxied and not held for the whole
      * routine. {@code resetPending[0]} carries the one-shot "first path reseeds odometry" flag.
      */
-    private Command buildCommand(JSONObject node, boolean[] resetPending) {
+    private Command buildCommand(JSONObject node, boolean[] resetPending, boolean mirror) {
         if (node == null) {
             return Commands.none();
         }
@@ -229,13 +249,13 @@ public class BLineAutos {
         JSONObject data = node.get("data") instanceof JSONObject ? (JSONObject) node.get("data") : node;
         switch (type == null ? "" : type) {
             case "sequential":
-                return BLineCommands.sequence(buildChildren(data, resetPending));
+                return BLineCommands.sequence(buildChildren(data, resetPending, mirror));
             case "parallel":
-                return BLineCommands.parallel(buildChildren(data, resetPending));
+                return BLineCommands.parallel(buildChildren(data, resetPending, mirror));
             case "race":
-                return BLineCommands.race(buildChildren(data, resetPending));
+                return BLineCommands.race(buildChildren(data, resetPending, mirror));
             case "deadline": {
-                Command[] cmds = buildChildren(data, resetPending);
+                Command[] cmds = buildChildren(data, resetPending, mirror);
                 if (cmds.length == 0) {
                     return Commands.none();
                 }
@@ -250,7 +270,7 @@ public class BLineAutos {
             case "path": {
                 boolean reset = resetPending[0];
                 resetPending[0] = false; // only the first path in document order reseeds odometry
-                return path((String) data.get("pathName"), reset);
+                return path((String) data.get("pathName"), reset, mirror);
             }
             default:
                 DriverStation.reportWarning("BLine routine: unknown command type '" + type + "'", false);
@@ -258,7 +278,7 @@ public class BLineAutos {
         }
     }
 
-    private Command[] buildChildren(JSONObject data, boolean[] resetPending) {
+    private Command[] buildChildren(JSONObject data, boolean[] resetPending, boolean mirror) {
         Object commands = data.get("commands");
         if (!(commands instanceof JSONArray)) {
             return new Command[0];
@@ -266,7 +286,7 @@ public class BLineAutos {
         JSONArray arr = (JSONArray) commands;
         Command[] out = new Command[arr.size()];
         for (int i = 0; i < arr.size(); i++) {
-            out[i] = buildCommand((JSONObject) arr.get(i), resetPending);
+            out[i] = buildCommand((JSONObject) arr.get(i), resetPending, mirror);
         }
         return out;
     }
