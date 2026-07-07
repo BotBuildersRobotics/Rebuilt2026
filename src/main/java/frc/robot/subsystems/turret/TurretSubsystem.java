@@ -249,8 +249,12 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
       // Robot-relative turret slew rate needed to hold aim. The setpoint is (goalAngle - robotAngle),
       // so its derivative is (field bearing rate) - (robot yaw rate). Without the yaw-rate term the
       // turret lags badly whenever the robot rotates (logs showed 49-111deg error when slewing fast).
+      // BUT while stowed goalAngle tracks robotAngle, so the robot-relative setpoint is CONSTANT and its
+      // true derivative is 0 — feeding -robotYawRate here would command the turret to counter-rotate
+      // against the chassis (hold field heading), drifting it off home whenever the robot turns. So the
+      // feedforward is zeroed while stowed; the position loop holds home and rejects the disturbance.
       double robotYawRate = DriveSubsystem.mInstance.getState().Speeds.omegaRadiansPerSecond;
-      double turretVelFF = goalVelocityRadPerSec - robotYawRate;
+      double turretVelFF = (LOCKED_TO_ZERO || stowed) ? 0.0 : (goalVelocityRadPerSec - robotYawRate);
 
       // Hybrid control: while acquiring (far from target) use Motion Magic so big moves stay smoothly
       // profiled (preserves the overshoot tuning). Once close, switch to position + velocity
