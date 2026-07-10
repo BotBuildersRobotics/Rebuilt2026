@@ -122,6 +122,15 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
   // through normal moving-target error; only the initial big acquisition slew uses Motion Magic.
   private static final LoggedTunableNumber trackingFeedforwardErrorDeg =
       new LoggedTunableNumber("Turret/TrackingFeedforwardErrorDeg", 45.0);
+  // Minimum |turretVelFF| (rad/s) required to use the position+velocity (PositionVoltage) path.
+  // That path applies kS in the direction of the velocity request, so when the target is essentially
+  // static (velFF ~ 0) kS contributes nothing and a small position error (e.g. a 2 deg manual offset
+  // nudge) produces only kP*error ~ 0.1 V, far below kS = 1.90 V -> the turret can't break stiction
+  // and the nudge is swallowed. Below this threshold we fall back to Motion Magic, whose profile has
+  // a nonzero velocity so kS fires and the small step actually moves. SOTM tracking (real velFF) is
+  // unaffected. Tune the handoff on the robot if needed.
+  private static final LoggedTunableNumber minTrackingVelRadPerSec =
+      new LoggedTunableNumber("Turret/MinTrackingVelRadPerSec", 0.10);
 
   private ShootState shootState = ShootState.ACTIVE_SHOOTING;
   private boolean stowed = true;
@@ -256,7 +265,12 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
       // profiled (preserves the overshoot tuning). Once close, switch to position + velocity
       // feedforward so the turret tracks a moving target instead of chasing it.
       double posErrRad = Math.abs(clampedAngle - getPosition().in(Radians));
-      boolean tracking = posErrRad < Units.degreesToRadians(trackingFeedforwardErrorDeg.get());
+      // Use the position+velocity (PositionVoltage) path only when we're close AND the target is
+      // actually moving. On a static hold (velFF ~ 0) PositionVoltage can't break stiction on a small
+      // step (kS is applied in the velocity-request direction), so a manual offset nudge stalls. Fall
+      // back to Motion Magic there, which profiles the small move and applies kS so it actually goes.
+      boolean tracking = posErrRad < Units.degreesToRadians(trackingFeedforwardErrorDeg.get())
+          && Math.abs(turretVelFF) >= minTrackingVelRadPerSec.get();
       if (useVelocityFeedforward.get() >= 0.5 && tracking) {
         this.applySetpoint(Setpoint.withPositionVelocitySetpoint(
             Radians.of(clampedAngle),
