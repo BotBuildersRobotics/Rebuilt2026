@@ -6,6 +6,7 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.geometry.Rotation2d;
 import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.RobotController;
@@ -192,11 +193,25 @@ public class SuperSystem extends SubsystemBase {
 
 	public Command idleShooter(){
 
-		return 
+		return
 		Commands.parallel(
 			RollerFloorSubsystem.mInstance.setpointCommand(RollerFloorSubsystem.IDLE),
 			ChuteSubsystem.mInstance.setpointCommand(ChuteSubsystem.IDLE)
 		);
+	}
+
+	/**
+	 * Pre-feed jam clear. Runs the roller floor in REVERSE for {@code seconds}, then holds it there —
+	 * the {@link #Shoot()} that follows in the shoot sequence overrides it to feed speed. This replaces
+	 * the old fixed pre-shoot wait: reversing during the flywheel-settle window automatically backs a
+	 * ball off a jam at the shooter entry before feeding starts. If the shot is released mid-clear, the
+	 * shoot binding's {@code onFalse} idles the floor, so nothing is left running in reverse.
+	 *
+	 * @param seconds supplier for the reverse duration, read at schedule time so the tunable applies live
+	 */
+	public Command reverseFloorThenFeedDelay(DoubleSupplier seconds){
+		return RollerFloorSubsystem.mInstance.setpointCommand(RollerFloorSubsystem.REVERSE)
+			.andThen(Commands.defer(() -> Commands.waitSeconds(seconds.getAsDouble()), Set.of()));
 	}
 
 	public Command DeployIntake(){

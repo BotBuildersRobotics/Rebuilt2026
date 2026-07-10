@@ -107,7 +107,7 @@ public class ControlSubsystem {
 						s.activeTurretHood(),
 						Commands.runOnce(() -> DriveConstants.setShootingSpeedLimited(true))
 					),
-					Commands.defer(() -> Commands.waitSeconds(shootDelay.get()), Set.of()),
+					s.reverseFloorThenFeedDelay(shootDelay::get),
 					Commands.parallel(
 						s.Shoot()
 						// s.intakePulseCommand()
@@ -166,7 +166,7 @@ public class ControlSubsystem {
 		driver.y()
 			.onTrue(Commands.runOnce(() -> {
 			
-					IntakeSubsystem.mInstance.applySetpoint(IntakeSubsystem.REVERSE);
+					
 					ChuteSubsystem.mInstance.applySetpoint(ChuteSubsystem.REVERSE);
 					RollerFloorSubsystem.mInstance.applySetpoint(RollerFloorSubsystem.REVERSE);
 			
