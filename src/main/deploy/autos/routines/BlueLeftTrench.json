@@ -11,7 +11,7 @@
         { "type": "named", "data": { "name": "aimTurret" } },
         { "type": "wait", "data": { "waitTime": 0.4 } },
         { "type": "named", "data": { "name": "Shoot" } },
-        { "type": "wait", "data": { "waitTime": 3.0 } },
+        { "type": "wait", "data": { "waitTime": 5.0 } },
         { "type": "named", "data": { "name": "idleShooter" } },
         { "type": "named", "data": { "name": "stowTurret" } },
          { "type": "wait", "data": { "waitTime": 1.0 } },
