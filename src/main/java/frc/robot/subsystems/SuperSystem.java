@@ -182,6 +182,36 @@ public class SuperSystem extends SubsystemBase {
 		.finallyDo(interrupted -> shooter.setActivelyShooting(false));
 	}
 
+	/**
+	 * Hold-to-shoot-straight-ahead. While held, pins the turret to its stowed zero
+	 * (0&deg; robot-relative, straight forward &mdash; the same spot it parks at when idle) instead of
+	 * auto-tracking the hub, while the hood and flywheel keep spooling for the current distance and
+	 * the feed runs gated on at-speed + on-target ({@link #Shoot()}). The driver aims by pointing the
+	 * chassis; releasing restores the turret's (and hood's) previous stow state.
+	 *
+	 * <p>Intended as a manual fallback when turret auto-aim isn't trusted: point the robot at the hub
+	 * and fire dead ahead. Only the turret <em>azimuth</em> is overridden &mdash; the hood is forced
+	 * active so its angle still tracks distance, keeping the shot arc/velocity correct. If you'd rather
+	 * also physically stow the hood (fixed close-range shot), drop the {@code hood.setStowed(false)}.
+	 *
+	 * <p>Bind with {@code whileTrue} so it holds only while the button is pressed.
+	 */
+	public Command shootStraightAhead(){
+		// [0] = turret stow, [1] = hood stow, captured on start and restored on release.
+		final boolean[] prevStow = { false, false };
+		return Shoot()
+			.beforeStarting(() -> {
+				prevStow[0] = turret.isStowed();
+				prevStow[1] = hood.isStowed();
+				turret.setStowed(true);   // pin turret to stow zero (straight forward)
+				hood.setStowed(false);    // keep the hood tracking so the arc stays correct
+			})
+			.finallyDo(interrupted -> {
+				turret.setStowed(prevStow[0]);
+				hood.setStowed(prevStow[1]);
+			});
+	}
+
 	public Command ShootAuto(){
 		return
 		

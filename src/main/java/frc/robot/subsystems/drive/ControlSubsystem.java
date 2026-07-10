@@ -144,6 +144,11 @@ public class ControlSubsystem {
 			)
 		);
 
+		// X button: hold to shoot straight ahead — turret pinned to its stow-zero (driver aims the
+		// chassis), hood + flywheel keep tracking distance so the shot stays makeable. Self-restores
+		// the turret/hood stow state on release.
+		driver.x().whileTrue(s.shootStraightAhead());
+
 		// B button: toggle passing on/off (disable when localisation is unreliable)
 		driver.b().onTrue(Commands.runOnce(() -> {
 			passingEnabled = !passingEnabled;
