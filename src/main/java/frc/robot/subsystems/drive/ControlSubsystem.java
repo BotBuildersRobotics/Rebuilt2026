@@ -70,10 +70,14 @@ public class ControlSubsystem {
 			s.idleIntakes()
 		);
 
-		// Right trigger: the show shot. Fixed flywheel speed + fixed hood angle, turret straight ahead,
-		// feed gated on the flywheel holding speed. Nothing here reads the pose estimator.
-		driver.rightTrigger().whileTrue(
-			s.showShotCommand()
+		// Right trigger: the show shot. Turret swings to the net, fixed flywheel speed and hood angle,
+		// feed gated on everything having arrived. Nothing here reads the pose estimator.
+		//
+		// onTrue, not whileTrue: the command deliberately outlives the button so it can stop the feed
+		// first and only then bring the turret home (see showShotCommand). The trigger is passed in so
+		// the command can see the release itself.
+		driver.rightTrigger().onTrue(
+			s.showShotCommand(driver.rightTrigger())
 		);
     }
 

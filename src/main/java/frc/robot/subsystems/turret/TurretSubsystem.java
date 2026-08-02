@@ -640,23 +640,32 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
    *
    * <p>Owns the turret while it runs, so it displaces the tracking default command entirely — no
    * shot-calculator or pose lookups happen at all, which is the point at a venue with no AprilTags.
-   * Un-stows on start and re-stows on end, so the turret parks back over the homing sensor and the
-   * auto re-zero logic keeps working between shots.
    *
-   * <p>Gate the feed on {@link #isOnTarget()} with this — a 90 deg slew is not instant, and without
-   * that gate the first ball leaves while the turret is still swinging.
+   * <p>Deliberately does <b>not</b> release the hold when it ends — the caller must call
+   * {@link #releaseRobotRelativeHold()}. The turret has to keep pointing at the net until the feed
+   * has actually stopped and the ball path is clear; if the hold dropped the instant this command
+   * was cancelled, a ball already in the chute would ride into a turret that is slewing home and get
+   * thrown somewhere unpredictable. Put the release in the enclosing command group's
+   * {@code finallyDo} so it still runs on interruption.
+   *
+   * <p>Gate the feed on arrival too — a 90 deg slew is not instant, and without that gate the first
+   * ball leaves while the turret is still swinging.
    */
   public Command runRobotRelativeHoldCommand(java.util.function.DoubleSupplier degrees) {
     return run(() -> {
           robotRelativeHold = Rotation2d.fromDegrees(degrees.getAsDouble());
           setShootState(ShootState.ACTIVE_SHOOTING);
         })
-        .beforeStarting(() -> stowed = false)
-        .finallyDo(
-            interrupted -> {
-              robotRelativeHold = null;
-              stowed = true;
-            });
+        .beforeStarting(() -> stowed = false);
+  }
+
+  /**
+   * Drops a {@link #runRobotRelativeHoldCommand} hold and returns the turret to stow (0 deg
+   * robot-relative, over the homing sensor, where the auto re-zero logic can work).
+   */
+  public void releaseRobotRelativeHold() {
+    robotRelativeHold = null;
+    stowed = true;
   }
 
   public void setStowed(boolean stowed) {

@@ -103,6 +103,20 @@ public final class ShowConstants {
 	public static final LoggedTunableNumber kFeedSettleSec =
 			new LoggedTunableNumber("Show/FeedSettleSec", 0.25);
 
+	/**
+	 * How long the turret keeps pointing at the net after the trigger is released, in seconds.
+	 *
+	 * <p>On release the feed is commanded to stop immediately, but the chute and roller floor take
+	 * time to actually spin down and a ball already in the path keeps travelling. For this long
+	 * afterwards the turret, hood and flywheel all stay exactly where they were, so anything still on
+	 * its way out leaves in the right direction at the right speed. Only then does the turret stow.
+	 *
+	 * <p>Raise it if you still see the occasional stray on release; the only cost is that the turret
+	 * takes longer to park between shots.
+	 */
+	public static final LoggedTunableNumber kFeedStopSec =
+			new LoggedTunableNumber("Show/FeedStopSec", 0.5);
+
 	/** Fraction of max translational speed the driver is allowed in show mode. */
 	public static final LoggedTunableNumber kDriveSpeedFraction =
 			new LoggedTunableNumber("Show/DriveSpeedFraction", 0.10);

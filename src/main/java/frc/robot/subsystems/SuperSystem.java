@@ -293,21 +293,53 @@ public class SuperSystem extends SubsystemBase {
 	 * no vision. The feed is gated on the flywheel being at speed <em>and</em> the turret having
 	 * arrived, sustained for {@code Show/FeedSettleSec}.
 	 *
-	 * <p>On release the turret re-stows (back to 0, over the homing sensor), the shooter and hood fall
-	 * back to their default commands, and the chute/roller floor are explicitly idled — so nothing is
-	 * left running or aimed sideways if the button is released mid-feed or the command is interrupted.
+	 * <p><b>Release is staged, not instant.</b> Bind this with {@code onTrue} and pass the trigger
+	 * itself as {@code held} — the command outlives the button press on purpose. The moment the
+	 * trigger is released the feed is commanded to stop, but the turret, hood and flywheel all hold
+	 * position for {@code Show/FeedStopSec} afterwards. The chute and roller floor take time to spin
+	 * down and a ball already in the path keeps travelling; if the turret started slewing home the
+	 * instant the button came up, that ball would be thrown wherever the turret happened to be
+	 * pointing. Only once the path is clear does the turret stow.
+	 *
+	 * <p>Re-pressing the trigger during that window simply resumes shooting — the timer resets and the
+	 * turret never leaves the net.
+	 *
+	 * @param held supplier that is true while the shot button is held
 	 */
-	public Command showShotCommand() {
+	public Command showShotCommand(BooleanSupplier held) {
+		// Time since the trigger came up. Only started once released, reset on every re-press.
+		final edu.wpi.first.wpilibj.Timer releaseTimer = new edu.wpi.first.wpilibj.Timer();
+
+		// The feed also requires the trigger to still be held, so releasing stops it on the same loop
+		// while everything else carries on holding.
+		BooleanSupplier feeding = () -> showFeedReady && held.getAsBoolean();
+
 		return Commands.parallel(
 			turret.runRobotRelativeHoldCommand(ShowConstants.kTurretAngleDeg::get),
 			shooter.runShowShotCommand(ShowConstants.kFlywheelRPS::get),
 			hood.runFixedCommand(ShowConstants.kHoodAngleDeg::get),
-			RollerFloorSubsystem.mInstance.runShootCommandGated(() -> showFeedReady),
-			ChuteSubsystem.mInstance.runShootCommandGated(() -> showFeedReady)
+			RollerFloorSubsystem.mInstance.runShootCommandGated(feeding),
+			ChuteSubsystem.mInstance.runShootCommandGated(feeding)
 		)
-		.beforeStarting(() -> shooter.setActivelyShooting(true))
+		.beforeStarting(() -> {
+			releaseTimer.stop();
+			releaseTimer.reset();
+			shooter.setActivelyShooting(true);
+		})
+		.until(() -> {
+			if (held.getAsBoolean()) {
+				// Still shooting (or shooting again) — cancel any pending shutdown.
+				releaseTimer.stop();
+				releaseTimer.reset();
+				return false;
+			}
+			releaseTimer.start();
+			return releaseTimer.hasElapsed(ShowConstants.kFeedStopSec.get());
+		})
 		.finallyDo(interrupted -> {
+			// Runs on normal end and on interruption, so the turret can never be left aimed sideways.
 			shooter.setActivelyShooting(false);
+			turret.releaseRobotRelativeHold();
 			RollerFloorSubsystem.mInstance.applySetpoint(RollerFloorSubsystem.IDLE);
 			ChuteSubsystem.mInstance.applySetpoint(ChuteSubsystem.IDLE);
 		});
