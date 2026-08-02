@@ -74,6 +74,11 @@ public class HoodSubsystem extends ServoMotorSubsystem<MotorIOTalonFX> {
             });
     }
 
+    /** Absolute error between the hood's actual angle and its commanded goal, in degrees. */
+    public double getGoalErrorDeg() {
+        return Math.abs(this.getPosition().in(Degrees) - goalAngleDeg);
+    }
+
     public void setStowed(boolean stowed) {
         this.stowed = stowed;
     }

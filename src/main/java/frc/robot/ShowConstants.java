@@ -32,6 +32,32 @@ public final class ShowConstants {
 			new LoggedTunableNumber("Show/TurretAngleDeg", 90.0);
 
 	/**
+	 * How close the turret must be to {@link #kTurretAngleDeg} before the feed is allowed to run, in
+	 * degrees.
+	 *
+	 * <p>Deliberately much tighter than the competition {@code Turret/OnTargetToleranceDeg} (10.5),
+	 * which is sized for keeping a moving hub shot flowing, not for a static aim into a net. At the
+	 * ranges involved 10 deg of turret error is most of the net width.
+	 *
+	 * <p>Not tightened further than this on purpose: if the turret's settled error is larger than the
+	 * tolerance the feed never opens at all and the robot simply will not shoot, which is a far worse
+	 * failure at a show than a slightly off shot. Watch {@code Show/TurretErrorDeg} on the dashboard —
+	 * it reports the real settled error, so this can be tightened or loosened against actual numbers.
+	 */
+	public static final LoggedTunableNumber kTurretToleranceDeg =
+			new LoggedTunableNumber("Show/TurretToleranceDeg", 4.0);
+
+	/**
+	 * How slowly the turret must be moving to count as arrived, in degrees/sec.
+	 *
+	 * <p>Position tolerance alone is not enough: a turret sweeping through 90 deg passes through the
+	 * tolerance band at full speed, and a purely positional gate can open on that pass-through. This
+	 * requires it to have actually stopped there.
+	 */
+	public static final LoggedTunableNumber kTurretMaxVelDegPerSec =
+			new LoggedTunableNumber("Show/TurretMaxVelDegPerSec", 8.0);
+
+	/**
 	 * Fixed flywheel velocity for the show shot, in rotations/sec.
 	 *
 	 * <p>Reference points from the competition distance regression
@@ -49,9 +75,25 @@ public final class ShowConstants {
 	 * by {@code HoodConstants.fudgeFactor} (2.5) before commanding it, and {@code runFixedCommand}
 	 * does not. So mechanism degrees = map degrees x 2.5 — the 20 deg map entry for a 3.3 m shot is
 	 * 50 here. 0.0 is the stowed/flat position.
+	 *
+	 * <p>The default is deliberately at the steep end: 100 is 40 map degrees, and the regression only
+	 * goes to 41 (its 5.7 m entry), so this is about the steepest shot the competition code ever
+	 * commands and therefore known to be mechanically reachable. That puts the ball on a high arc that
+	 * drops down into the net rather than driving flat at it. There is no soft limit configured on the
+	 * hood, so if you wind this past ~102 at the venue you are past anything the robot has been asked
+	 * for before — go up in small steps and watch the mechanism.
 	 */
 	public static final LoggedTunableNumber kHoodAngleDeg =
-			new LoggedTunableNumber("Show/HoodAngleDeg", 50.0);
+			new LoggedTunableNumber("Show/HoodAngleDeg", 100.0);
+
+	/**
+	 * How close the hood must be to {@link #kHoodAngleDeg} before the feed is allowed to run, in
+	 * mechanism degrees. Same reasoning as the turret gate: the hood has a long way to travel to a
+	 * steep show angle, and a ball fed before it arrives leaves on a much flatter trajectory than the
+	 * one the net is positioned for.
+	 */
+	public static final LoggedTunableNumber kHoodToleranceDeg =
+			new LoggedTunableNumber("Show/HoodToleranceDeg", 3.0);
 
 	/**
 	 * Extra dwell after the flywheel first reports at-speed before the feed is allowed to run, in

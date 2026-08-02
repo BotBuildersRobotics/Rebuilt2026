@@ -576,6 +576,16 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
     return onTarget;
   }
 
+  /**
+   * Absolute error between the turret's actual position and its last commanded setpoint, in degrees.
+   * Exposed so callers can apply their own arrival tolerance rather than the shared
+   * {@code Turret/OnTargetToleranceDeg} used by {@link #isOnTarget()} — show mode wants a much
+   * tighter one than hub tracking does.
+   */
+  public double getTargetErrorDeg() {
+    return Math.abs(Units.radiansToDegrees(getPosition().in(Radians) - lastClampedAngle));
+  }
+
   public void setShootState(ShootState state){
     this.shootState = state;
   }

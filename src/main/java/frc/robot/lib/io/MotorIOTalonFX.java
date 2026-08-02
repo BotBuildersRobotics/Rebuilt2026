@@ -331,7 +331,6 @@ public class MotorIOTalonFX extends MotorIO {
 
 		public ControlRequest getMotionMagicRequest(Angle mechanismPosition) {
 			return new MotionMagicVoltage(mechanismPosition).withSlot(0).withEnableFOC(true);
-			//return new MotionMagicExpoVoltage(mechanismPosition).withSlot(0).withEnableFOC(true);
 		}
 
 		public ControlRequest getPositionVelocityRequest(Angle mechanismPosition, AngularVelocity velocity){

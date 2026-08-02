@@ -225,11 +225,26 @@ public class SuperSystem extends SubsystemBase {
 	 * swings the turret 90 deg to the net on the trigger pull, and a 90 deg slew is not instant, so
 	 * without it the first ball of each burst leaves mid-swing and misses.
 	 *
+	 * <p>Turret arrival is checked against {@code Show/TurretToleranceDeg} rather than
+	 * {@code turret.isOnTarget()}, whose 10.5 deg competition tolerance is most of a net's width at
+	 * these ranges, and it additionally requires the turret to have stopped
+	 * ({@code Show/TurretMaxVelDegPerSec}) — a 90 deg sweep crosses the tolerance band at full speed,
+	 * and a position-only gate can open on that pass-through and fire mid-swing.
+	 *
 	 * <p>Simpler than the competition {@link #updateFeedReady()} latch on purpose: no hysteresis to
 	 * hold the feed open through tracking flickers, because nothing here is tracking a moving target.
 	 */
 	private void updateShowFeedReady() {
-		if (shooter.isAtSpeed() && turret.isOnTarget()) {
+		double turretErrorDeg = turret.getTargetErrorDeg();
+		double turretVelDegPerSec =
+			Math.abs(edu.wpi.first.math.util.Units.radiansToDegrees(turret.getTurretVelocity()));
+
+		boolean turretArrived = turretErrorDeg <= ShowConstants.kTurretToleranceDeg.get()
+			&& turretVelDegPerSec <= ShowConstants.kTurretMaxVelDegPerSec.get();
+		boolean flywheelReady = shooter.isAtSpeed();
+		boolean hoodArrived = hood.getGoalErrorDeg() <= ShowConstants.kHoodToleranceDeg.get();
+
+		if (turretArrived && hoodArrived && flywheelReady) {
 			showAtSpeedTimer.start();
 			showFeedReady = showAtSpeedTimer.hasElapsed(ShowConstants.kFeedSettleSec.get());
 		} else {
@@ -237,7 +252,21 @@ public class SuperSystem extends SubsystemBase {
 			showAtSpeedTimer.reset();
 			showFeedReady = false;
 		}
+
+		// Broken out so a feed that never opens can be diagnosed from the dashboard at the venue.
 		org.littletonrobotics.junction.Logger.recordOutput("Show/FeedReady", showFeedReady);
+		org.littletonrobotics.junction.Logger.recordOutput("Show/TurretArrived", turretArrived);
+		org.littletonrobotics.junction.Logger.recordOutput("Show/TurretErrorDeg", turretErrorDeg);
+		org.littletonrobotics.junction.Logger.recordOutput("Show/TurretVelDegPerSec", turretVelDegPerSec);
+		org.littletonrobotics.junction.Logger.recordOutput("Show/FlywheelReady", flywheelReady);
+		org.littletonrobotics.junction.Logger.recordOutput("Show/HoodArrived", hoodArrived);
+		org.littletonrobotics.junction.Logger.recordOutput("Show/HoodErrorDeg", hood.getGoalErrorDeg());
+		SmartDashboard.putBoolean("Show/FeedReady", showFeedReady);
+		SmartDashboard.putBoolean("Show/TurretArrived", turretArrived);
+		SmartDashboard.putNumber("Show/TurretErrorDeg", turretErrorDeg);
+		SmartDashboard.putBoolean("Show/FlywheelReady", flywheelReady);
+		SmartDashboard.putBoolean("Show/HoodArrived", hoodArrived);
+		SmartDashboard.putNumber("Show/HoodErrorDeg", hood.getGoalErrorDeg());
 	}
 
 	/**
