@@ -1,29 +1,9 @@
 package frc.robot.subsystems.drive;
 
 
-import com.ctre.phoenix6.SignalLogger;
-import com.ctre.phoenix6.swerve.SwerveRequest;
-
-import edu.wpi.first.units.measure.AngularVelocity;
-import java.util.Set;
-import edu.wpi.first.wpilibj.GenericHID.RumbleType;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.ConditionalCommand;
-import frc.robot.ShiftHelpers;
-import frc.robot.lib.LoggedTunableNumber;
-import frc.robot.lib.io.MotorIO.Setpoint;
 import frc.robot.subsystems.SuperSystem;
-import frc.robot.subsystems.chute.ChuteSubsystem;
-import frc.robot.subsystems.intake.IntakeConstants;
-import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.pivot.PivotSubsystem;
-import frc.robot.subsystems.shooter.ShooterConstants;
-import frc.robot.subsystems.shooter.ShooterSubsystem;
-import frc.robot.subsystems.rollerFloor.RollerFloorSubsystem;
-import frc.robot.subsystems.turret.TurretSubsystem;
-import frc.robot.subsystems.vision.Limelight;
-import static edu.wpi.first.units.Units.RadiansPerSecond;
 
 
 
@@ -32,221 +12,73 @@ public class ControlSubsystem {
     public static final ControlSubsystem mInstance = new ControlSubsystem();
 
 	private ControllerMap driver = ControlBoardConstants.mDriverController;
-	private ControllerMap operator = ControlBoardConstants.mOperatorController;
-	
-
-	private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
-	private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
-
-	// When false, right trigger always shoots regardless of field position.
-	// Toggle with driver B button when localisation is unreliable.
-	private boolean passingEnabled = true;
-
-	// How long after pressing the trigger before the chute/shuffla start feeding.
-	// Gives the turret and hood time to reach their target before the ball enters the shooter.
-	private static final LoggedTunableNumber shootDelay =
-		new LoggedTunableNumber("Driver/ShootDelaySec");
 
 
+	/**
+	 * SHOW MODE (Ekka outreach build) &mdash; deliberately minimal bindings.
+	 *
+	 * <p>The competition control set has been stripped out: no passing, no hub tracking, no defence
+	 * mode, no turret offsets, no flywheel trim, no turbo, and no operator controls at all. Everything
+	 * removed depended on a pose estimate, AprilTags, alliance side, or hub-shift timing &mdash; none
+	 * of which exist at a demo. What the driver has left:
+	 *
+	 * <ul>
+	 *   <li><b>Left trigger</b> &mdash; hold to deploy the intake pivot and run the intake.
+	 *   <li><b>Right trigger</b> &mdash; hold for the fixed show shot: turret swings 90 deg left into
+	 *       the net, fixed flywheel and hood. See
+	 *       {@link SuperSystem#showShotCommand()} and {@link frc.robot.ShowConstants}.
+	 *   <li><b>Back</b> &mdash; re-seed field-centric heading (the robot gets carried around at a show).
+	 * </ul>
+	 *
+	 * <p>Setup actions that are needed once per event but must not be on the controller mid-show
+	 * (pivot homing, turret zeroing) live on the dashboard instead &mdash; see {@code RobotContainer}.
+	 *
+	 * <p>The competition bindings are not lost, they are on the {@code OffseasonRobot} branch this one
+	 * was cut from.
+	 */
     public void configureBindings() {
 		DriveSubsystem.mInstance.setDefaultCommand(DriveSubsystem.mInstance.followSwerveRequestCommand(
 				DriveConstants.teleopRequest, DriveConstants.teleopRequestUpdater));
-		
-        //back button to re-seed heading       
-        driver.back()
+
+		driver.back()
 				.onTrue(Commands.runOnce(
 								() -> DriveSubsystem.mInstance.getGeneratedDrive().seedFieldCentric(), DriveSubsystem.mInstance)
 						.ignoringDisable(true));
 
-		SmartDashboard.putBoolean("Passing Enabled", passingEnabled);
-		driverControls();
-		operatorControls();
+		// Park the turret and hood stowed. Only the show shot moves the turret off zero, and it puts it
+		// back on release, so between shots the turret sits over its homing sensor.
+		SuperSystem.mInstance.enterShowModeCommand().schedule();
 
-		// Rumble the driver controller 5 seconds before our hub activates
-		ShiftHelpers.hubAboutToActivate(5.0)
-			.onTrue(Commands.startEnd(
-				() -> driver.getHID().setRumble(RumbleType.kBothRumble, 1.0),
-				() -> driver.getHID().setRumble(RumbleType.kBothRumble, 0.0)
-			).withTimeout(1.0));
-		
-		ShiftHelpers.hubAboutToActivate(10.0)
-			.onTrue(Commands.startEnd(
-				() -> operator.getHID().setRumble(RumbleType.kBothRumble, 1.0),
-				() -> operator.getHID().setRumble(RumbleType.kBothRumble, 0.0)
-			).withTimeout(1.0));
-	
+		driverControls();
 	}
 
     public void driverControls() {
 
 		SuperSystem s = SuperSystem.mInstance;
 
+		// Left trigger: intake. The pivot deploy is folded into this binding rather than sitting on its
+		// own button, because the dedicated deploy button is gone in show mode. This is a plain setpoint
+		// move, not the current-sensing homing routine — home once on the dashboard at setup, then this
+		// just returns to the found deploy angle. The pivot is left deployed on release so it is not
+		// slamming up and down all day.
 		driver.leftTrigger().whileTrue(
-			s.intakeContinuousCommand()
+			Commands.parallel(
+				PivotSubsystem.mInstance.setpointCommand(PivotSubsystem.DEPLOY),
+				s.intakeContinuousCommand()
+			)
 		).onFalse(
 			s.idleIntakes()
 		);
 
-		shootDelay.initDefault(0.3);
-
-		// Trigger pull (opponent side + passing enabled): pass over the bump.
-		// Separate binding so the pass commands' turret requirement doesn't bleed into
-		// the shoot binding and cancel the turret's tracking default command.
-		driver.rightTrigger()
-			.and(() -> passingEnabled && ShiftHelpers.isOnOpponentSide())
-			.whileTrue(new ConditionalCommand(s.passLobAuto(), s.passAutoSCR(), ShiftHelpers::isInOpponentZone))
-			.onFalse(Commands.parallel(s.stowTurretHood(), s.idleShooter()));
-
-		// Trigger pull (alliance side, or passing disabled): normal shoot.
-		// No turret requirement here — turret default command provides field-relative tracking.
-		driver.rightTrigger()
-			.and(() -> !passingEnabled || !ShiftHelpers.isOnOpponentSide())
-			.whileTrue(
-				Commands.sequence(
-					Commands.parallel(
-						s.activeTurretHood(),
-						Commands.runOnce(() -> DriveConstants.setShootingSpeedLimited(true))
-					),
-					s.reverseFloorThenFeedDelay(shootDelay::get),
-					Commands.parallel(
-						s.Shoot()
-						// s.intakePulseCommand()
-					)
-				)
-			).onFalse(
-				Commands.parallel(
-					s.stowTurretHood(),
-					s.idleShooter(),
-					Commands.runOnce(() -> DriveConstants.setShootingSpeedLimited(false))
-				)
-			);
-
-		// Right bumper: shoot + agitate intake pivot simultaneously
-		driver.rightBumper().whileTrue(
-			Commands.sequence(
-				Commands.parallel(
-					s.activeTurretHood(),
-					Commands.runOnce(() -> DriveConstants.setShootingSpeedLimited(true))
-				),
-				Commands.defer(() -> Commands.waitSeconds(shootDelay.get()), Set.of()),
-				Commands.parallel(
-					s.Shoot(),
-					// s.intakePulseCommand(),
-					s.pivotAgitateLoopCommand()
-				)
-			)
-		).onFalse(
-			Commands.parallel(
-				s.stowTurretHood(),
-				s.idleShooter(),
-				PivotSubsystem.mInstance.setpointCommand(PivotSubsystem.DEPLOY),
-				Commands.runOnce(() -> DriveConstants.setShootingSpeedLimited(false))
-			)
+		// Right trigger: the show shot. Fixed flywheel speed + fixed hood angle, turret straight ahead,
+		// feed gated on the flywheel holding speed. Nothing here reads the pose estimator.
+		driver.rightTrigger().whileTrue(
+			s.showShotCommand()
 		);
-
-		// X button: hold to shoot straight ahead — turret pinned to its stow-zero (driver aims the
-		// chassis), hood + flywheel keep tracking distance so the shot stays makeable. Self-restores
-		// the turret/hood stow state on release.
-		driver.x().whileTrue(s.shootStraightAhead());
-
-		// B button: toggle passing on/off (disable when localisation is unreliable)
-		driver.b().onTrue(Commands.runOnce(() -> {
-			passingEnabled = !passingEnabled;
-			SmartDashboard.putBoolean("Passing Enabled", passingEnabled);
-		}).ignoringDisable(true));
-
-
-		driver.povUp().onTrue(s.incrementFlywheelSpeed());
-		driver.povDown().onTrue(s.decrementFlywheelSpeed());
-
-
-		driver.leftBumper().onTrue(
-			PivotSubsystem.mInstance.findDeployLimitCommand()
-		);
-
-		driver.start().onTrue(DriveSubsystem.mInstance.runOnce( () ->DriveSubsystem.mInstance.getDrivetrain().seedFieldCentric()));
-
-		driver.a().onTrue(s.toggleDefenceModeCommand());
-
-		driver.y()
-			.onTrue(Commands.runOnce(() -> {
-			
-					
-					ChuteSubsystem.mInstance.applySetpoint(ChuteSubsystem.REVERSE);
-					RollerFloorSubsystem.mInstance.applySetpoint(RollerFloorSubsystem.REVERSE);
-			
-			}))
-			.onFalse(Commands.runOnce(() -> {
-
-					IntakeSubsystem.mInstance.applySetpoint(IntakeSubsystem.IDLE);
-					ChuteSubsystem.mInstance.applySetpoint(ChuteSubsystem.IDLE);
-					RollerFloorSubsystem.mInstance.applySetpoint(RollerFloorSubsystem.IDLE);
-			}
-			));
     }
-
-	public void operatorControls(){
-
-		SuperSystem s = SuperSystem.mInstance;
-
-	//	operator.b().onTrue(s.enableStow());
-
-		// Turret offset correction
-		operator.leftTrigger().onTrue(s.offsetTurretLeft());
-		operator.rightTrigger().onTrue(s.offsetTurretRight());
-
-		operator.povUp().onTrue(s.incrementFlywheelSpeed());
-		operator.povDown().onTrue(s.decrementFlywheelSpeed());
-
-		operator.x()
-			.onTrue(Commands.runOnce(() -> {
-			
-					IntakeSubsystem.mInstance.applySetpoint(IntakeSubsystem.REVERSE);
-					ChuteSubsystem.mInstance.applySetpoint(ChuteSubsystem.REVERSE);
-					RollerFloorSubsystem.mInstance.applySetpoint(RollerFloorSubsystem.REVERSE);
-			
-			}))
-			.onFalse(Commands.runOnce(() -> {
-
-					IntakeSubsystem.mInstance.applySetpoint(IntakeSubsystem.IDLE);
-					ChuteSubsystem.mInstance.applySetpoint(ChuteSubsystem.IDLE);
-					RollerFloorSubsystem.mInstance.applySetpoint(RollerFloorSubsystem.IDLE);
-			}
-			));
-	
-		operator.y()
-			.onTrue(Commands.runOnce(() -> {
-			
-					ChuteSubsystem.mInstance.applySetpoint(ChuteSubsystem.REVERSE);
-					RollerFloorSubsystem.mInstance.applySetpoint(RollerFloorSubsystem.REVERSE);
-			
-			}))
-			.onFalse(Commands.runOnce(() -> {
-
-					ChuteSubsystem.mInstance.applySetpoint(ChuteSubsystem.IDLE);
-					RollerFloorSubsystem.mInstance.applySetpoint(RollerFloorSubsystem.IDLE);
-			}
-			));
-
-		// Zero turret
-		//operator.x().onTrue(s.zeroTurretCommand());
-
-		// Reverse all systems (intake, shuffla, chute) — hold to reverse
-		//operator.y()
-		//	.onTrue(s.reverseAllSystems())
-		//	.onFalse(s.idleAllSystems());
-
-		// Stow intake
-		operator.b().onTrue(s.stowIntake());
-
-		// Vision calibration mode
-		operator.back().onTrue(Limelight.mInstance.toggleCalibrationMode());
-	}
 
     public void setRumble(boolean on) {
 		//ControlBoardConstants.mDriverController.getHID().setRumble(RumbleType.kBothRumble, on ? 1.0 : 0.0);
 	}
-
-
 
 }

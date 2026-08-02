@@ -160,6 +160,24 @@ public class ShooterSubsystem  extends MotorSubsystem<MotorIOTalonFX> {
             });
     }
 
+    /**
+     * Show/outreach mode fixed shot. Holds the flywheel at {@code rps} with no distance regression,
+     * no flywheel preset/offset, and no neutral-zone gating — none of which mean anything away from a
+     * real field.
+     *
+     * <p>Unlike {@link #runFixedCommand(DoubleSupplier)} this also publishes {@code setpointVal}, so
+     * {@link #isAtSpeed()} actually works against the commanded speed. {@code runFixedCommand} goes
+     * straight to {@code runVelocity()} and leaves {@code setpointVal} stale, which makes
+     * {@code isAtSpeed()} return false forever — a feed gated on it would never open.
+     */
+    public Command runShowShotCommand(DoubleSupplier rps) {
+        return run(
+            () -> {
+                setpointVal = rps.getAsDouble();
+                runVelocity(setpointVal);
+            });
+    }
+
     public Command runFixedCommand(DoubleSupplier velocity) {
         return run(
             () -> {

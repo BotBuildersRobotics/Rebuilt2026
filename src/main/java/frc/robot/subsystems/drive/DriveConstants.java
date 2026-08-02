@@ -18,39 +18,18 @@ import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
+import frc.robot.ShowConstants;
 import frc.robot.generated.TunerConstants;
-import frc.robot.lib.LoggedTunableNumber;
 
 import java.util.function.UnaryOperator;
 
 public class DriveConstants {
 	public static final LinearVelocity kMaxSpeed = TunerConstants.kSpeedAt12Volts;
-	public static final LinearVelocity kMaxSpeedFAST = kMaxSpeed.times(2.0);
 
 	public static final LinearAcceleration kMaxAcceleration = Units.MetersPerSecondPerSecond.of(12.0);
 	public static final AngularVelocity kMaxAngularRate = Units.RadiansPerSecond.of(2.75 * Math.PI);
-	public static final AngularVelocity kMaxAngularRateFAST = kMaxAngularRate.times(2.0);
 	public static final AngularAcceleration kMaxAngularAcceleration =
 			kMaxAngularRate.div(0.1).per(Units.Second);
-
-	// Fraction of max translational speed allowed while shooting (0.0 to 1.0)
-	private static final LoggedTunableNumber shootingSpeedFraction =
-			new LoggedTunableNumber("Drive/ShootingSpeedFraction", 0.3);
-	// Fraction of max angular rate allowed while shooting. Separate from (and lower than) the
-	// translation cap because the turret can't slew as fast as the robot can yaw — a tighter rotation
-	// limit keeps the required turret rate within what it can track, so aim doesn't lag while shooting.
-	private static final LoggedTunableNumber shootingRotationFraction =
-			new LoggedTunableNumber("Drive/ShootingRotationFraction", 0.15);
-	private static boolean shootingSpeedLimited = false;
-
-	public static void setShootingSpeedLimited(boolean limited) {
-		shootingSpeedLimited = limited;
-	}
-
-	public static boolean isShootingSpeedLimited() {
-		return shootingSpeedLimited;
-	}
-
 
 	public static final SwerveRequest.FieldCentric teleopRequest =
 			new SwerveRequest.FieldCentric().withDriveRequestType(DriveRequestType.OpenLoopVoltage);
@@ -66,19 +45,16 @@ public class DriveConstants {
 
 				SmartDashboard.putNumber("Sticks/hypot/raw", Math.hypot(xDesiredRaw, yDesiredRaw));
 
-				LinearVelocity speedLimit;
-				AngularVelocity rotLimit;
-
-				if (shootingSpeedLimited) {
-					speedLimit = DriveConstants.kMaxSpeed.times(shootingSpeedFraction.get());
-					rotLimit = DriveConstants.kMaxAngularRate.times(shootingRotationFraction.get());
-				} else if (ControlBoardConstants.mDriverController.leftStick().getAsBoolean()) {
-					speedLimit = DriveConstants.kMaxSpeedFAST;
-					rotLimit = DriveConstants.kMaxAngularRateFAST;
-				} else {
-					speedLimit = DriveConstants.kMaxSpeed;
-					rotLimit = DriveConstants.kMaxAngularRate;
-				}
+				// SHOW MODE: one speed, always. The competition logic here had three branches — a
+				// shooting cap, a left-stick turbo at 2x, and full speed otherwise — and there is now no
+				// path back to any of them. Around a crowd the robot must never be able to reach full
+				// speed, so the cap is unconditional rather than something a binding turns on and off.
+				// Rotation is capped less hard than translation because the chassis is the only aiming
+				// device in show mode.
+				LinearVelocity speedLimit =
+						DriveConstants.kMaxSpeed.times(ShowConstants.kDriveSpeedFraction.get());
+				AngularVelocity rotLimit =
+						DriveConstants.kMaxAngularRate.times(ShowConstants.kDriveRotationFraction.get());
 
 				return request.withVelocityX(speedLimit.times(xFancy))
 						.withVelocityY(speedLimit.times(yFancy))

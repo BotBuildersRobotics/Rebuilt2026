@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.ShiftHelpers;
+import frc.robot.ShowConstants;
 import frc.robot.lib.AllianceFlipUtil;
 import frc.robot.lib.LoggedTunableNumber;
 import frc.robot.subsystems.chute.ChuteSubsystem;
@@ -111,6 +112,7 @@ public class SuperSystem extends SubsystemBase {
 	public void periodic() {
 
 		updateFeedReady();
+		updateShowFeedReady();
 
 		 // Clear shooting parameters so they are recalculated each tick
     	shotCalc.clearShootingParameters();
@@ -210,6 +212,72 @@ public class SuperSystem extends SubsystemBase {
 				turret.setStowed(prevStow[0]);
 				hood.setStowed(prevStow[1]);
 			});
+	}
+
+	// --- Show / outreach mode ---------------------------------------------------------------
+
+	private final edu.wpi.first.wpilibj.Timer showAtSpeedTimer = new edu.wpi.first.wpilibj.Timer();
+	private boolean showFeedReady = false;
+
+	/**
+	 * Feed gate for the show shot: flywheel at speed <em>and</em> the turret arrived at its held
+	 * angle, both sustained for {@code Show/FeedSettleSec}. The turret term matters — the show shot
+	 * swings the turret 90 deg to the net on the trigger pull, and a 90 deg slew is not instant, so
+	 * without it the first ball of each burst leaves mid-swing and misses.
+	 *
+	 * <p>Simpler than the competition {@link #updateFeedReady()} latch on purpose: no hysteresis to
+	 * hold the feed open through tracking flickers, because nothing here is tracking a moving target.
+	 */
+	private void updateShowFeedReady() {
+		if (shooter.isAtSpeed() && turret.isOnTarget()) {
+			showAtSpeedTimer.start();
+			showFeedReady = showAtSpeedTimer.hasElapsed(ShowConstants.kFeedSettleSec.get());
+		} else {
+			showAtSpeedTimer.stop();
+			showAtSpeedTimer.reset();
+			showFeedReady = false;
+		}
+		org.littletonrobotics.junction.Logger.recordOutput("Show/FeedReady", showFeedReady);
+	}
+
+	/**
+	 * Puts the shooting mechanisms into their show-mode resting state: turret and hood stowed. In show
+	 * mode nothing ever un-stows the turret, so it stays at its zero (straight ahead, robot-relative)
+	 * for the whole event and the driver aims by pointing the chassis.
+	 */
+	public Command enterShowModeCommand() {
+		return Commands.runOnce(() -> {
+			turret.setStowed(true);
+			hood.setStowed(true);
+			shooter.clearflywheelPreset();
+		}).ignoringDisable(true);
+	}
+
+	/**
+	 * Hold-to-shoot for outreach events. Swings the turret to a fixed robot-relative angle
+	 * ({@code Show/TurretAngleDeg}, 90 deg left by default — out the side into the net) and holds a
+	 * fixed flywheel speed and hood angle from {@link ShowConstants}. No distance regression, no pose,
+	 * no vision. The feed is gated on the flywheel being at speed <em>and</em> the turret having
+	 * arrived, sustained for {@code Show/FeedSettleSec}.
+	 *
+	 * <p>On release the turret re-stows (back to 0, over the homing sensor), the shooter and hood fall
+	 * back to their default commands, and the chute/roller floor are explicitly idled — so nothing is
+	 * left running or aimed sideways if the button is released mid-feed or the command is interrupted.
+	 */
+	public Command showShotCommand() {
+		return Commands.parallel(
+			turret.runRobotRelativeHoldCommand(ShowConstants.kTurretAngleDeg::get),
+			shooter.runShowShotCommand(ShowConstants.kFlywheelRPS::get),
+			hood.runFixedCommand(ShowConstants.kHoodAngleDeg::get),
+			RollerFloorSubsystem.mInstance.runShootCommandGated(() -> showFeedReady),
+			ChuteSubsystem.mInstance.runShootCommandGated(() -> showFeedReady)
+		)
+		.beforeStarting(() -> shooter.setActivelyShooting(true))
+		.finallyDo(interrupted -> {
+			shooter.setActivelyShooting(false);
+			RollerFloorSubsystem.mInstance.applySetpoint(RollerFloorSubsystem.IDLE);
+			ChuteSubsystem.mInstance.applySetpoint(ChuteSubsystem.IDLE);
+		});
 	}
 
 	public Command ShootAuto(){

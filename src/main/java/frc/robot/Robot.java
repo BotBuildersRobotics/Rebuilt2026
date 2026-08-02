@@ -107,11 +107,11 @@ public class Robot extends LoggedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
-    SuperSystem.mInstance.clearFlywheelPreset().schedule();
     SuperSystem.mInstance.clearTurretAnglePreset().schedule();
-    SuperSystem.mInstance.stowTurret();
-    SuperSystem.mInstance.stowHood();
-    SuperSystem.mInstance.clearflywheelPreset();
+    // SHOW MODE: re-assert the stowed turret/hood every time teleop starts, so the show shot is aimed
+    // straight ahead even if an auto ran first and left the turret un-stowed. The previous
+    // stowTurret()/stowHood() calls here were no-ops — they build a command and never schedule it.
+    SuperSystem.mInstance.enterShowModeCommand().schedule();
   }
 
   /** This function is called periodically during operator control. */

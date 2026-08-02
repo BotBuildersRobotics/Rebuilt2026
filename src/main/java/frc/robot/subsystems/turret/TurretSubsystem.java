@@ -127,6 +127,17 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
   private boolean stowed = true;
   private Rotation2d turretAnglePreset = null; // null = use shot calculator
 
+  /**
+   * Show/outreach mode: hold a fixed <em>robot-relative</em> angle (null = not held). This is the
+   * same idea as {@link #stowed}, which holds 0 deg robot-relative, generalised to any angle — the
+   * turret follows the chassis instead of holding a field bearing, so it stays pointed at the same
+   * spot relative to the robot no matter how the driver spins. That is what you want aiming into a
+   * net at a demo, where there is no field pose to hold a bearing against.
+   *
+   * <p>{@link #stowed} still wins over this, because stow is what the homing/re-zero logic keys off.
+   */
+  private Rotation2d robotRelativeHold = null;
+
   private Mechanism2d turretMech;
   private MechanismLigament2d turretLigament;
   private Field2d fieldViz;
@@ -205,6 +216,10 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
           if (LOCKED_TO_ZERO || stowed) {
             goalAngle = robotAngle; // hold 0° robot-relative regardless of commands (stow overrides tracking)
             goalVelocityRadPerSec = 0.0;
+          } else if (robotRelativeHold != null) {
+            // Show mode: hold a fixed angle off the chassis (see robotRelativeHold).
+            goalAngle = robotAngle.plus(robotRelativeHold);
+            goalVelocityRadPerSec = 0.0;
           }
 
           Rotation2d robotRelativeGoalAngle = goalAngle.minus(robotAngle);
@@ -253,8 +268,13 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
       // true derivative is 0 — feeding -robotYawRate here would command the turret to counter-rotate
       // against the chassis (hold field heading), drifting it off home whenever the robot turns. So the
       // feedforward is zeroed while stowed; the position loop holds home and rejects the disturbance.
+      // A robotRelativeHold is the same case — the setpoint is a constant offset from the chassis, so
+      // its true derivative is 0 too. Feeding -robotYawRate there would drag the turret off the net
+      // whenever the driver turned.
       double robotYawRate = DriveSubsystem.mInstance.getState().Speeds.omegaRadiansPerSecond;
-      double turretVelFF = (LOCKED_TO_ZERO || stowed) ? 0.0 : (goalVelocityRadPerSec - robotYawRate);
+      double turretVelFF = (LOCKED_TO_ZERO || stowed || robotRelativeHold != null)
+          ? 0.0
+          : (goalVelocityRadPerSec - robotYawRate);
 
       // Hybrid control: while acquiring (far from target) use Motion Magic so big moves stay smoothly
       // profiled (preserves the overshoot tuning). Once close, switch to position + velocity
@@ -601,6 +621,32 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
             setShootState(ShootState.ACTIVE_SHOOTING);
           }
         });
+  }
+
+  /**
+   * Show/outreach mode: swing to and hold a fixed robot-relative angle for as long as this command
+   * runs. Positive is left (CCW looking down on the robot / from behind it), matching
+   * {@link #offsetLeft()}. 90 aims out the robot's left side.
+   *
+   * <p>Owns the turret while it runs, so it displaces the tracking default command entirely — no
+   * shot-calculator or pose lookups happen at all, which is the point at a venue with no AprilTags.
+   * Un-stows on start and re-stows on end, so the turret parks back over the homing sensor and the
+   * auto re-zero logic keeps working between shots.
+   *
+   * <p>Gate the feed on {@link #isOnTarget()} with this — a 90 deg slew is not instant, and without
+   * that gate the first ball leaves while the turret is still swinging.
+   */
+  public Command runRobotRelativeHoldCommand(java.util.function.DoubleSupplier degrees) {
+    return run(() -> {
+          robotRelativeHold = Rotation2d.fromDegrees(degrees.getAsDouble());
+          setShootState(ShootState.ACTIVE_SHOOTING);
+        })
+        .beforeStarting(() -> stowed = false)
+        .finallyDo(
+            interrupted -> {
+              robotRelativeHold = null;
+              stowed = true;
+            });
   }
 
   public void setStowed(boolean stowed) {

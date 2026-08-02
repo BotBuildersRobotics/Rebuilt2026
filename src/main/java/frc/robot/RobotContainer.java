@@ -106,6 +106,16 @@ public class RobotContainer {
 		// Dashboard buttons for zeroing mechanisms
 		SmartDashboard.putData("Zero Turret", SuperSystem.mInstance.zeroTurretCommand());
 
+		// SHOW MODE setup actions. These are needed once when the robot is set up at the venue, but must
+		// not be on the driver's controller during the show — the pivot homing routine drives the pivot
+		// down into the hard stop on current sensing, which is not something you want a stray button
+		// press doing in front of a crowd. Run "Show/Home Intake Pivot" once after power-on; the left
+		// trigger's deploy then just returns to the angle this found.
+		SmartDashboard.putData("Show/Home Intake Pivot",
+			PivotSubsystem.mInstance.findDeployLimitCommand().withName("Home Intake Pivot"));
+		SmartDashboard.putData("Show/Stow Intake Pivot",
+			PivotSubsystem.mInstance.setpointCommand(PivotSubsystem.STOW_FULL).withName("Stow Intake Pivot"));
+
 		// SignalLogger control
 		SmartDashboard.putData("SysId/Signal Logger Start", Commands.runOnce(SignalLogger::start).ignoringDisable(true).withName("Signal Logger Start"));
 		SmartDashboard.putData("SysId/Signal Logger Stop",  Commands.runOnce(SignalLogger::stop).ignoringDisable(true).withName("Signal Logger Stop"));
