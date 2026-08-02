@@ -306,7 +306,38 @@ public class SuperSystem extends SubsystemBase {
 	 *
 	 * @param held supplier that is true while the shot button is held
 	 */
-	public Command showShotCommand(BooleanSupplier held) {
+	public Command showNetShotCommand(BooleanSupplier held) {
+		return showShotCommand(
+			held,
+			ShowConstants.kTurretAngleDeg::get,
+			ShowConstants.kHoodAngleDeg::get,
+			ShowConstants.kFlywheelRPS::get);
+	}
+
+	/**
+	 * Hold-to-shoot straight ahead, flat, and gently — a soft pop for a spectator to catch, rather
+	 * than the hard shot into the net. Turret at 0 (straight forward, robot-relative), hood at 0, and
+	 * a much lower flywheel speed, all from the {@code Show/Catch*} tunables.
+	 *
+	 * <p>Identical machinery to {@link #showNetShotCommand(BooleanSupplier)} — same arrival gating,
+	 * same staged release — just different numbers. The two share every subsystem, so pressing one
+	 * while the other runs cleanly interrupts it.
+	 *
+	 * @param held supplier that is true while the shot button is held
+	 */
+	public Command showCatchShotCommand(BooleanSupplier held) {
+		return showShotCommand(
+			held,
+			ShowConstants.kCatchTurretAngleDeg::get,
+			ShowConstants.kCatchHoodAngleDeg::get,
+			ShowConstants.kCatchFlywheelRPS::get);
+	}
+
+	private Command showShotCommand(
+			BooleanSupplier held,
+			DoubleSupplier turretDeg,
+			DoubleSupplier hoodDeg,
+			DoubleSupplier flywheelRPS) {
 		// Time since the trigger came up. Only started once released, reset on every re-press.
 		final edu.wpi.first.wpilibj.Timer releaseTimer = new edu.wpi.first.wpilibj.Timer();
 
@@ -315,9 +346,9 @@ public class SuperSystem extends SubsystemBase {
 		BooleanSupplier feeding = () -> showFeedReady && held.getAsBoolean();
 
 		return Commands.parallel(
-			turret.runRobotRelativeHoldCommand(ShowConstants.kTurretAngleDeg::get),
-			shooter.runShowShotCommand(ShowConstants.kFlywheelRPS::get),
-			hood.runFixedCommand(ShowConstants.kHoodAngleDeg::get),
+			turret.runRobotRelativeHoldCommand(turretDeg),
+			shooter.runShowShotCommand(flywheelRPS),
+			hood.runFixedCommand(hoodDeg),
 			RollerFloorSubsystem.mInstance.runShootCommandGated(feeding),
 			ChuteSubsystem.mInstance.runShootCommandGated(feeding)
 		)

@@ -24,9 +24,10 @@ public class ControlSubsystem {
 	 *
 	 * <ul>
 	 *   <li><b>Left trigger</b> &mdash; hold to deploy the intake pivot and run the intake.
-	 *   <li><b>Right trigger</b> &mdash; hold for the fixed show shot: turret swings 90 deg left into
-	 *       the net, fixed flywheel and hood. See
-	 *       {@link SuperSystem#showShotCommand()} and {@link frc.robot.ShowConstants}.
+	 *   <li><b>Right trigger</b> &mdash; hold for the net shot: turret swings 90 deg left into the
+	 *       net, fixed flywheel and hood. See {@link SuperSystem#showNetShotCommand}.
+	 *   <li><b>Right bumper</b> &mdash; hold for the catch shot: straight ahead, no hood, gentle, for
+	 *       a spectator to catch. See {@link SuperSystem#showCatchShotCommand}.
 	 *   <li><b>Back</b> &mdash; re-seed field-centric heading (the robot gets carried around at a show).
 	 * </ul>
 	 *
@@ -77,7 +78,14 @@ public class ControlSubsystem {
 		// first and only then bring the turret home (see showShotCommand). The trigger is passed in so
 		// the command can see the release itself.
 		driver.rightTrigger().onTrue(
-			s.showShotCommand(driver.rightTrigger())
+			s.showNetShotCommand(driver.rightTrigger())
+		);
+
+		// Right bumper: the catch shot. Straight ahead, no hood, gentle — a soft pop for a spectator to
+		// catch. Same gating and staged release as the net shot, just different numbers. Shares every
+		// subsystem with it, so whichever is pressed second cleanly interrupts the first.
+		driver.rightBumper().onTrue(
+			s.showCatchShotCommand(driver.rightBumper())
 		);
     }
 

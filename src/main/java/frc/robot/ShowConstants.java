@@ -31,9 +31,36 @@ public final class ShowConstants {
 	public static final LoggedTunableNumber kTurretAngleDeg =
 			new LoggedTunableNumber("Show/TurretAngleDeg", 90.0);
 
+	// --- Catch shot (right bumper) ----------------------------------------------------------------
+	// A soft pop straight ahead for a spectator to catch, rather than the hard shot into the net.
+
+	/** Turret angle for the catch shot, robot-relative degrees. 0 = straight forward. */
+	public static final LoggedTunableNumber kCatchTurretAngleDeg =
+			new LoggedTunableNumber("Show/CatchTurretAngleDeg", 0.0);
+
+	/** Hood angle for the catch shot, mechanism degrees. 0 = no hood, the stowed/flat position. */
+	public static final LoggedTunableNumber kCatchHoodAngleDeg =
+			new LoggedTunableNumber("Show/CatchHoodAngleDeg", 0.0);
+
 	/**
-	 * How close the turret must be to {@link #kTurretAngleDeg} before the feed is allowed to run, in
-	 * degrees.
+	 * Flywheel velocity for the catch shot, in rotations/sec.
+	 *
+	 * <p>Deliberately far below anything the competition regression covers — its slowest entry is 160
+	 * rps for a 1 m shot, and this needs to be gentle enough for a person to catch by hand. 110 is a
+	 * starting guess, not a measured value.
+	 *
+	 * <p><b>Dial this in from below, not above.</b> Start here or lower, on an empty field, and creep
+	 * up until the ball carries far enough. Coming down from a hard shot means the first few test
+	 * shots are the dangerous ones.
+	 */
+	public static final LoggedTunableNumber kCatchFlywheelRPS =
+			new LoggedTunableNumber("Show/CatchFlywheelRPS", 110.0);
+
+	// --- Arrival gating ---------------------------------------------------------------------------
+
+	/**
+	 * How close the turret must be to its commanded angle before the feed is allowed to run, in
+	 * degrees. Applies to both shots.
 	 *
 	 * <p>Deliberately much tighter than the competition {@code Turret/OnTargetToleranceDeg} (10.5),
 	 * which is sized for keeping a moving hub shot flowing, not for a static aim into a net. At the
