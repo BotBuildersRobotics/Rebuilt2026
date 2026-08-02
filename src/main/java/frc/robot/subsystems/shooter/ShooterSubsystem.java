@@ -161,6 +161,23 @@ public class ShooterSubsystem  extends MotorSubsystem<MotorIOTalonFX> {
     }
 
     /**
+     * Show/outreach mode idle. Holds the flywheel at neutral and publishes a zero setpoint, so
+     * {@link #isAtSpeed()} reads false while idle and the feed gate cannot open.
+     *
+     * <p>Used as the show-mode default command in place of
+     * {@link #runTrackTargetActiveShootingCommand()}. That one keeps the flywheel spinning off the
+     * distance regression whenever the robot is outside the neutral zone — which, with no valid pose
+     * at a demo venue, means spinning more or less constantly for hours at a crowd.
+     */
+    public Command runIdleCommand() {
+        return run(
+            () -> {
+                setpointVal = 0.0;
+                stop();
+            });
+    }
+
+    /**
      * Show/outreach mode fixed shot. Holds the flywheel at {@code rps} with no distance regression,
      * no flywheel preset/offset, and no neutral-zone gating — none of which mean anything away from a
      * real field.

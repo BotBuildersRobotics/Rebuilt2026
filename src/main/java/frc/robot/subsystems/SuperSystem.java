@@ -94,7 +94,11 @@ public class SuperSystem extends SubsystemBase {
 			frc.robot.subsystems.drive.DriveSubsystem.mInstance.getDrivetrain().getState().Pose.getRotation().getRadians()
 			+ turret.getTurretAngle());
 		
-		shooter.setDefaultCommand(shooter.runTrackTargetActiveShootingCommand());
+		// SHOW MODE: the flywheel idles unless the shot is actually being held. The competition default
+		// (runTrackTargetActiveShootingCommand) spins off the distance regression whenever the robot is
+		// outside the neutral zone, and with no valid pose at a demo that means spinning constantly all
+		// day next to the public. Note this also means autos won't spin the flywheel on this branch.
+		shooter.setDefaultCommand(shooter.runIdleCommand());
 		turret.setDefaultCommand(turret.runTrackTargetActiveShootingCommand());
 		hood.setDefaultCommand(hood.runTrackTargetActiveShootingCommand());
 
@@ -540,7 +544,7 @@ public class SuperSystem extends SubsystemBase {
 				hood.setStowed(true);
 			}))
 			.finallyDo(() -> {
-				shooter.setDefaultCommand(shooter.runTrackTargetActiveShootingCommand());
+				shooter.setDefaultCommand(shooter.runIdleCommand()); // show mode: never restore constant spin
 				turret.setStowed(false);
 				hood.setStowed(false);
 			});
@@ -554,7 +558,7 @@ public class SuperSystem extends SubsystemBase {
 				hood.setStowed(true);
 			}))
 			.finallyDo(() -> {
-				shooter.setDefaultCommand(shooter.runTrackTargetActiveShootingCommand());
+				shooter.setDefaultCommand(shooter.runIdleCommand()); // show mode: never restore constant spin
 				turret.setStowed(false);
 				hood.setStowed(false);
 			});
@@ -661,7 +665,7 @@ public class SuperSystem extends SubsystemBase {
 			defenceModeActive = false;
 			PivotSubsystem.mInstance.applySetpoint(PivotSubsystem.DEPLOY);
 			Commands.waitSeconds(0.2);
-			shooter.setDefaultCommand(shooter.runTrackTargetActiveShootingCommand());
+			shooter.setDefaultCommand(shooter.runIdleCommand()); // show mode: never restore constant spin
 			SmartDashboard.putBoolean("SuperSystem/DefenceMode", false);
 		});
 	}
