@@ -24,7 +24,7 @@ public class ControlSubsystem {
 	 *
 	 * <ul>
 	 *   <li><b>Left trigger</b> &mdash; hold to deploy the intake pivot and run the intake.
-	 *   <li><b>Right trigger</b> &mdash; hold for the net shot: turret swings 90 deg left into the
+	 *   <li><b>Right trigger</b> &mdash; hold for the net shot: turret swings 90 deg right into the
 	 *       net, fixed flywheel and hood. See {@link SuperSystem#showNetShotCommand}.
 	 *   <li><b>Right bumper</b> &mdash; hold for the catch shot: straight ahead, no hood, gentle, for
 	 *       a spectator to catch. See {@link SuperSystem#showCatchShotCommand}.

@@ -24,12 +24,12 @@ public final class ShowConstants {
 	 * down on the robot, i.e. the robot's left as seen standing behind it looking forward. Matches the
 	 * sign of {@code TurretSubsystem.offsetLeft()}.
 	 *
-	 * <p>90 fires straight out the left side, into the net. The turret follows the chassis, so this
-	 * stays pointing at the same place relative to the robot however the driver spins; it does not
+	 * <p>-90 fires straight out the <b>right</b> side, into the net. The turret follows the chassis, so
+	 * this stays pointing at the same place relative to the robot however the driver spins; it does not
 	 * hold a field bearing. Between shots the turret returns to 0 (stowed, over the homing sensor).
 	 */
 	public static final LoggedTunableNumber kTurretAngleDeg =
-			new LoggedTunableNumber("Show/TurretAngleDeg", 90.0);
+			new LoggedTunableNumber("Show/TurretAngleDeg", -90.0);
 
 	// --- Catch shot (right bumper) ----------------------------------------------------------------
 	// A soft pop straight ahead for a spectator to catch, rather than the hard shot into the net.

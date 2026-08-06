@@ -288,7 +288,7 @@ public class SuperSystem extends SubsystemBase {
 
 	/**
 	 * Hold-to-shoot for outreach events. Swings the turret to a fixed robot-relative angle
-	 * ({@code Show/TurretAngleDeg}, 90 deg left by default — out the side into the net) and holds a
+	 * ({@code Show/TurretAngleDeg}, 90 deg right by default — out the side into the net) and holds a
 	 * fixed flywheel speed and hood angle from {@link ShowConstants}. No distance regression, no pose,
 	 * no vision. The feed is gated on the flywheel being at speed <em>and</em> the turret having
 	 * arrived, sustained for {@code Show/FeedSettleSec}.
