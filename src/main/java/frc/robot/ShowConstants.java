@@ -31,6 +31,20 @@ public final class ShowConstants {
 	public static final LoggedTunableNumber kTurretAngleDeg =
 			new LoggedTunableNumber("Show/TurretAngleDeg", -90.0);
 
+	// --- Intake -----------------------------------------------------------------------------------
+
+	/**
+	 * Intake roller voltage in show mode. The competition setpoint
+	 * ({@code IntakeConstants.kIntakeVoltage}) is 9 V, sized for sweeping fuel up at speed during a
+	 * match; that is more aggressive than a demo needs, where the robot is crawling at 10% and people
+	 * are hand-feeding it.
+	 *
+	 * <p>Too low and fuel will sit on the rollers without being drawn in — if it stops picking up
+	 * reliably, put this back up rather than making the driver nudge the robot into the ball.
+	 */
+	public static final LoggedTunableNumber kIntakeVolts =
+			new LoggedTunableNumber("Show/IntakeVolts", 5.0);
+
 	// --- Catch shot (right bumper) ----------------------------------------------------------------
 	// A soft pop straight ahead for a spectator to catch, rather than the hard shot into the net.
 

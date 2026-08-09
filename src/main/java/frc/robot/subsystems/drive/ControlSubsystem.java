@@ -65,7 +65,7 @@ public class ControlSubsystem {
 		driver.leftTrigger().whileTrue(
 			Commands.parallel(
 				PivotSubsystem.mInstance.setpointCommand(PivotSubsystem.DEPLOY),
-				s.intakeContinuousCommand()
+				s.showIntakeCommand()
 			)
 		).onFalse(
 			s.idleIntakes()

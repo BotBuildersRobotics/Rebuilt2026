@@ -145,6 +145,17 @@ public class SuperSystem extends SubsystemBase {
 		return IntakeSubsystem.mInstance.followSetpointCommand(() -> IntakeSubsystem.INTAKE);
 	}
 
+	/**
+	 * Show-mode intake: same continuous hold, but at the reduced {@code Show/IntakeVolts} rather than
+	 * the 9 V competition setpoint. Read live, so the voltage can be dialled in from the dashboard
+	 * while someone feeds the robot by hand.
+	 */
+	public Command showIntakeCommand() {
+		return IntakeSubsystem.mInstance.followSetpointCommand(
+			() -> frc.robot.lib.io.MotorIO.Setpoint.withVoltageSetpoint(
+				edu.wpi.first.units.Units.Volts.of(ShowConstants.kIntakeVolts.get())));
+	}
+
 
 	/**
 	 * Hysteretic feed-readiness latch, evaluated once per loop so the roller floor and chute share
