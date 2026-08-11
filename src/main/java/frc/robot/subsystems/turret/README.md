@@ -226,6 +226,35 @@ To read profile-following vs steady-state: `Reference` vs actual position. To va
 
 ---
 
+## 10b. Show mode: field lock and the 360° unwrap
+
+Show mode has two opposite holds, and it is worth being clear which is which:
+
+- **`runRobotRelativeHoldCommand`** — hold an angle *off the chassis*. The turret rides with the
+  robot; the yaw-rate feedforward is zeroed because the robot-relative setpoint is constant.
+- **`runFieldLockCommand`** (left bumper) — hold a *bearing in the room*. The turret counter-rotates
+  as the driver spins the chassis, so it stays aimed at one spot. The bearing is captured once at
+  button-down from `gyro yaw + turret mechanism angle` (plus `Show/FieldLockOffsetDeg`); nothing
+  reads the pose estimator, so it works with no AprilTags. Gyro drift shows up as the aim slowly
+  walking — irrelevant over a demo-length hold. The yaw-rate FF *does* apply here: the setpoint's
+  true derivative is `-robotYawRate`, which is exactly the case §7a's feedforward was written for.
+
+**The wrap.** Travel is ±180°, exactly one turn. Spin the chassis far enough one way and the
+field-locked setpoint walks into a limit; the same bearing then exists one full turn the other way,
+so the turret unwraps 360° and carries on. That is what keeps the cable alive when the robot is spun
+in one direction all afternoon.
+
+Because the window is exactly one turn, **only one wrap of a bearing is ever legal**, so the unwrap
+can't be done early — it happens right at the boundary. The chatter guard is therefore in *time*,
+not position (`fieldLockSetpoint`): a wrap is taken only if the setpoint is past the limit by more
+than `Turret/FieldLock/WrapDeadbandDeg`, or if the last wrap was over
+`Turret/FieldLock/WrapLockoutSec` ago. Otherwise it clamps to the stop — a few degrees of aim error
+no spectator will notice — while `lastGoalAngle` keeps the *un-wrapped* branch, so a genuine
+continued rotation still unwraps once instead of nudging back and forth. Watch
+`Turret/FieldLock/WrapCount`: it should tick once per revolution of sustained spinning, never rapidly.
+
+---
+
 ## 11. Tunables quick reference (current defaults)
 
 **Control mode**
@@ -251,6 +280,11 @@ To read profile-following vs steady-state: `Reference` vs actual position. To va
 
 **On target**
 - `Turret/OnTargetToleranceDeg` = 10.5
+
+**Show field lock (§10b)**
+- `Show/FieldLockOffsetDeg` = 0 — bearing offset applied at capture; positive = left.
+- `Turret/FieldLock/WrapDeadbandDeg` = 3.0 — overshoot past the limit needed to wrap during lockout.
+- `Turret/FieldLock/WrapLockoutSec` = 1.0 — quiet period after a wrap before another is allowed.
 
 **Feed (SuperSystem)**
 - `SuperSystem/FeedSettleSeconds` = 0.12 — arm time.

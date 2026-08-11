@@ -28,6 +28,8 @@ public class ControlSubsystem {
 	 *       net, fixed flywheel and hood. See {@link SuperSystem#showNetShotCommand}.
 	 *   <li><b>Right bumper</b> &mdash; hold for the catch shot: straight ahead, no hood, gentle, for
 	 *       a spectator to catch. See {@link SuperSystem#showCatchShotCommand}.
+	 *   <li><b>Left bumper</b> &mdash; hold to lock the turret on its current bearing, so it stays
+	 *       pointing at one spot while the robot spins. See {@link SuperSystem#showFieldLockCommand}.
 	 *   <li><b>Back</b> &mdash; re-seed field-centric heading (the robot gets carried around at a show).
 	 * </ul>
 	 *
@@ -86,6 +88,15 @@ public class ControlSubsystem {
 		// subsystem with it, so whichever is pressed second cleanly interrupts the first.
 		driver.rightBumper().onTrue(
 			s.showCatchShotCommand(driver.rightBumper())
+		);
+
+		// Left bumper: field lock. The turret grabs the bearing it is pointing at and holds it while the
+		// driver spins the robot — the turret visibly counter-rotating to stay aimed at one spot is the
+		// whole trick. whileTrue, not onTrue: no ball is in flight, so it can stow the instant the
+		// bumper comes up. The turret unwraps itself at its travel limit so the cable survives being
+		// spun in one direction all afternoon.
+		driver.leftBumper().whileTrue(
+			s.showFieldLockCommand()
 		);
     }
 

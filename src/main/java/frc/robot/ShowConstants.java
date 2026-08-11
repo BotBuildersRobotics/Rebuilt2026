@@ -31,6 +31,18 @@ public final class ShowConstants {
 	public static final LoggedTunableNumber kTurretAngleDeg =
 			new LoggedTunableNumber("Show/TurretAngleDeg", -90.0);
 
+	/**
+	 * Bearing offset applied when the field lock (left bumper) is engaged, in degrees. Positive is
+	 * <b>left</b>, same sign convention as {@link #kTurretAngleDeg}.
+	 *
+	 * <p>0 means "hold whatever the turret is pointing at when the bumper goes down" — with the turret
+	 * stowed between shots that is straight out the front of the robot, so the driver aims by parking
+	 * the robot, presses, and can then spin the chassis while the turret stays put. Set this to -90 to
+	 * instead lock onto the net's direction from the robot's right side, mirroring the net shot.
+	 */
+	public static final LoggedTunableNumber kFieldLockOffsetDeg =
+			new LoggedTunableNumber("Show/FieldLockOffsetDeg", 0.0);
+
 	// --- Intake -----------------------------------------------------------------------------------
 
 	/**

@@ -138,6 +138,36 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
    */
   private Rotation2d robotRelativeHold = null;
 
+  /**
+   * Show/outreach mode: hold a fixed <em>field</em> bearing (null = not held). The opposite of
+   * {@link #robotRelativeHold} — the turret counter-rotates against the chassis so it keeps pointing
+   * at the same spot in the room while the driver spins the robot, which is the whole point of the
+   * demo. Captured once when the hold starts (see {@link #runFieldLockCommand}), not tracked from a
+   * pose estimate, so it works at a venue with no AprilTags: the drive gyro alone carries it.
+   *
+   * <p>{@link #stowed} still wins over this, as it does over {@link #robotRelativeHold}.
+   */
+  private Rotation2d fieldLockAngle = null;
+
+  // --- Field-lock cable safety ------------------------------------------------------------
+  // The turret has one turn of travel (+/-180). Holding a field bearing while the chassis spins
+  // walks the robot-relative setpoint straight into that limit, so at the limit the turret has to
+  // unwrap: the same bearing, one full turn the other way. The window is exactly 360 wide, so
+  // exactly one wrap of a given bearing is ever legal and the unwrap cannot be done early — it
+  // happens right at the boundary. That makes boundary chatter the real risk: yaw noise either side
+  // of the limit would otherwise command a 360 sweep, then another back, indefinitely.
+  //
+  // So a wrap is only taken when the setpoint is past the limit by more than kWrapDeadbandDeg, or
+  // when the last wrap was longer than kWrapLockoutSec ago. Inside that window the setpoint is
+  // simply clamped to the limit — the turret sits at the stop a few degrees off the true bearing,
+  // which no one at a show will see, instead of spinning back and forth.
+  private static final LoggedTunableNumber fieldLockWrapDeadbandDeg =
+      new LoggedTunableNumber("Turret/FieldLock/WrapDeadbandDeg", 3.0);
+  private static final LoggedTunableNumber fieldLockWrapLockoutSec =
+      new LoggedTunableNumber("Turret/FieldLock/WrapLockoutSec", 1.0);
+  private double lastFieldLockWrapTime = Double.NEGATIVE_INFINITY;
+  private int fieldLockWrapCount = 0;
+
   private Mechanism2d turretMech;
   private MechanismLigament2d turretLigament;
   private Field2d fieldViz;
@@ -220,6 +250,10 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
             // Show mode: hold a fixed angle off the chassis (see robotRelativeHold).
             goalAngle = robotAngle.plus(robotRelativeHold);
             goalVelocityRadPerSec = 0.0;
+          } else if (fieldLockAngle != null) {
+            // Show mode: hold a fixed bearing in the room while the chassis turns under it.
+            goalAngle = fieldLockAngle;
+            goalVelocityRadPerSec = 0.0;
           }
 
           Rotation2d robotRelativeGoalAngle = goalAngle.minus(robotAngle);
@@ -242,21 +276,27 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
             case ACTIVE_SHOOTING -> maxAngle;
             case TRACKING -> trackMaxAngle;
           };
-      for (int i = -2; i < 3; i++) {
-        double potentialSetpoint = robotRelativeGoalAngle.getRadians() + Math.PI * 2.0 * i;
-        if (potentialSetpoint < minLegalAngle || potentialSetpoint > maxLegalAngle) {
-          continue;
-        } else {
-          if (!hasBestAngle) {
-            bestAngle = potentialSetpoint;
-            hasBestAngle = true;
-          }
-          if (Math.abs(lastGoalAngle - potentialSetpoint) < Math.abs(lastGoalAngle - bestAngle)) {
-            bestAngle = potentialSetpoint;
+      if (fieldLockAngle != null) {
+        // Field lock has its own wrap rule (chatter-proofed at the travel limit) — see
+        // fieldLockSetpoint. It maintains lastGoalAngle itself.
+        bestAngle = fieldLockSetpoint(robotRelativeGoalAngle.getRadians(), minLegalAngle, maxLegalAngle);
+      } else {
+        for (int i = -2; i < 3; i++) {
+          double potentialSetpoint = robotRelativeGoalAngle.getRadians() + Math.PI * 2.0 * i;
+          if (potentialSetpoint < minLegalAngle || potentialSetpoint > maxLegalAngle) {
+            continue;
+          } else {
+            if (!hasBestAngle) {
+              bestAngle = potentialSetpoint;
+              hasBestAngle = true;
+            }
+            if (Math.abs(lastGoalAngle - potentialSetpoint) < Math.abs(lastGoalAngle - bestAngle)) {
+              bestAngle = potentialSetpoint;
+            }
           }
         }
+        lastGoalAngle = bestAngle;
       }
-      lastGoalAngle = bestAngle;
 
       double clampedAngle = MathUtil.clamp(bestAngle, minLegalAngle, maxLegalAngle);
       lastClampedAngle = clampedAngle; // remember the commanded setpoint for isOnTarget()
@@ -356,6 +396,63 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
     LoggedTracer.record("TurretPeriodic");
 
    }
+
+  /**
+   * Picks the mechanism setpoint for a field-locked hold, wrapping it back into the turret's one
+   * turn of travel when the chassis has rotated far enough to push it past a limit.
+   *
+   * <p>Starts from the wrap of the requested robot-relative angle nearest to where the turret
+   * already is, so it stays on its current branch as long as that is legal. Once it isn't, the same
+   * bearing is one full turn away in the other direction — a 360 deg unwrap, which is the motion
+   * that keeps the cable intact instead of the turret winding into its hard stop.
+   *
+   * <p>The travel window is exactly one turn, so exactly one wrap of any bearing is legal at a time
+   * and the unwrap can only happen right at the limit — there is no room to do it early. The guard
+   * against yaw noise pinballing across that boundary is therefore in time, not position: a wrap is
+   * only taken if the setpoint is past the limit by more than {@code FieldLock/WrapDeadbandDeg}, or
+   * if the last wrap was more than {@code FieldLock/WrapLockoutSec} ago. Otherwise the setpoint is
+   * held at the limit, a few degrees off the true bearing — invisible at a demo, unlike a turret
+   * spinning full circles back and forth.
+   *
+   * <p>Maintains {@link #lastGoalAngle} itself: on a clamp it stores the un-wrapped branch, so the
+   * turret is still remembered as being on that side of the limit and a genuine continued rotation
+   * eventually unwraps once rather than nudging back and forth.
+   */
+  private double fieldLockSetpoint(double robotRelativeGoalRad, double minLegal, double maxLegal) {
+    double turn = Math.PI * 2.0;
+    double nearest =
+        robotRelativeGoalRad + turn * Math.round((lastGoalAngle - robotRelativeGoalRad) / turn);
+
+    if (nearest >= minLegal && nearest <= maxLegal) {
+      lastGoalAngle = nearest;
+      return nearest;
+    }
+
+    boolean overMax = nearest > maxLegal;
+    double overshoot = overMax ? nearest - maxLegal : minLegal - nearest;
+    boolean lockedOut =
+        (Timer.getFPGATimestamp() - lastFieldLockWrapTime) < fieldLockWrapLockoutSec.get();
+
+    if (lockedOut && overshoot <= Units.degreesToRadians(fieldLockWrapDeadbandDeg.get())) {
+      // Sit at the stop for now; stay on this branch so a real, sustained rotation still unwraps.
+      lastGoalAngle = nearest;
+      return MathUtil.clamp(nearest, minLegal, maxLegal);
+    }
+
+    double wrapped = overMax ? nearest - turn : nearest + turn;
+    if (wrapped < minLegal || wrapped > maxLegal) {
+      // No legal wrap exists (only possible if the travel window is under one full turn). Hold at
+      // the stop rather than commanding something the mechanism cannot reach.
+      lastGoalAngle = nearest;
+      return MathUtil.clamp(nearest, minLegal, maxLegal);
+    }
+
+    lastFieldLockWrapTime = Timer.getFPGATimestamp();
+    fieldLockWrapCount++;
+    Logger.recordOutput("Turret/FieldLock/WrapCount", fieldLockWrapCount);
+    lastGoalAngle = wrapped;
+    return wrapped;
+  }
 
    private void setFieldRelativeTarget(Rotation2d angle) {
     this.goalAngle = angle;
@@ -665,6 +762,55 @@ public class TurretSubsystem extends MotorSubsystem<MotorIO> {
    */
   public void releaseRobotRelativeHold() {
     robotRelativeHold = null;
+    stowed = true;
+  }
+
+  /**
+   * Show/outreach mode: lock the turret onto the bearing it is pointing at <em>right now</em> and
+   * hold it there while the command runs, so the driver can spin the chassis under it and the turret
+   * stays aimed at the same spot in the room. The counterpart to
+   * {@link #runRobotRelativeHoldCommand} — that one rides with the chassis, this one refuses to.
+   *
+   * <p>The bearing is captured once, at start, from the drive's rotation plus the turret's current
+   * mechanism angle. Nothing here reads the pose estimator or a target: the gyro alone holds the
+   * bearing, which is what makes it usable at a venue with no AprilTags. Gyro drift shows up as the
+   * aim slowly walking, which over a demo-length hold is not worth correcting.
+   *
+   * <p>Cable safety is handled in {@link #fieldLockSetpoint}: keep rotating the same way and the
+   * turret unwraps a full turn at its travel limit rather than winding up against the hard stop.
+   *
+   * <p>Unlike {@link #runRobotRelativeHoldCommand} this does release its hold when it ends (on
+   * interruption too) and returns the turret to stow, where the homing sensor can re-zero it. There
+   * is no feed involved, so there is nothing in flight to protect.
+   *
+   * @param offsetDegrees extra bearing offset applied at capture, degrees, positive left (CCW)
+   */
+  public Command runFieldLockCommand(java.util.function.DoubleSupplier offsetDegrees) {
+    return runOnce(() -> {
+          stowed = false;
+          robotRelativeHold = null;
+          lastFieldLockWrapTime = Double.NEGATIVE_INFINITY;
+          Rotation2d robotAngle = DriveSubsystem.mInstance.getState().Pose.getRotation();
+          fieldLockAngle =
+              robotAngle
+                  .plus(Rotation2d.fromRadians(getTurretAngle()))
+                  .plus(Rotation2d.fromDegrees(offsetDegrees.getAsDouble()));
+          // Start from where the turret actually is, so the wrap logic keeps it on its current turn
+          // instead of picking a branch a full revolution away on the first loop.
+          lastGoalAngle = getPosition().in(Radians);
+          setShootState(ShootState.ACTIVE_SHOOTING);
+          Logger.recordOutput("Turret/FieldLock/BearingDeg", fieldLockAngle.getDegrees());
+        })
+        .andThen(run(() -> Logger.recordOutput("Turret/FieldLock/Active", true)))
+        .finallyDo(() -> {
+          releaseFieldLock();
+          Logger.recordOutput("Turret/FieldLock/Active", false);
+        });
+  }
+
+  /** Drops a {@link #runFieldLockCommand} hold and returns the turret to stow. */
+  public void releaseFieldLock() {
+    fieldLockAngle = null;
     stowed = true;
   }
 

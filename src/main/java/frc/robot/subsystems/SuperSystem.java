@@ -344,6 +344,20 @@ public class SuperSystem extends SubsystemBase {
 			ShowConstants.kCatchFlywheelRPS::get);
 	}
 
+	/**
+	 * Hold-to-lock for outreach events: the turret pins itself to the bearing it is pointing at when
+	 * the button goes down and stays aimed there while the driver spins the chassis underneath it.
+	 * Purely a turret demo — no flywheel, no hood, no feed, nothing to shoot.
+	 *
+	 * <p>Bind with {@code whileTrue}: unlike the shots there is nothing in flight on release, so the
+	 * turret can go straight back to stow the moment the button comes up. Turret travel limits and the
+	 * 360 deg unwrap that keeps the cable intact are handled inside
+	 * {@link frc.robot.subsystems.turret.TurretSubsystem#runFieldLockCommand}.
+	 */
+	public Command showFieldLockCommand() {
+		return turret.runFieldLockCommand(ShowConstants.kFieldLockOffsetDeg::get);
+	}
+
 	private Command showShotCommand(
 			BooleanSupplier held,
 			DoubleSupplier turretDeg,
